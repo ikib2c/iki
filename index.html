@@ -633,8 +633,8 @@ footer a:hover{color:var(--cr)}
 
 <!-- ============ Marquesina ============ -->
 <div class="marquee" aria-hidden="true"><div class="mq">
-  <span>Envíos a todo el país</span><span>Hallazgos que se vuelven sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
-  <span>Envíos a todo el país</span><span>Hallazgos que se vuelven sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
+  <span>Envíos a todo el país</span><span>Detalles que se vuelven sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
+  <span>Envíos a todo el país</span><span>Detalles que se vuelven sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
 </div></div>
 
 <!-- ============ Catálogo ============ -->
@@ -681,7 +681,7 @@ footer a:hover{color:var(--cr)}
 
 <!-- ============ Banda de contacto ============ -->
 <div class="news"><div class="wrap">
-  <div><h2>Hallazgos que se vuelven sonrisas.</h2><div>Cuéntanos qué buscas y te ayudamos a encontrarlo.</div></div>
+  <div><h2>Detalles que se vuelven sonrisas.</h2><div>Cuéntanos qué buscas y te ayudamos a encontrarlo.</div></div>
   <a class="btn" id="waNews" href="#" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
 </div></div>
 
@@ -1618,26 +1618,58 @@ function scrollToProduct(id){
 function scrollToTop(){window.scrollTo({top:0,behavior:"smooth"});}
 async function shareCatalog(){
   let url="";try{url=location.origin+location.pathname;}catch(e){url=location.href;}
-  const texto="IKI — joyas, moda y regalos con envíos a toda Colombia.";
   track("Lead",{content_name:"Compartir tienda"});
   try{
     if(navigator.share&&navigator.canShare){
-      try{
-        const r=await fetch((TIENDA.logo&&TIENDA.logo.indexOf("http")===0)?TIENDA.logo:"logo_512.png",{mode:"cors"});
-        const b=await r.blob();
-        const file=new File([b],"iki-logo.png",{type:(b.type||"image/png")});
-        if(navigator.canShare({files:[file]})){
-          await navigator.share({text:texto,url:url,files:[file]});
-          return;
-        }
-      }catch(e){}
-      await navigator.share({title:"IKI",text:texto,url:url});
+      const tarjeta=await crearTarjetaCompartir();
+      if(tarjeta&&navigator.canShare({files:[tarjeta]})){
+        /* Solo la imagen: el nombre, el eslogan y la direccion van DIBUJADOS
+           dentro, asi texto y logo llegan juntos y nunca por separado. */
+        await navigator.share({files:[tarjeta]});
+        return;
+      }
+      await navigator.share({title:"IKI",text:"IKI — joyas, moda y regalos con envíos a toda Colombia.",url:url});
       return;
     }
   }catch(e){}
   if(navigator.clipboard&&navigator.clipboard.writeText){
+    const texto="IKI — joyas, moda y regalos con envíos a toda Colombia.";
     navigator.clipboard.writeText(texto+" "+url).then(()=>showToast("Enlace copiado. Compártelo donde quieras")).catch(()=>window.prompt("Copia este enlace:",texto+" "+url));
-  }else window.prompt("Copia este enlace:",texto+" "+url);
+  }else window.prompt("Copia este enlace:","IKI — joyas, moda y regalos "+url);
+}
+
+/* Tarjeta para compartir: 1080x1080 con logo transparente, nombre, eslogan
+   y direccion dibujados en canvas. Todo en una sola imagen. */
+async function crearTarjetaCompartir(){
+  try{
+    const logo=new Image();
+    logo.src="logo_512.png";
+    await logo.decode();
+    const cv=document.createElement("canvas");
+    cv.width=1080;cv.height=1080;
+    const cx=cv.getContext("2d");
+    cx.fillStyle="#FFF8E9";cx.fillRect(0,0,1080,1080);
+    /* logo centrado */
+    cx.drawImage(logo,330,150,420,420);
+    /* nombre */
+    cx.textAlign="center";
+    cx.fillStyle="#242424";
+    cx.font="700 130px Montserrat, Arial, sans-serif";
+    cx.fillText("IKI",540,720);
+    /* eslogan */
+    cx.fillStyle="#6B645A";
+    cx.font="500 46px Poppins, Arial, sans-serif";
+    cx.fillText("Joyas, moda y regalos",540,820);
+    cx.fillText("con envíos a toda Colombia",540,882);
+    /* direccion (clicleable al escribirla) */
+    cx.fillStyle="#242424";
+    cx.font="600 44px Montserrat, Arial, sans-serif";
+    let host="ikib2c.github.io/iki";
+    try{host=location.host+(location.pathname==="/"?"":location.pathname).replace(/^\//,"");}catch(e){}
+    cx.fillText(host,540,975);
+    const blob=await new Promise(function(res){cv.toBlob(res,"image/png");});
+    return new File([blob],"iki-tienda.png",{type:"image/png"});
+  }catch(e){return null;}
 }
 
 /* ===== Carruseles ===== */
