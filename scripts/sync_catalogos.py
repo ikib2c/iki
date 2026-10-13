@@ -243,43 +243,30 @@ def opciones_shopify(p):
     return grupos or None
 
 def curar_joyas_gava(prods, h2c):
-    """28 joyas: 2 por coleccion, precios 20k-200k, nombres unicos y limpios."""
+    """TODOS los productos de Gava con imagen y precio valido, dedup por nombre.
+    Ya no filtra por coleccion: carga el inventario completo y deduplica."""
     FIX = {"Dije e cruz con piedra Jade": "Dije de cruz con piedra Jade",
            "Aretes De Filigrana": "Aretes de Filigrana"}
-    REEMPLAZO_HANDLE = {"set-perla-copia": "set-perla-cruz-copia"}  # evita nombre duplicado
-    orden = ["anillos", "silver-gold", "aretes-con-piedras", "brazalete", "cadena", "candongas",
-             "choker", "earcuff", "filigrana", "pulseras", "topos", "coleccion-flores",
-             "coleccion-piedra-jade", "campana", "coleccion-de-insectos", "esmeralda-lab"]
-    COLEC_NOMBRES = {"anillos": "Anillos", "silver-gold": "Aretes", "aretes-con-piedras": "Aretes con Piedras",
-                      "brazalete": "Brazalete", "cadena": "Cadena", "candongas": "Candongas",
-                      "choker": "Collares", "earcuff": "Earcuff", "filigrana": "Filigrana",
-                      "pulseras": "Pulseras", "topos": "Topos", "coleccion-flores": "Colección Flores",
-                      "coleccion-piedra-jade": "Colección Piedra Jade", "campana": "Pulsera Religiosas",
-                      "coleccion-de-insectos": "Colección de Insectos", "esmeralda-lab": "Esmeralda de Laboratorio"}
-    por_h = {p["handle"]: p for p in prods}
     vistos, sel = set(), []
-    for h in orden:
-        nombre_colec = COLEC_NOMBRES[h]
-        for p in prods:
-            if nombre_colec not in h2c.get(p["handle"], []):
-                continue
-            h_real = REEMPLAZO_HANDLE.get(p["handle"], p["handle"])
-            if h_real != p["handle"] and h_real in por_h:
-                p = por_h[h_real]
-            precio = float(p["variants"][0]["price"]) if p.get("variants") else 0
-            if not (5000 <= precio <= 500000) or not p.get("images"):
-                continue
-            nombre = re.sub(r"\s+", " ", p["title"]).strip()
-            nombre = FIX.get(nombre, titulo(nombre))
-            if nombre.lower() in vistos:
-                continue
-            vistos.add(nombre.lower())
-            sel.append({"nombre": nombre, "precio": int(precio),
-                        "imgs": ["https:" + im["src"] if im["src"].startswith("//") else im["src"]
-                                 for im in p["images"][:4]],
-                        "var": None})
-    sel.sort(key=lambda x: x["precio"])  # ids estables: j01 = mas economico
+    for p in prods:
+        if not p.get("images"):
+            continue
+        precio = float(p["variants"][0]["price"]) if p.get("variants") else 0
+        if not (5000 <= precio <= 500000):
+            continue
+        nombre = re.sub(r"\s+", " ", p["title"]).strip()
+        nombre = FIX.get(nombre, titulo(nombre))
+        if not nombre or nombre.lower() in vistos:
+            continue
+        vistos.add(nombre.lower())
+        imgs = ["https:" + im["src"] if im["src"].startswith("//") else im["src"]
+                for im in p["images"][:4]]
+        sel.append({"nombre": nombre, "precio": int(precio),
+                    "imgs": imgs, "var": None,
+                    "sku": (str(p["variants"][0].get("sku") or "").strip() or None) if p.get("variants") else None})
+    sel.sort(key=lambda x: x["precio"])
     return sel
+
 
 def curar_moda_majestic(items):
     """14 prendas: 2 por categoria del proveedor, precios 18k-110k, con tallas."""
