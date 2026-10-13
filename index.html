@@ -938,16 +938,14 @@ footer a:hover{color:var(--cr)}
       <div class="admin-h">Ganancia por categoría <small>deja vacío para usar la ganancia general</small></div>
       <div class="admin-cats" id="adminCats"></div>
 
-      <div class="admin-h">Inicio: producto destacado y favoritos</div>
-      <input class="admin-buscar" id="adminBuscarHero" placeholder="Busca el producto del héroe… ej: filigrana, pijama, peluche" oninput="buscarAdminHero()">
+      <div class="admin-h">Galería del héroe <small>hasta 6 productos en la portada (solo escritorio)</small></div>
+      <input class="admin-buscar" id="adminBuscarHero" placeholder="Busca productos para el héroe… ej: esmeralda, anillo, pijama" oninput="buscarAdminHero()">
       <div class="admin-fijados" id="adminResHero"></div>
-      <div class="admin-grid">
-        <label class="admin-label">Id del producto destacado<input id="adminDestacado" placeholder="j243"></label>
-      </div>
+      <div class="admin-fijados" id="adminHeroLista"></div>
+      <div class="admin-h">Favoritos del carrusel <small>productos destacados en la fila de favoritos</small></div>
       <input class="admin-buscar" id="adminBuscarFav" placeholder="Busca productos para el carrusel de favoritos…" oninput="buscarAdminFav()">
       <div class="admin-fijados" id="adminResFav"></div>
       <div class="admin-fijados" id="adminFavoritosLista"></div>
-
       <div class="admin-h">Comportamiento de la tienda</div>
       <div class="admin-grid">
         <label class="admin-check"><input type="checkbox" id="adminContraEntrega" checked> Ofrecer <strong>pago contra entrega</strong> (el cliente paga al recibir). Desmárcala y solo quedará Transferencia</label>
@@ -1037,7 +1035,7 @@ const TIENDA_DEFECTO={
   razonSocial:"",nit:"",direccion:"",email:"",
   instagram:"",tiktok:"",
   pixelMeta:"",ga4:"",
-  destacado:"j243",
+  heroIds:"j243,j262,j315,j244,j222,j178",
   favoritos:"j243,j262,j315,j244,j222,j178",
   pagoContraEntrega:true,
   vaciarCarrito:true,
@@ -1065,7 +1063,7 @@ function cargarTienda(){
     razonSocial:str(g.razonSocial,""),nit:str(g.nit,""),direccion:str(g.direccion,""),email:str(g.email,""),
     instagram:str(g.instagram,""),tiktok:str(g.tiktok,""),
     pixelMeta:str(g.pixelMeta,""),ga4:str(g.ga4,""),
-    destacado:str(g.destacado,TIENDA_DEFECTO.destacado),
+    heroIds:str(g.heroIds||g.destacado,TIENDA_DEFECTO.heroIds),
     favoritos:str(g.favoritos,TIENDA_DEFECTO.favoritos),
     pagoContraEntrega:si(g.pagoContraEntrega,TIENDA_DEFECTO.pagoContraEntrega),
     vaciarCarrito:si(g.vaciarCarrito,TIENDA_DEFECTO.vaciarCarrito),
@@ -1098,7 +1096,7 @@ function aplicarTienda(){
   CONFIG.whatsapp=TIENDA.whatsappPedidos;
   CONFIG.whatsappPedidos=TIENDA.whatsappPedidos;
   CONFIG.whatsappAtencion=TIENDA.whatsappAtencion||TIENDA.whatsappPedidos;
-  CONFIG.destacado=TIENDA.destacado;
+  CONFIG.heroIds=TIENDA.heroIds.split(",").map(function(s){return s.trim();}).filter(Boolean);
   CONFIG.favoritosIds=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
   CONFIG.vaciarCarritoTrasPedido=TIENDA.vaciarCarrito;
   CONFIG.pagoContraEntrega=TIENDA.pagoContraEntrega;
@@ -1126,14 +1124,14 @@ function precioFinal(p){
   return redondearPrecio(p.p*PRECIOS.multiplicadorBase*(1+margen));
 }
 function recargarPrecios(){
-  window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){
-    return Object.assign({},p,{p:precioFinal(p)});
+  window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p,i){
+    return Object.assign({},p,{p:precioFinal(p),cid:"IKI-"+String(i+1).padStart(4,"0")});
   });
   pagina=1;
   renderGrid();initCarouseles();actualizarHero();renderCart();
 }
-window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){
-  return Object.assign({},p,{p:precioFinal(p)});
+window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p,i){
+  return Object.assign({},p,{p:precioFinal(p),cid:"IKI-"+String(i+1).padStart(4,"0")});
 });
 /* ============================================================ */
 
@@ -1577,7 +1575,8 @@ function sendOrder(){
     const p=prod(it.id);
     if(!p)return;
     m+="\u2022 *"+it.qty+" x "+p.n+"*"+(it.var?varTxt(it.var):"")+"\n";
-    if(p.sku)m+="   Ref: "+p.sku+"\n";
+    if(p.sku)m+="   Ref: "+p.sku+" · Cat: "+(p.cid||"")+"\n";
+    else if(p.cid)m+="   Cat: "+p.cid+"\n";
     m+="   "+cop(p.p*it.qty)+(it.qty>1?" ("+cop(p.p)+" c/u)":"")+"\n";
   });
   m+="\n*TOTAL PRODUCTOS: "+cop(s.total)+"*\n";
@@ -1586,7 +1585,11 @@ function sendOrder(){
   track("Lead",{value:s.total,currency:"COP",num_items:s.count,content_name:"Pedido WhatsApp"});
   /* wa.me abre WhatsApp DIRECTO en cualquier dispositivo: sin selector
      de apps, sin fricción, cero pérdida de ventas por confusion. */
-  window.open(waLink(m),"_blank");
+  if(navigator.share&&navigator.canShare&&cart.length){
+    enviarPedidoConImagen(m);
+  }else{
+    window.open(waLink(m),"_blank");
+  }
   closeOrderForm();
   showToast("¡Pedido enviado! Termina de confirmarlo por WhatsApp");
   if(CONFIG.vaciarCarritoTrasPedido){
@@ -1660,12 +1663,12 @@ async function crearHojaPedido(){
       cx.font="600 38px Poppins, Arial, sans-serif";
       cx.fillText(p.n.length>34?p.n.slice(0,33)+"…":p.n,248,y+52);
       let linea2=y+96;
-      if(p.sku){
-        cx.fillStyle="#6B645A";
-        cx.font="500 30px Poppins, Arial, sans-serif";
-        cx.fillText("Ref: "+p.sku,248,linea2);
-        linea2+=40;
-      }
+      cx.fillStyle="#6B645A";
+      cx.font="500 30px Poppins, Arial, sans-serif";
+      let refParts=[];
+      if(p.cid)refParts.push("Cat: "+p.cid);
+      if(p.sku)refParts.push("Ref: "+p.sku);
+      if(refParts.length){cx.fillText(refParts.join(" · "),248,linea2);linea2+=40;}
       if(it.var){
         cx.fillStyle="#6B645A";
         cx.font="500 28px Poppins, Arial, sans-serif";
@@ -1697,6 +1700,21 @@ async function crearHojaPedido(){
     const blob=await new Promise(function(res){cv.toBlob(res,"image/png");});
     return new File([blob],"pedido-iki.png",{type:"image/png"});
   }catch(e){return null;}
+}
+
+/* Envia el pedido con IMAGEN: una hoja-resumen con la miniatura de cada
+   producto. El vendedor identifica visualmente lo que le piden (algunos
+   proveedores no usan SKU ni referencias). navigator.share abre el
+   selector del sistema; si falla, cae al texto directo por wa.me. */
+async function enviarPedidoConImagen(msg){
+  try{
+    const hoja=await crearHojaPedido();
+    if(hoja&&navigator.canShare&&navigator.canShare({files:[hoja]})){
+      await navigator.share({text:msg,files:[hoja]});
+      return;
+    }
+  }catch(e){}
+  window.open(waLink(msg),"_blank");
 }
 
 /* ===== Lightbox ===== */
@@ -2001,25 +2019,22 @@ function iniciarDeriva(){
 }
 
 /* ===== Héroe ===== */
-/* Hero: galería de esmeraldas de laboratorio (solo escritorio).
-   Cada foto es CLICABLE y lleva directo a la tarjeta del producto. */
-const HERO_ESMERALDAS={
-  imgs:["https://cdn.shopify.com/s/files/1/0755/0605/7437/files/11.jpg?v=1791260534","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6117.jpg?v=1776044646","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/A330ED2C-C7B7-4B98-B159-94C21BC667E6.jpg?v=1776050822","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsApp_Image_2026-09-25_at_1.10.24_PM.jpg?v=1791254780","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/6.jpg?v=1791257437","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-11at12.55.29AM_3.jpg?v=1762863930"],
-  nombres:["Anillo Cuadrado esmeralda Siver","Cadena con dije Esmeralda Ojo","Set Esmeralda Ojo","Esmeralda Corazon Silver","Topo Baguette Esmeralda Silver","Pulsera con dije Esmeralda Gota 8mm"],
-  precios:[75000,80000,150000,75000,69000,55000],
-  ids:["j243","j262","j315","j244","j222","j178"]
-};
+/* Hero: galería configurable desde el panel de administración.
+   TIENDA.heroIds contiene los IDs de hasta 6 productos; se renderizan
+   sus fotos, nombres y precios con overlay de marca. */
 function actualizarHero(){
   const gal=$("heroGal");
   if(!gal)return;
+  const ids=(TIENDA.heroIds||"").split(",").map(function(s){return s.trim();}).filter(Boolean);
   let h="";
-  for(let i=0;i<HERO_ESMERALDAS.imgs.length;i++){
-    const pid=HERO_ESMERALDAS.ids[i];
-    h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+HERO_ESMERALDAS.nombres[i]+'">'
-      +'<img src="'+HERO_ESMERALDAS.imgs[i]+'" alt="'+HERO_ESMERALDAS.nombres[i]+'" decoding="async" loading="eager">'
-      +'<div class="hg-info"><b>'+HERO_ESMERALDAS.nombres[i]+'</b><span>'+cop(HERO_ESMERALDAS.precios[i])+'</span></div>'
+  ids.forEach(function(pid){
+    const p=window.PRODUCTOS.find(function(x){return x.id===pid;});
+    if(!p||!p.img)return;
+    h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+p.n+'">'
+      +'<img src="'+p.img+'" alt="'+p.n+'" decoding="async" loading="eager">'
+      +'<div class="hg-info"><b>'+p.n+'</b><span>'+cop(p.p)+'</span></div>'
       +'</div>';
-  }
+  });
   gal.innerHTML=h;
 }
 
@@ -2167,15 +2182,14 @@ function pintarPanelAdmin(){
   $("adminIg").value=TIENDA.instagram;
   $("adminTiktok").value=TIENDA.tiktok;
   $("adminPixel").value=TIENDA.pixelMeta;$("adminGa4").value=TIENDA.ga4;
-  $("adminDestacado").value=TIENDA.destacado;
   $("adminContraEntrega").checked=TIENDA.pagoContraEntrega!==false;
   $("adminVaciar").checked=TIENDA.vaciarCarrito!==false;
   $("adminClaveNueva").value="";
-  /* ganancias */
   $("adminMargen").value=Math.round(PRECIOS.margenGlobal*1000)/10;
   $("adminMultiplicador").value=PRECIOS.multiplicadorBase;
   $("adminRedondeo").value=String(PRECIOS.redondeo);
   pintarCategoriasAdmin();
+  pintarHeroAdmin();
   pintarFavoritosAdmin();
   pintarListaAdmin();
   $("adminResHero").innerHTML="";$("adminResPrecio").innerHTML="";$("adminResFav").innerHTML="";
@@ -2199,17 +2213,43 @@ function precioEjemplo(cat){
   const barato=window.PRODUCTOS.filter(function(p){return p.cat===cat}).sort(function(a,b){return a.p-b.p})[0];
   return barato?barato.p:0;
 }
+function pintarHeroAdmin(){
+  const ids=(TIENDA.heroIds||"").split(",").map(function(s){return s.trim();}).filter(Boolean);
+  let h="";
+  if(ids.length){
+    h='<p style="font:600 12px Poppins;color:var(--mu);margin:0 0 6px">HÉROE ACTUAL ('+ids.length+'/6):</p>';
+    ids.forEach(function(id,i){
+      const p=window.PRODUCTOS.find(function(x){return x.id===id;});
+      if(!p)return;
+      h+='<div class="admin-fila" style="background:#FFF3D6;border-color:#EADFCB">'
+        +'<img src="'+p.img+'" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:8px">'
+        +'<span class="an">'+(i+1)+'. '+esc(p.n.slice(0,30))+'</span>'
+        +'<span style="font:600 12px Poppins">'+cop(p.p)+'</span>'
+        +'<button class="admin-btn quitar" type="button" onclick="quitarHeroAdmin(\''+escJs(id)+'\')">Quitar</button>'
+        +'</div>';
+    });
+  }else{
+    h='<p style="font-size:12px;color:var(--mu)">Sin productos en el héroe: busca abajo.</p>';
+  }
+  $("adminHeroLista").innerHTML=h;
+}
 function pintarFavoritosAdmin(){
   const ids=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
   let h="";
-  if(!ids.length)h='<p style="font-size:12px;color:var(--mu)">Sin favoritos todavía: busca abajo para agregar.</p>';
-  else{
-    h='<p style="font:600 12px Poppins;color:var(--mu);margin:0 0 6px">FAVORITOS ACTUALES ('+ids.length+'):</p>';
+  if(ids.length){
+    h='<p style="font:600 12px Poppins;color:var(--mu);margin:0 0 6px">FAVORITOS ('+ids.length+'):</p>';
     ids.forEach(function(id){
       const p=window.PRODUCTOS.find(function(x){return x.id===id;});
       if(!p)return;
-      h+='<div class="admin-fila" style="background:#FFF3D6;border-color:#EADFCB"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(p.p)+'</span><button class="admin-btn quitar" type="button" onclick="quitarFavoritoAdmin(\''+escJs(id)+'\')">Quitar</button></div>';
+      h+='<div class="admin-fila" style="background:#FFF3D6;border-color:#EADFCB">'
+        +'<img src="'+p.img+'" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:8px">'
+        +'<span class="an">'+esc(p.n.slice(0,30))+'</span>'
+        +'<span style="font:600 12px Poppins">'+cop(p.p)+'</span>'
+        +'<button class="admin-btn quitar" type="button" onclick="quitarFavoritoAdmin(\''+escJs(id)+'\')">Quitar</button>'
+        +'</div>';
     });
+  }else{
+    h='<p style="font-size:12px;color:var(--mu)">Sin favoritos: busca abajo.</p>';
   }
   $("adminFavoritosLista").innerHTML=h;
 }
@@ -2248,50 +2288,57 @@ function pintarPreviewAdmin(){
   const ejemplo=Math.round(10000*mult*(1+margen/100));
   const final=red>0?Math.max(red,Math.round(ejemplo/red)*red):Math.round(ejemplo);
   el.innerHTML='Ejemplo: un producto de costo <strong>'+cop(10000)+'</strong> se venderá en <strong>'+cop(final)+'</strong>'
-    +' · Ganancia: <strong>'+cop(final-10000)+'</strong> ('+Math.round((final-10000)/100)+'%)'
-    +' · Margen: '+margen+'% · Multiplicador: ×'+mult+(red>0?' · Redondeado a '+cop(red):'');
+    +' · Ganancia: <strong>'+cop(final-10000)+'</strong> ('+Math.round((final-10000)/100)+'%)';
 }
-
-/* --- buscadores del panel --- */
 function buscarAdminHero(){
   const q=$("adminBuscarHero").value.trim().toLowerCase();
   if(q.length<2){$("adminResHero").innerHTML="";return;}
-  const r=window.PRODUCTOS.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,6);
+  const heroIds=(TIENDA.heroIds||"").split(",").map(function(s){return s.trim();}).filter(Boolean);
+  const r=window.PRODUCTOS.filter(function(p){
+    return (p.n.toLowerCase().includes(q)||String(p.id).includes(q)||(p.cid||"").toLowerCase().includes(q))&&!heroIds.includes(p.id);
+  }).slice(0,6);
   $("adminResHero").innerHTML=r.length?r.map(function(p){
-    const es=(TIENDA.destacado===p.id);
-    return '<div class="admin-fila"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(p.p)+'</span><button class="admin-btn" type="button" '+(es?"disabled style='opacity:.5'":"")+' onclick="destacarAdminHero(\''+escJs(p.id)+'\')">'+(es?"★ Destacado":"Destacar")+'</button></div>';
+    return '<div class="admin-fila">'
+      +'<img src="'+p.img+'" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:8px">'
+      +'<span class="an">'+esc(p.n.slice(0,30))+'</span>'
+      +'<span style="font:600 12px Poppins">'+cop(p.p)+'</span>'
+      +'<button class="admin-btn" type="button" '+(heroIds.length>=6?"disabled":"")+' onclick="agregarHeroAdmin(\''+escJs(p.id)+'\')">'+(heroIds.length>=6?"Máximo 6":"+ Agregar")+'</button>'
+      +'</div>';
   }).join(""):'<div class="admin-nota">Sin resultados para "'+esc(q)+'".</div>';
 }
-function destacarAdminHero(id){
-  TIENDA.destacado=id;
-  $("adminDestacado").value=id;
+function agregarHeroAdmin(id){
+  const ids=(TIENDA.heroIds||"").split(",").map(function(s){return s.trim();}).filter(Boolean);
+  if(ids.length>=6){showToast("Máximo 6 productos en el héroe","err");return;}
+  if(!ids.includes(id))ids.push(id);
+  TIENDA.heroIds=ids.join(",");
   aplicarTienda();actualizarHero();
-  pintarFijadosAdmin();pintarPreviewAdmin();
-  showToast("Producto destacado actualizado");
+  pintarHeroAdmin();$("adminResHero").innerHTML="";$("adminBuscarHero").value="";
+  showToast("Agregado al héroe");
+}
+function quitarHeroAdmin(id){
+  const ids=(TIENDA.heroIds||"").split(",").map(function(s){return s.trim();}).filter(function(x){return x&&x!==id;});
+  TIENDA.heroIds=ids.join(",");
+  aplicarTienda();actualizarHero();pintarHeroAdmin();
+  showToast("Quitado del héroe");
+}
+function destacarAdminHero(id){
+  agregarHeroAdmin(id);
 }
 function buscarAdminFav(){
   const q=$("adminBuscarFav").value.trim().toLowerCase();
   if(q.length<2){$("adminResFav").innerHTML="";return;}
   const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
   const r=window.PRODUCTOS.filter(function(p){
-    return (p.n.toLowerCase().includes(q)||String(p.id).includes(q))&&!favs.includes(p.id);
+    return (p.n.toLowerCase().includes(q)||String(p.id).includes(q)||(p.cid||"").toLowerCase().includes(q))&&!favs.includes(p.id);
   }).slice(0,6);
   $("adminResFav").innerHTML=r.length?r.map(function(p){
-    return '<div class="admin-fila"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(p.p)+'</span><button class="admin-btn" type="button" onclick="agregarFavoritoAdmin(\''+escJs(p.id)+'\')">+ Favorito</button></div>';
-  }).join(""):'<div class="admin-nota">Sin resultados o ya agregado.</div>';
-}
-function agregarFavoritoAdmin(id){
-  const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
-  if(!favs.includes(id)){favs.push(id);TIENDA.favoritos=favs.join(",");}
-  aplicarTienda();initCarouseles();pintarFavoritosAdmin();pintarPreviewAdmin();
-  $("adminResFav").innerHTML="";$("adminBuscarFav").value="";
-  showToast("Agregado a favoritos");
-}
-function quitarFavoritoAdmin(id){
-  const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(function(x){return x&&x!==id;});
-  TIENDA.favoritos=favs.join(",");
-  aplicarTienda();initCaruseles();pintarFavoritosAdmin();pintarPreviewAdmin();
-  showToast("Quitado de favoritos");
+    return '<div class="admin-fila">'
+      +'<img src="'+p.img+'" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:8px">'
+      +'<span class="an">'+esc(p.n.slice(0,30))+'</span>'
+      +'<span style="font:600 12px Poppins">'+cop(p.p)+'</span>'
+      +'<button class="admin-btn" type="button" onclick="agregarFavoritoAdmin(\''+escJs(p.id)+'\')">+ Favorito</button>'
+      +'</div>';
+  }).join(""):'<div class="admin-nota">Sin resultados.</div>';
 }
 function buscarAdminPrecio(){
   const q=$("adminBuscarPrecio").value.trim().toLowerCase();
@@ -2323,7 +2370,7 @@ function leerPanelAdmin(){
   TIENDA.razonSocial=$("adminRazon").value.trim();TIENDA.nit=$("adminNit").value.trim();TIENDA.direccion=$("adminDir").value.trim();
   TIENDA.instagram=$("adminIg").value.trim().replace(/^@/,"");TIENDA.tiktok=$("adminTiktok").value.trim().replace(/^@/,"");
   TIENDA.pixelMeta=$("adminPixel").value.trim();TIENDA.ga4=$("adminGa4").value.trim();
-  TIENDA.destacado=$("adminDestacado").value.trim()||TIENDA_DEFECTO.destacado;
+  /* heroIds se gestiona con agregarHeroAdmin/quitarHeroAdmin */
   TIENDA.pagoContraEntrega=$("adminContraEntrega").checked;
   TIENDA.vaciarCarrito=$("adminVaciar").checked;
   const nc=$("adminClaveNueva").value.trim();
@@ -2376,7 +2423,7 @@ function codigoConfigAdmin(){
   L.push(" razonSocial:"+JSON.stringify(TIENDA.razonSocial)+",nit:"+JSON.stringify(TIENDA.nit)+",direccion:"+JSON.stringify(TIENDA.direccion)+",email:"+JSON.stringify(TIENDA.email)+",");
   L.push(" instagram:"+JSON.stringify(TIENDA.instagram)+",tiktok:"+JSON.stringify(TIENDA.tiktok)+",");
   L.push(" pixelMeta:"+JSON.stringify(TIENDA.pixelMeta)+",ga4:"+JSON.stringify(TIENDA.ga4)+",");
-  L.push(" destacado:"+JSON.stringify(TIENDA.destacado)+",");
+  L.push(" heroIds:"+JSON.stringify(TIENDA.heroIds)+",");
   L.push(" favoritos:"+JSON.stringify(TIENDA.favoritos)+",");
   L.push(" pagoContraEntrega:"+TIENDA.pagoContraEntrega+",");
   L.push(" vaciarCarrito:"+TIENDA.vaciarCarrito+",");
