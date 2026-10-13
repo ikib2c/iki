@@ -439,7 +439,28 @@ def curar_urbana_openmind(prods):
 # ============================================================================
 
 def escribir_catalogo_js(secciones):
-    """secciones: [(prefijo, categoria, [productos])] -> catalogo.js con ids estables."""
+    """secciones: [(prefijo, categoria, proveedor, [productos])] -> catalogo.js con ids ESTABLES.
+    Los ids se reutilizan del catalogo.js anterior (clave: prefijo + nombre en minusculas),
+    asi el heroe, los favoritos y los precios fijos del admin no se rompen cuando
+    cambian precios u orden de ordenamiento en el proveedor."""
+    previos = {}
+    usados = {}
+    try:
+        with open(os.path.join(RAIZ, "catalogo.js"), encoding="utf-8") as f:
+            for mm in re.finditer(r'\{id:"([a-z]+)(\d+)",n:"((?:[^"\\]|\\.)*)"', f.read()):
+                previos[(mm.group(1), mm.group(3).lower())] = int(mm.group(2))
+                usados.setdefault(mm.group(1), set()).add(int(mm.group(2)))
+    except Exception:
+        pass
+
+    def num_libre(prefijo):
+        s = usados.setdefault(prefijo, set())
+        n = 1
+        while n in s:
+            n += 1
+        s.add(n)
+        return n
+
     lineas = []
     lineas.append("// ======================================================================")
     lineas.append("// catalogo.js de IKI - generado automaticamente por scripts/sync_catalogos.py")
@@ -451,8 +472,10 @@ def escribir_catalogo_js(secciones):
     total = 0
     for prefijo, cat, prov, items in secciones:
         lineas.append("/* %s: %d productos */" % (cat, len(items)))
-        for i, p in enumerate(items, 1):
-            partes = ['{id:"%s%02d"' % (prefijo, i), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov]
+        for p in items:
+            clave = (prefijo, p["nombre"].lower())
+            num = previos.get(clave) or num_libre(prefijo)
+            partes = ['{id:"%s%02d"' % (prefijo, num), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov]
             imgs = p.get("imgs") or []
             if imgs:
                 partes.append("img:%s" % js_str(imgs[0]))

@@ -651,7 +651,7 @@ footer a:hover{color:var(--cr)}
 <!-- ============ Carruseles ============ -->
 <section class="carsec"><div class="wrap">
   <h2 class="sect-t rv">Descubre los favoritos de la tienda</h2>
-  <p class="sect-s rv">Joyas y pijamas primero: desliza y toca un producto para verlo en el catálogo.</p>
+  <p class="sect-s rv">Un carrusel por catálogo con lo mejor de cada proveedor: desliza y toca un producto.</p>
   <div class="crow" id="favoritos" style="display:none">
     <div class="chead"><span class="clab" id="favRowLabel">Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()"></span><span class="cmeta" id="favRowMeta"></span></div>
     <div class="ctrack" id="carFav" tabindex="0" role="region" aria-label="Carrusel de los favoritos de IKI"></div>
@@ -672,6 +672,27 @@ footer a:hover{color:var(--cr)}
     <div class="cnav" id="dots2"></div>
     <button class="carr L" type="button" onclick="scrollCarousel(-1,'car2')" aria-label="Producto anterior"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
     <button class="carr R" type="button" onclick="scrollCarousel(1,'car2')" aria-label="Producto siguiente"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+  <div class="crow" id="row3">
+    <div class="chead"><span class="clab" id="row3Label"></span><span class="cmeta" id="row3Meta"></span></div>
+    <div class="ctrack" id="car3" tabindex="0" role="region" aria-label="Carrusel de productos"></div>
+    <div class="cnav" id="dots3"></div>
+    <button class="carr L" type="button" onclick="scrollCarousel(-1,'car3')" aria-label="Producto anterior"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="carr R" type="button" onclick="scrollCarousel(1,'car3')" aria-label="Producto siguiente"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+  <div class="crow" id="row4">
+    <div class="chead"><span class="clab" id="row4Label"></span><span class="cmeta" id="row4Meta"></span></div>
+    <div class="ctrack" id="car4" tabindex="0" role="region" aria-label="Carrusel de productos"></div>
+    <div class="cnav" id="dots4"></div>
+    <button class="carr L" type="button" onclick="scrollCarousel(-1,'car4')" aria-label="Producto anterior"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="carr R" type="button" onclick="scrollCarousel(1,'car4')" aria-label="Producto siguiente"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+  <div class="crow" id="row5">
+    <div class="chead"><span class="clab" id="row5Label"></span><span class="cmeta" id="row5Meta"></span></div>
+    <div class="ctrack" id="car5" tabindex="0" role="region" aria-label="Carrusel de productos"></div>
+    <div class="cnav" id="dots5"></div>
+    <button class="carr L" type="button" onclick="scrollCarousel(-1,'car5')" aria-label="Producto anterior"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="carr R" type="button" onclick="scrollCarousel(1,'car5')" aria-label="Producto siguiente"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
   <div class="chint">Desliza para ver más productos</div>
 </div></section>
@@ -1096,8 +1117,8 @@ const TIENDA_DEFECTO={
   razonSocial:"",nit:"",direccion:"",email:"",
   instagram:"",tiktok:"",
   pixelMeta:"",ga4:"",
-  heroIds:"j243,j262,j315,j244,j222,j178",
-  favoritos:"j243,j262,j315,j244,j222,j178,u01,u04,u17",
+  heroIds:"j180,j182,j213,j225,j247,j283",
+  favoritos:"j180,j182,j213,j225,j247,j283,u01,u04,u17,b120,b119,r01,r04",
   pagoContraEntrega:true,
   vaciarCarrito:true,
   claveAdmin:"IKI123*",
@@ -1122,7 +1143,7 @@ function cargarTienda(){
   const t=String(g.nombre||TIENDA_DEFECTO.nombre);
   const str=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
   const si=(v,d)=>(typeof v==="boolean")?v:d;
-  return {
+  const T={
     nombre:t,logo:str(g.logo,TIENDA_DEFECTO.logo),
     whatsappPedidos:str(g.whatsappPedidos,TIENDA_DEFECTO.whatsappPedidos),
     whatsappAtencion:str(g.whatsappAtencion,TIENDA_DEFECTO.whatsappAtencion),
@@ -1140,6 +1161,15 @@ function cargarTienda(){
     carruselesOcultos:str(g.carruselesOcultos,""),
     catalogosOcultos:str(g.catalogosOcultos,"")
   };
+  /* Migracion v2: el catalogo cambio de ids al crecer; respetar la curacion
+     nueva del heroe y los favoritos UNA sola vez, y de ahi en adelante
+     respetar lo que el admin guarde. */
+  if((parseInt(g.heroeV)||0)<2){
+    T.heroIds=TIENDA_DEFECTO.heroIds;
+    T.favoritos=TIENDA_DEFECTO.favoritos;
+    T.heroeV=2;
+  }
+  return T;
 }function cargarPrecios(){
   let g={};try{g=JSON.parse(localStorage.getItem(PRECIOS_KEY))||{};}catch(e){}
   const num=(v,d)=>(typeof v==="number"&&isFinite(v)&&v>=0)?v:d;
@@ -2016,17 +2046,22 @@ function initCarouseles(){
     buildDots("carFav","dotsFav");hookScroll("carFav","dotsFav");
   }else fr.style.display="none";
   const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  const prioridad=["joyas","moda"].filter(c=>counts[c]&&!catOculta(c));
-  const resto=Object.keys(counts).filter(c=>c!=="joyas"&&c!=="moda"&&!catOculta(c)).sort((a,b)=>counts[b]-counts[a]);
-  const top=prioridad.concat(resto).slice(0,2);
-  [["row1","car1","dots1","row1Label","row1Meta"],["row2","car2","dots2","row2Label","row2Meta"]].forEach((cfg,i)=>{
+  const PRIORIDAD=["joyas","urbana","juguetes","moda","bebe"];
+  const prioridad=PRIORIDAD.filter(c=>counts[c]&&!catOculta(c));
+  const resto=Object.keys(counts).filter(c=>!PRIORIDAD.includes(c)&&!catOculta(c)).sort((a,b)=>counts[b]-counts[a]);
+  const top=prioridad.concat(resto).slice(0,5);
+  [["row1","car1","dots1","row1Label","row1Meta"],
+   ["row2","car2","dots2","row2Label","row2Meta"],
+   ["row3","car3","dots3","row3Label","row3Meta"],
+   ["row4","car4","dots4","row4Label","row4Meta"],
+   ["row5","car5","dots5","row5Label","row5Meta"]].forEach((cfg,i)=>{
     const cat=top[i],row=$(cfg[0]),t=$(cfg[1]);
     if(!cat||carruselOculto(cfg[0])){row.style.display="none";return;}
     row.style.display="";
     $(cfg[3]).textContent=labelOf(cat);
     $(cfg[4]).textContent=counts[cat]+" producto"+(counts[cat]===1?"":"s");
     t.innerHTML="";
-    PRODUCTOS.filter(p=>p.cat===cat&&!prodOculto(p.id)&&!provOculto(p.prov)).forEach(p=>t.appendChild(crearItemCarro(p)));
+    PRODUCTOS.filter(p=>p.cat===cat&&!prodOculto(p.id)&&!provOculto(p.prov)).slice(0,24).forEach(p=>t.appendChild(crearItemCarro(p)));
     buildDots(cfg[1],cfg[2]);hookScroll(cfg[1],cfg[2]);
   });
   iniciarAutoplay();
