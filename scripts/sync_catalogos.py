@@ -201,6 +201,20 @@ def parse_tallas(s):
     partes = [x.strip() for x in s.split(",") if x.strip()]
     return partes if len(partes) > 1 else None
 
+def parse_estampados(s):
+    """'PIOLIN, GATO ROSA, MY MELODDY' -> ['Piolin', 'Gato Rosa', ...] (max 8, sin duplicados).
+    Se descartan valores puramente numericos: en algunos productos el proveedor
+    guarda referencias (ej. 1003558423) en lugar de nombres de estampado."""
+    if not s:
+        return None
+    vistos, out = set(), []
+    for x in str(s).split(","):
+        x = titulo(x)
+        if x and not x.isdigit() and any(c.isalpha() for c in x) and x.lower() not in vistos:
+            vistos.add(x.lower())
+            out.append(x)
+    return out[:8] if len(out) > 1 else None
+
 def opciones_shopify(p):
     """Grupos de variantes de un producto Shopify (ej. Color: Azul/Verde) de variantes DISPONIBLES.
     options puede venir como ["Color"] o como [{"name":"Color",...}]."""
@@ -248,7 +262,7 @@ def curar_joyas_gava(prods, h2c):
         nombre_colec = COLEC_NOMBRES[h]
         tomados = 0
         for p in prods:
-            if tomados >= 2:
+            if tomados >= 3:
                 break
             if nombre_colec not in h2c.get(p["handle"], []):
                 continue
@@ -265,7 +279,7 @@ def curar_joyas_gava(prods, h2c):
             vistos.add(nombre.lower())
             sel.append({"nombre": nombre, "precio": int(precio),
                         "imgs": ["https:" + im["src"] if im["src"].startswith("//") else im["src"]
-                                 for im in p["images"][:3]],
+                                 for im in p["images"][:4]],
                         "var": None})
             tomados += 1
     sel.sort(key=lambda x: x["precio"])  # ids estables: j01 = mas economico
@@ -289,6 +303,12 @@ def curar_moda_majestic(items):
     def con_datos(p):
         nombre = re.sub(r"\s+", " ", p.get("nombre") or "").strip()
         tallas = parse_tallas(p.get("tallas"))
+        var = {}
+        if tallas:
+            var["Talla"] = tallas
+        est = parse_estampados(p.get("estampados"))
+        if est:
+            var["Estampado"] = est
         extras = p.get("imagenes_extra")
         urls = []
         if isinstance(extras, list):
@@ -305,21 +325,21 @@ def curar_moda_majestic(items):
             if u.startswith("http") and u != p["imagen_url"] and u not in gal:
                 gal.append(u)
         return {"nombre": titulo(nombre), "precio": int(float(p.get("precio") or 0)),
-                "imgs": [p["imagen_url"]] + gal[:2],
-                "var": ({"Talla": tallas} if tallas else None)}
+                "imgs": [p["imagen_url"]] + gal[:3],
+                "var": (var if var else None)}
 
-    # 2 por categoria real del proveedor (los mas caros primero), hasta 14
+    # TODOS los validos (sin tope por categoria)
     por_cat = {}
     for p in sorted((c for c in (candidato(x) for x in items) if c),
                     key=lambda x: -float(x.get("precio") or 0)):
         por_cat.setdefault(p.get("categoria") or "Sin categoría", []).append(p)
     elegidos = []
     for cat, lst in por_cat.items():
-        for p in lst[:2]:
+        for p in lst:
             elegidos.append(p)
     elegidos = [con_datos(p) for p in elegidos if len(p.get("nombre") or "") >= 6]
     elegidos.sort(key=lambda x: -x["precio"])
-    return elegidos[:14]
+    return elegidos
 
 ETIQ_TW = {"jugueteria": "Juguetería", "juego-de-mesa": "Juego de mesa", "burbujeros": "Burbujeros",
            "cacharro": "Cacharro", "piñateria": "Piñatería", "slime": "Slime", "cubo-rubik": "Cubo Rubik",
@@ -369,14 +389,18 @@ def curar_solobabys(prods, h2c):
         vs = p.get("variants") or []
         precios = [float(v["price"]) for v in vs if v.get("price")]
         antes = [float(v["compare_at_price"]) for v in vs if v.get("compare_at_price")]
-        img = (p.get("images") or [{}])[0].get("src", "")
-        if img.startswith("//"):
-            img = "https:" + img
+        imgs = []
+        for im in (p.get("images") or [])[:4]:
+            s = im.get("src", "")
+            if s.startswith("//"):
+                s = "https:" + s
+            if s and s not in imgs:
+                imgs.append(s)
         return {"nombre": titulo(p["title"]),
                 "precio": int(min(precios)) if precios else 0,
                 "antes": int(max(antes)) if antes else None,
                 "disp": any(v.get("available") for v in vs),
-                "imgs": [img], "var": opciones_shopify(p),
+                "imgs": imgs, "var": opciones_shopify(p),
                 "cols": h2c.get(p.get("handle"), []), "tipo": p.get("product_type") or ""}
     combos, bebes = [], []
     for p in prods:
@@ -392,13 +416,13 @@ def curar_solobabys(prods, h2c):
     vistos, sel_b = {}, []
     for b in sorted(bebes, key=lambda x: x["precio"]):
         k = b["tipo"] or b["nombre"].split()[0].lower()
-        if vistos.get(k, 0) >= 2:
+        if vistos.get(k, 0) >= 3:
             continue
         vistos[k] = vistos.get(k, 0) + 1
         sel_b.append(b)
-        if len(sel_b) >= 12:
+        if len(sel_b) >= 30:
             break
-    return sel_b, combos[:4]
+    return sel_b, combos[:10]
 
 # ============================================================================
 # 3. ESCRITURA: catalogo.js y Excel
@@ -503,8 +527,8 @@ if __name__ == "__main__":
     print("== Curando seleccion de la tienda ==")
     joyas = curar_joyas_gava(gava, gava_cols)
     moda = curar_moda_majestic(majestic)
-    juguetes = curar_taiwan(taiwan, ["jugueteria", "peluches", "burbujeros", "armatodo", "didactico", "juego-de-mesa"], 8000, 90000, 14)
-    escolar = curar_taiwan(taiwan, ["escolar"], 2000, 60000, 8)
+    juguetes = curar_taiwan(taiwan, ["jugueteria", "peluches", "burbujeros", "armatodo", "didactico", "juego-de-mesa"], 8000, 90000, 24)
+    escolar = curar_taiwan(taiwan, ["escolar"], 2000, 60000, 12)
     bebes, combos = curar_solobabys(solobabys, sb_cols)
     print("  joyas=%d moda=%d juguetes=%d escolar=%d bebe=%d regalos=%d" % (len(joyas), len(moda), len(juguetes), len(escolar), len(bebes), len(combos)))
 
