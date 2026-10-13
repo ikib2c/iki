@@ -458,11 +458,18 @@ def escribir_catalogo_js(secciones):
     cambian precios u orden de ordenamiento en el proveedor."""
     previos = {}
     usados = {}
+    previos_cid = {}
+    usados_cid = set()
     try:
         with open(os.path.join(RAIZ, "catalogo.js"), encoding="utf-8") as f:
-            for mm in re.finditer(r'\{id:"([a-z]+)(\d+)",n:"((?:[^"\\]|\\.)*)"', f.read()):
+            texto_previo = f.read()
+            for mm in re.finditer(r'\{id:"([a-z]+)(\d+)",n:"((?:[^"\\]|\\.)*)"', texto_previo):
                 previos[(mm.group(1), mm.group(3).lower())] = int(mm.group(2))
                 usados.setdefault(mm.group(1), set()).add(int(mm.group(2)))
+            for mm in re.finditer(r'cid:"IKI-(\d+)"', texto_previo):
+                usados_cid.add(int(mm.group(1)))
+            for mm in re.finditer(r'\{id:"([a-z]+)\d+",n:"((?:[^"\\]|\\.)*)"[^}]*?cid:"IKI-(\d+)"', texto_previo):
+                previos_cid[(mm.group(1), mm.group(2).lower())] = int(mm.group(3))
     except Exception:
         pass
 
@@ -472,6 +479,13 @@ def escribir_catalogo_js(secciones):
         while n in s:
             n += 1
         s.add(n)
+        return n
+
+    def cid_libre():
+        n = 1
+        while n in usados_cid:
+            n += 1
+        usados_cid.add(n)
         return n
 
     lineas = []
@@ -485,6 +499,7 @@ def escribir_catalogo_js(secciones):
     for prefijo, cat, prov, items in secciones:
         lineas.append("/* %s: %d productos */" % (cat, len(items)))
         claves = set()
+        claves_cid = set()
         for p in items:
             clave = (prefijo, p["nombre"].lower())
             if clave in previos and clave not in claves:
@@ -492,7 +507,13 @@ def escribir_catalogo_js(secciones):
             else:
                 num = num_libre(prefijo)
             claves.add(clave)
-            partes = ['{id:"%s%02d"' % (prefijo, num), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov]
+            if clave in previos_cid and clave not in claves_cid:
+                cid_num = previos_cid[clave]
+                usados_cid.add(cid_num)
+            else:
+                cid_num = cid_libre()
+            claves_cid.add(clave)
+            partes = ['{id:"%s%02d"' % (prefijo, num), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov, 'cid:"IKI-%04d"' % cid_num]
             imgs = p.get("imgs") or []
             if imgs:
                 partes.append("img:%s" % js_str(imgs[0]))
@@ -508,6 +529,11 @@ def escribir_catalogo_js(secciones):
             lineas.append(",".join(partes) + "},")
             total += 1
     lineas.append("];")
+    # Guarda-red: si un proveedor cayo o la conexion fallo a medias, NO
+    # destruir el catalogo vigente (protege ids/cids estables y la tienda).
+    if previos and total < len(previos) * 0.5:
+        print("  ! ABORTADO: %d productos vs %d previos (descarga parcial): se conserva el catalogo vigente." % (total, len(previos)))
+        return 0
     with open(os.path.join(RAIZ, "catalogo.js"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lineas) + "\n")
     print("catalogo.js: %d productos" % total)

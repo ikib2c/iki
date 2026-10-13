@@ -1263,13 +1263,13 @@ function precioFinal(p,hoyOpt){
 }
 function recargarPrecios(){
   window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p,i){
-    return Object.assign({},p,{p:precioFinal(p),cid:"IKI-"+String(i+1).padStart(4,"0")});
+    return Object.assign({},p,{p:precioFinal(p),cid:(p.cid||("IKI-"+String(i+1).padStart(4,"0")))});
   });
   pagina=1;
   renderGrid();initCarouseles();actualizarHero();renderCart();
 }
 window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p,i){
-  return Object.assign({},p,{p:precioFinal(p),cid:"IKI-"+String(i+1).padStart(4,"0")});
+  return Object.assign({},p,{p:precioFinal(p),cid:(p.cid||("IKI-"+String(i+1).padStart(4,"0")))});
 });
 /* ============================================================ */
 
@@ -1735,6 +1735,8 @@ function sendOrder(){
   if(barrio)m+="Barrio: "+barrio+"\n";
   m+="Dirección: "+dir+"\n";
   m+="\n*Pago:* "+(labels[pago]||pago)+"\n\n*Productos:*\n";
+  let urlBase="";
+  try{urlBase=location.origin+location.pathname;}catch(e){urlBase="https://ikib2c.github.io/iki/";}
   cart.forEach(function(it){
     const p=prod(it.id);
     if(!p)return;
@@ -1742,6 +1744,8 @@ function sendOrder(){
     if(p.sku)m+="   Ref: "+p.sku+" · Cat: "+(p.cid||"")+"\n";
     else if(p.cid)m+="   Cat: "+p.cid+"\n";
     m+="   "+cop(p.p*it.qty)+(it.qty>1?" ("+cop(p.p)+" c/u)":"")+"\n";
+    /* enlace a la ficha del articulo EN NUESTRA TIENDA: aliste con un toque */
+    m+="   Ver: "+urlBase+"?art="+encodeURIComponent(p.cid||p.id)+"\n";
   });
   m+="\n*TOTAL PRODUCTOS: "+cop(s.total)+"*\n";
   m+="Envío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
@@ -2006,6 +2010,21 @@ function scrollToSection(id){
   const off=(h?h.offsetHeight:0)+10;
   const top=s.getBoundingClientRect().top+window.scrollY-off;
   window.scrollTo({top:Math.max(0,top),behavior:"smooth"});
+}
+/* Enlace de alistamiento (?art=IKI-XXXX): resuelve por Cat permanente
+   (o por id interno) y lleva directo a la tarjeta del producto. */
+function resolverArticulo(art){
+  art=String(art||"").trim();
+  if(!art)return null;
+  return window.PRODUCTOS.find(function(x){return x.cid===art;})||window.PRODUCTOS.find(function(x){return x.id===art;})||null;
+}
+function abrirArticuloPorEnlace(){
+  let art="";
+  try{art=new URLSearchParams(location.search).get("art")||"";}catch(e){return;}
+  if(!art)return;
+  const p=resolverArticulo(art);
+  if(!p)return;
+  setTimeout(function(){scrollToProduct(p.id);},700);
 }
 function scrollToProduct(id){
   hideSearch();
@@ -2851,6 +2870,7 @@ document.addEventListener("DOMContentLoaded",function(){
   initCarouseles();iniciarDeriva();actualizarHero();renderMobileMenu();
   renderCart();
   aplicarSeccionesVisibles();
+  abrirArticuloPorEnlace();
   measureHeader();
   window.addEventListener("resize",function(){
     clearTimeout(window.__rt);
