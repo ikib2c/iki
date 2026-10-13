@@ -1,6 +1,6 @@
 # Sincronizacion automatica de los catalogos de proveedores:
-# descarga Gava, Sublimados Majestic, Jugueteria Taiwan y Solobabys;
-# regenera catalogo.js (tienda) y los 4 Excel completos; y publica los cambios.
+# descarga Gava, Sublimados Majestic, Jugueteria Taiwan, Solobabys y Open Mind;
+# regenera catalogo.js (tienda) y los 5 Excel completos; y publica los cambios.
 #
 # Requisito (una sola vez): Settings > Actions > General > Workflow permissions
 # debe estar en "Read and write permissions" para que el bot pueda hacer push.

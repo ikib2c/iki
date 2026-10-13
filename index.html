@@ -998,6 +998,8 @@ footer a:hover{color:var(--cr)}
       <label class="admin-check"><input type="checkbox" id="adminVerCar1" onchange="toggleCarrusel('row1',this.checked)" checked> Mostrar carrusel 1</label>
       <label class="admin-check"><input type="checkbox" id="adminVerCar2" onchange="toggleCarrusel('row2',this.checked)" checked> Mostrar carrusel 2</label>
       </div>
+      <div class="admin-h">Catálogos de proveedores <small>oculta de un golpe todas las prendas de un proveedor</small></div>
+      <div class="admin-lista" id="adminCatalogosVis"></div>
       <div class="admin-h">Categorías visibles <small>desmarca para ocultar la categoría de toda la tienda</small></div>
       <div class="admin-lista" id="adminCatsVis"></div>
       <div class="admin-h">Ocultar productos <small>busca por nombre o código IKI-XXXX</small></div>
@@ -1072,7 +1074,8 @@ const CATS=[
  {id:"juguetes",n:"Juguetes",c:"#C6EEE9",i:"M12 20a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM6 6a2.5 2.5 0 1 0 0 .1M18 6a2.5 2.5 0 1 0 0 .1M10 12v.1M14 12v.1"},
  {id:"escolar",n:"Escolar",c:"#BDE8C7",i:"M4 20l1-4L17 4l3 3L8 19zM14 7l3 3"},
  {id:"regalos",n:"Regalos",c:"#E3DAFD",i:"M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"},
- {id:"bebe",n:"Bebé",c:"#C9E4F7",i:"M9 2h6v4l2 3v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9l2-3zM7 13h10"}];
+ {id:"bebe",n:"Bebé",c:"#C9E4F7",i:"M9 2h6v4l2 3v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9l2-3zM7 13h10"},
+  {id:"urbana",n:"Ropa urbana",c:"#D7E3FC",i:"M4 4l5 2 3 2 3-2 5-2 2 5-3 2v11H5v-9L2 9z"}];
 /* Fotos provisionales por categoría (banners del proyecto) */
 const IMG={joyas:"IKI_banner_joyas_1600x600.png",moda:"IKI_banner_pijamas_1600x600.png",juguetes:"",escolar:"",regalos:"IKI_banner_regalos_1600x600.png"};
 /* Chips de Regalos por ocasión */
@@ -1094,14 +1097,15 @@ const TIENDA_DEFECTO={
   instagram:"",tiktok:"",
   pixelMeta:"",ga4:"",
   heroIds:"j243,j262,j315,j244,j222,j178",
-  favoritos:"j243,j262,j315,j244,j222,j178",
+  favoritos:"j243,j262,j315,j244,j222,j178,u01,u04,u17",
   pagoContraEntrega:true,
   vaciarCarrito:true,
   claveAdmin:"IKI123*",
   categoriasOcultas:"",
   productosOcultos:"",
   seccionesOcultas:"",
-  carruselesOcultos:""
+  carruselesOcultos:"",
+  catalogosOcultos:""
 };
 const PRECIOS_DEFECTO={
   margenGlobal:0,
@@ -1133,7 +1137,8 @@ function cargarTienda(){
     categoriasOcultas:str(g.categoriasOcultas,""),
     productosOcultos:str(g.productosOcultos,""),
     seccionesOcultas:str(g.seccionesOcultas,""),
-    carruselesOcultos:str(g.carruselesOcultos,"")
+    carruselesOcultos:str(g.carruselesOcultos,""),
+    catalogosOcultos:str(g.catalogosOcultos,"")
   };
 }function cargarPrecios(){
   let g={};try{g=JSON.parse(localStorage.getItem(PRECIOS_KEY))||{};}catch(e){}
@@ -1271,7 +1276,7 @@ function renderBubbles(){
 function scrollCats(d){const t=$("catsTrack");if(t)t.scrollBy({left:d*300,behavior:"smooth"});}
 function renderChips(){
   const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  let h='<button type="button" class="chip" data-c="todo" onclick="filterProducts(\'todo\')">Todo <small>'+PRODUCTOS.filter(p=>!prodOculto(p.id)&&!catOculta(p.cat)).length+'</small></button>';
+  let h='<button type="button" class="chip" data-c="todo" onclick="filterProducts(\'todo\')">Todo <small>'+PRODUCTOS.filter(p=>!prodOculto(p.id)&&!catOculta(p.cat)&&!provOculto(p.prov)).length+'</small></button>';
   CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<button type="button" class="chip" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+' <small>'+(counts[c.id]||0)+'</small></button>');
   $("chips").innerHTML=h;
 }
@@ -1291,7 +1296,7 @@ function syncActive(){
 
 /* ===== Catálogo ===== */
 function listado(){
-  let l=PRODUCTOS.filter(p=>(filter==="todo"||p.cat===filter)&&(!onlyFav||favs.includes(p.id))&&!prodOculto(p.id)&&!catOculta(p.cat));
+  let l=PRODUCTOS.filter(p=>(filter==="todo"||p.cat===filter)&&(!onlyFav||favs.includes(p.id))&&!prodOculto(p.id)&&!catOculta(p.cat)&&!provOculto(p.prov));
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
@@ -2002,7 +2007,7 @@ function scrollCarousel(d,tid){
 function initCarouseles(){
   const sel=CONFIG.favoritosIds.map(prod).filter(Boolean);
   const fr=$("favoritos");
-  const vis=sel.filter(p=>!prodOculto(p.id));
+  const vis=sel.filter(p=>!prodOculto(p.id)&&!provOculto(p.prov));
   if(vis.length>=2&&!carruselOculto("favoritos")){
     fr.style.display="";
     $("favRowMeta").textContent=vis.length+" selecciones de la tienda";
@@ -2021,7 +2026,7 @@ function initCarouseles(){
     $(cfg[3]).textContent=labelOf(cat);
     $(cfg[4]).textContent=counts[cat]+" producto"+(counts[cat]===1?"":"s");
     t.innerHTML="";
-    PRODUCTOS.filter(p=>p.cat===cat&&!prodOculto(p.id)).forEach(p=>t.appendChild(crearItemCarro(p)));
+    PRODUCTOS.filter(p=>p.cat===cat&&!prodOculto(p.id)&&!provOculto(p.prov)).forEach(p=>t.appendChild(crearItemCarro(p)));
     buildDots(cfg[1],cfg[2]);hookScroll(cfg[1],cfg[2]);
   });
   iniciarAutoplay();
@@ -2097,7 +2102,7 @@ function actualizarHero(){
   let h="";
   ids.forEach(function(pid){
     const p=window.PRODUCTOS.find(function(x){return x.id===pid;});
-    if(!p||!p.img||prodOculto(pid))return;
+    if(!p||!p.img||prodOculto(pid)||provOculto(p.prov))return;
     h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+p.n+'">'
       +'<img src="'+p.img+'" alt="'+p.n+'" decoding="async" loading="eager">'
       +'<div class="hg-info"><b>'+p.n+'</b><span>'+cop(p.p)+'</span></div>'
@@ -2193,6 +2198,8 @@ function catOculta(id){return ocultasLista(TIENDA.categoriasOcultas).includes(id
 function prodOculto(id){return ocultasLista(TIENDA.productosOcultos).includes(id);}
 function seccionOculta(id){return ocultasLista(TIENDA.seccionesOcultas).includes(id);}
 function carruselOculto(id){return ocultasLista(TIENDA.carruselesOcultos).includes(id);}
+function provOculto(prv){return ocultasLista(TIENDA.catalogosOcultos).includes(prv);}
+const PROVEEDORES=[{id:"gava",n:"Gava Joyería"},{id:"majestic",n:"Sublimados Majestic"},{id:"taiwan",n:"Juguetería Taiwan"},{id:"solobabys",n:"Solobabys"},{id:"openmind",n:"Open Mind"}];
 function aplicarSeccionesVisibles(){
   const mapa={hero:".hero",marquee:".marquee",carruseles:".carsec",categorias:".catsbar",confianza:".trust",faq:"#faq",contacto:".news"};
   Object.keys(mapa).forEach(function(k){
@@ -2379,6 +2386,17 @@ function pintarVisibilidadAdmin(){
       +'</div>';
   });
   $("adminCatsVis").innerHTML=h;
+  const ocProv=ocultasLista(TIENDA.catalogosOcultos);
+  let hc="";
+  PROVEEDORES.forEach(function(pr){
+    const visProv=!ocProv.includes(pr.id);
+    const nPr=window.PRODUCTOS.filter(function(p){return p.prov===pr.id;}).length;
+    hc+='<div class="admin-cat-fila">'
+      +'<span class="admin-cat-nombre">'+esc(pr.n)+' <small style="font:500 10.5px Poppins;color:var(--mu)">'+nPr+' productos</small></span>'
+      +'<label class="admin-check" style="min-height:0;font-size:12px"><input type="checkbox" '+(visProv?"checked":"")+' onchange="toggleCatalogo(\''+escJs(pr.id)+'\',this.checked)"> Visible</label>'
+      +'</div>';
+  });
+  $("adminCatalogosVis").innerHTML=hc;
   const secs={hero:"adminVerHero",marquee:"adminVerMarquee",categorias:"adminVerCategorias",carruseles:"adminVerCarruseles",confianza:"adminVerConfianza",faq:"adminVerFaq",contacto:"adminVerContacto"};
   Object.keys(secs).forEach(function(k){const el=$(secs[k]);if(el)el.checked=!seccionOculta(k);});
   const cars={favoritos:"adminVerCarFav",row1:"adminVerCar1",row2:"adminVerCar2"};
@@ -2398,6 +2416,13 @@ function toggleCarrusel(id,visible){
   else if(!l.includes(id))l.push(id);
   TIENDA.carruselesOcultos=l.join(",");
   initCarouseles();persistirPanel();pintarVisibilidadAdmin();
+}
+function toggleCatalogo(id,visible){
+  let l=ocultasLista(TIENDA.catalogosOcultos);
+  if(visible)l=l.filter(function(x){return x!==id;});
+  else if(!l.includes(id))l.push(id);
+  TIENDA.catalogosOcultos=l.join(",");
+  aplicarVisibilidad();persistirPanel();pintarVisibilidadAdmin();
 }
 function toggleCategoriaVis(id,visible){
   let l=ocultasLista(TIENDA.categoriasOcultas);
@@ -2604,7 +2629,8 @@ function codigoConfigAdmin(){
   L.push(" categoriasOcultas:"+JSON.stringify(TIENDA.categoriasOcultas)+",");
   L.push(" productosOcultos:"+JSON.stringify(TIENDA.productosOcultos)+",");
   L.push(" seccionesOcultas:"+JSON.stringify(TIENDA.seccionesOcultas)+",");
-  L.push(" carruselesOcultos:"+JSON.stringify(TIENDA.carruselesOcultos));
+  L.push(" carruselesOcultos:"+JSON.stringify(TIENDA.carruselesOcultos)+",");
+  L.push(" catalogosOcultos:"+JSON.stringify(TIENDA.catalogosOcultos));
   L.push("};");
   L.push("const PRECIOS_DEFECTO={");
   L.push(" margenGlobal:"+PRECIOS.margenGlobal+",");

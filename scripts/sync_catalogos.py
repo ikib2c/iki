@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Sincroniza el catalogo de IKI desde los 4 proveedores y actualiza:
+"""Sincroniza el catalogo de IKI desde los 5 proveedores y actualiza:
   - catalogo.js  : productos curados (con galerias y variantes) para la tienda
-  - 4 Excel      : catalogos completos de cada proveedor (Gava, Majestic, Taiwan, Solobabys)
+  - 5 Excel      : catalogos completos de cada proveedor (Gava, Majestic, Taiwan, Solobabys, OpenMind)
 
 Fuentes (todas publicas):
   - Gava Joyeria          -> Shopify products.json + colecciones
   - Sublimados Majestic   -> Supabase REST (publishable key del bundle publico)
   - Jugueteria Taiwan     -> catalogo.js publico de su GitHub Pages (cron del proveedor)
   - Solobabys             -> Shopify products.json + colecciones
+  - Open Mind             -> Shopify products.json (tiendasopenmind.com, ropa urbana)
 
 Ejecutar:  python scripts/sync_catalogos.py   (sin argumentos; escribe en la raiz del repo)
 Cron:      .github/workflows/sync-catalogos.yml (cada 6 horas + manual)
@@ -187,6 +188,19 @@ def descargar_solobabys():
             page += 1
         time.sleep(0.2)
     return list(prods.values()), h2c
+
+def descargar_openmind():
+    """Open Mind (tiendasopenmind.com): Shopify products.json paginado (ropa urbana caleña)."""
+    prods = {}
+    for page in range(1, 12):
+        d = get_json("https://tiendasopenmind.com/products.json?limit=250&page=%d" % page)
+        ps = d.get("products") or []
+        if not ps:
+            break
+        for p in ps:
+            prods[p["id"]] = p
+        time.sleep(0.2)
+    return list(prods.values())
 
 # ============================================================================
 # 2. CURACION (seleccion para la tienda) + VARIANTES
@@ -390,6 +404,36 @@ def curar_solobabys(prods, h2c):
     sel_b = sorted(bebes, key=lambda x: x["precio"])
     return sel_b, combos[:10]
 
+def curar_urbana_openmind(prods):
+    """Open Mind: TODOS los disponibles con precio real e imagen, dedup por nombre.
+    Descarta agotados y placeholders a precio 0 (prendas por llegar)."""
+    vistos, sel = set(), []
+    for p in prods:
+        vs = p.get("variants") or []
+        if not any(v.get("available") for v in vs):
+            continue
+        precios = [float(v["price"]) for v in vs if v.get("available") and float(v.get("price") or 0) > 0]
+        if not precios:
+            continue
+        nombre = re.sub(r"\s+", " ", p["title"]).strip()
+        if not nombre or not p.get("images") or nombre.lower() in vistos:
+            continue
+        vistos.add(nombre.lower())
+        imgs = []
+        for im in p["images"][:4]:
+            s = im.get("src", "")
+            if s.startswith("//"):
+                s = "https:" + s
+            if s and s not in imgs:
+                imgs.append(s)
+        if not imgs:
+            continue
+        sel.append({"nombre": titulo(nombre), "precio": int(min(precios)),
+                    "imgs": imgs, "var": opciones_shopify(p),
+                    "sku": (str(vs[0].get("sku") or "").strip() or None)})
+    sel.sort(key=lambda x: x["precio"])
+    return sel
+
 # ============================================================================
 # 3. ESCRITURA: catalogo.js y Excel
 # ============================================================================
@@ -405,10 +449,10 @@ def escribir_catalogo_js(secciones):
     lineas.append("// ======================================================================")
     lineas.append("const CATALOGO_IKI=[")
     total = 0
-    for prefijo, cat, items in secciones:
+    for prefijo, cat, prov, items in secciones:
         lineas.append("/* %s: %d productos */" % (cat, len(items)))
         for i, p in enumerate(items, 1):
-            partes = ['{id:"%s%02d"' % (prefijo, i), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat]
+            partes = ['{id:"%s%02d"' % (prefijo, i), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov]
             imgs = p.get("imgs") or []
             if imgs:
                 partes.append("img:%s" % js_str(imgs[0]))
@@ -491,6 +535,8 @@ if __name__ == "__main__":
     print("  taiwan:", len(taiwan))
     solobabys, sb_cols = descargar_solobabys()
     print("  solobabys:", len(solobabys))
+    openmind = descargar_openmind()
+    print("  openmind:", len(openmind))
 
     print("== Curando seleccion de la tienda ==")
     joyas = curar_joyas_gava(gava, gava_cols)
@@ -498,16 +544,18 @@ if __name__ == "__main__":
     juguetes = curar_taiwan(taiwan, ["jugueteria", "peluches", "burbujeros", "armatodo", "didactico", "juego-de-mesa", "cacharro", "piñateria", "animales", "colecciones", "slime", "deporte", "termos"], 500, 200000)
     escolar = curar_taiwan(taiwan, ["escolar", "cubo-rubik"], 500, 200000)
     bebes, combos = curar_solobabys(solobabys, sb_cols)
-    print("  joyas=%d moda=%d juguetes=%d escolar=%d bebe=%d regalos=%d" % (len(joyas), len(moda), len(juguetes), len(escolar), len(bebes), len(combos)))
+    urbana = curar_urbana_openmind(openmind)
+    print("  joyas=%d moda=%d juguetes=%d escolar=%d bebe=%d regalos=%d urbana=%d" % (len(joyas), len(moda), len(juguetes), len(escolar), len(bebes), len(combos), len(urbana)))
 
     print("== catalogo.js ==")
     escribir_catalogo_js([
-        ("m", "moda", moda),
-        ("t", "juguetes", juguetes),
-        ("s", "escolar", escolar),
-        ("b", "bebe", bebes),
-        ("r", "regalos", combos),
-        ("j", "joyas", joyas),
+        ("m", "moda", "majestic", moda),
+        ("t", "juguetes", "taiwan", juguetes),
+        ("s", "escolar", "taiwan", escolar),
+        ("b", "bebe", "solobabys", bebes),
+        ("r", "regalos", "solobabys", combos),
+        ("j", "joyas", "gava", joyas),
+        ("u", "urbana", "openmind", urbana),
     ])
 
     print("== Excel de cada proveedor ==")
@@ -610,5 +658,40 @@ if __name__ == "__main__":
          ["Fecha de extracción", time.strftime("%Y-%m-%d %H:%M")]] +
         [["En colección " + c, sum(1 for v in sb_cols.values() if c in v)]
          for c in sorted({x for v in sb_cols.values() for x in v})])])
+
+    # --- OpenMind ---
+    filas = []
+    for p in sorted(openmind, key=lambda x: (re.sub(r"\s+", " ", x["title"]).strip(), -(float(x["variants"][0]["price"]) if x.get("variants") else 0))):
+        vs = p.get("variants") or []
+        precios = [float(v["price"]) for v in vs if v.get("price")]
+        antes = [float(v["compare_at_price"]) for v in vs if v.get("compare_at_price")]
+        img = p["images"][0]["src"] if p.get("images") else ""
+        tallas = []
+        for v in vs:
+            for k in ("option1", "option2", "option3"):
+                val = (v.get(k) or "").strip()
+                if val and val.lower() not in ("default title",) and val not in tallas:
+                    tallas.append(val)
+        filas.append([p["id"], re.sub(r"\s+", " ", p["title"]).strip(),
+                      (p.get("product_type") or "").strip() or "Sin categoría",
+                      ", ".join(p.get("tags") or [])[:60],
+                      min(precios) if precios else None, max(antes) if antes else None,
+                      len(vs), "Sí" if any(v.get("available") for v in vs) else "No",
+                      ", ".join(tallas)[:80],
+                      "https://tiendasopenmind.com/products/%s" % p["handle"],
+                      ("https:" + img) if img.startswith("//") else img,
+                      len(p.get("images") or [])])
+    precios_todos = [f[4] for f in filas if f[4]]
+    escribir_excel("OpenMind_Catalogo.xlsx", [(
+        "Catálogo",
+        ["ID", "Nombre", "Tipo", "Etiquetas", "Precio (COP)", "Precio antes", "N.º variantes",
+         "Disponible", "Tallas", "URL producto", "URL imagen", "N.º imágenes"],
+        filas, [14, 44, 18, 30, 13, 13, 12, 12, 30, 58, 70, 11], (5, 6),
+        [["Métrica", "Valor"], ["Total de productos", len(filas)],
+         ["Disponibles", sum(1 for f in filas if f[7] == "Sí")],
+         ["Con precio y disponibles (tienda)", sum(1 for f in filas if f[7] == "Sí" and f[4])],
+         ["Precio mínimo disponible (COP)", min([f[4] for f in filas if f[4] and f[7] == "Sí"] or [0])],
+         ["Precio máximo disponible (COP)", max([f[4] for f in filas if f[4] and f[7] == "Sí"] or [0])],
+         ["Fecha de extracción", time.strftime("%Y-%m-%d %H:%M")]])])
 
     print("== Sincronización completa ==")
