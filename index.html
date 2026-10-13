@@ -8,7 +8,7 @@
 <meta property="og:title" content="IKI — Todo lo que te hace feliz, en un solo lugar">
 <meta property="og:description" content="Joyas, moda, pijamas, juguetes, escolar y regalos seleccionados.">
 <!-- Al publicar: reemplazar por la URL absoluta de la imagen de vista previa (mínimo 512×512) -->
-<meta property="og:image" content="IKI_post_cuadrado_1080x1080.png">
+<meta property="og:image" content="https://ikib2c.github.io/iki/logo_512.png">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_CO">
 <meta name="theme-color" content="#FFF8E9">
@@ -429,6 +429,7 @@ footer a:hover{color:var(--cr)}
 .lbi .pp{font:700 12px var(--ff)}
 /* ============ Responsive ============ */
 @media(max-width:900px){
+  .hero{display:none}
   .hd{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;position:relative}
   .brand{flex:1}
   .brand img{height:38px}
@@ -604,8 +605,8 @@ footer a:hover{color:var(--cr)}
 
 <!-- ============ Carruseles ============ -->
 <section class="carsec"><div class="wrap">
-  <h2 class="sect-t rv">Pequeños hallazgos para empezar</h2>
-  <p class="sect-s rv">Desliza y toca un producto para verlo en el catálogo.</p>
+  <h2 class="sect-t rv">Descubre los favoritos de la tienda</h2>
+  <p class="sect-s rv">Joyas y pijamas primero: desliza y toca un producto para verlo en el catálogo.</p>
   <div class="crow" id="favoritos" style="display:none">
     <div class="chead"><span class="clab" id="favRowLabel">Los favoritos de IKI</span><span class="cmeta" id="favRowMeta"></span></div>
     <div class="ctrack" id="carFav" tabindex="0" role="region" aria-label="Carrusel de los favoritos de IKI"></div>
@@ -632,8 +633,8 @@ footer a:hover{color:var(--cr)}
 
 <!-- ============ Marquesina ============ -->
 <div class="marquee" aria-hidden="true"><div class="mq">
-  <span>Envíos a todo el país</span><span>Pequeños hallazgos, grandes sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
-  <span>Envíos a todo el país</span><span>Pequeños hallazgos, grandes sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
+  <span>Envíos a todo el país</span><span>Hallazgos que se vuelven sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
+  <span>Envíos a todo el país</span><span>Hallazgos que se vuelven sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
 </div></div>
 
 <!-- ============ Catálogo ============ -->
@@ -643,7 +644,7 @@ footer a:hover{color:var(--cr)}
     <span class="tcount" id="productsCount">0 productos</span>
     <label class="sortw">Ordenar
       <select id="sortSelect" onchange="setSort(this.value)" aria-label="Ordenar productos">
-        <option value="n">Novedades</option>
+        <option value="n">Recomendados</option>
         <option value="a">Precio: menor a mayor</option>
         <option value="d">Precio: mayor a menor</option>
         <option value="cat">Por categoría</option>
@@ -680,7 +681,7 @@ footer a:hover{color:var(--cr)}
 
 <!-- ============ Banda de contacto ============ -->
 <div class="news"><div class="wrap">
-  <div><h2>Pequeños hallazgos, grandes sonrisas.</h2><div>Escríbenos y cuéntanos qué estás buscando.</div></div>
+  <div><h2>Hallazgos que se vuelven sonrisas.</h2><div>Cuéntanos qué buscas y te ayudamos a encontrarlo.</div></div>
   <a class="btn" id="waNews" href="#" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
 </div></div>
 
@@ -688,7 +689,7 @@ footer a:hover{color:var(--cr)}
 <footer><div class="wrap">
   <div>
     <b style="font:700 28px var(--ff);letter-spacing:-.02em;text-transform:none;color:var(--cr)">IKI</b><br>
-    Todo lo que te hace feliz,<br>en un solo lugar.<br>
+    Joyas, moda y regalos<br>con cariño colombiano.<br>
     <a id="waFoot" href="#" target="_blank" rel="noopener">WhatsApp 315 637 1501</a>
   </div>
   <div><b class="h">Tienda</b>
@@ -1135,7 +1136,7 @@ function listado(){
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
-  else l=l.slice().reverse();
+  else{const PRIO={joyas:0,moda:1};l=l.slice().sort((a,b)=>(PRIO[a.cat]!==undefined?PRIO[a.cat]:2)-(PRIO[b.cat]!==undefined?PRIO[b.cat]:2)||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
   return l;
 }
 function tarjetaHTML(p){
@@ -1480,7 +1481,11 @@ function sendOrder(){
   m+="\nSubtotal: "+cop(s.total)+"\nEnvío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
   if(notas)m+="\n\nNotas: "+notas;
   track("Lead",{value:s.total,currency:"COP",num_items:s.count,content_name:"Pedido WhatsApp"});
-  window.open(waLink(m),"_blank");
+  if(navigator.share&&navigator.canShare&&cart.length){
+    enviarPedidoConImagen(m);
+  }else{
+    window.open(waLink(m),"_blank");
+  }
   closeOrderForm();
   showToast("¡Pedido enviado! Termina de confirmarlo por WhatsApp");
   if(CONFIG.vaciarCarritoTrasPedido){
@@ -1492,6 +1497,25 @@ function sendOrder(){
       updateSubmit(false);
     },1200);
   }
+}
+
+/* Envia el pedido por WhatsApp con la FOTO del primer articulo: al viajar
+   como archivo (no como URL), el cliente ve la imagen y el origen del
+   proveedor queda oculto. Si el navegador no lo permite, va solo el texto. */
+async function enviarPedidoConImagen(msg){
+  try{
+    const primero=cart[0]?prod(cart[0].id):null;
+    if(primero&&primero.img){
+      const r=await fetch(primero.img,{mode:"cors"});
+      const b=await r.blob();
+      const file=new File([b],"pedido-iki.jpg",{type:(b.type||"image/jpeg")});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({text:msg,files:[file]});
+        return;
+      }
+    }
+  }catch(e){}
+  window.open(waLink(msg),"_blank");
 }
 
 /* ===== Lightbox ===== */
@@ -1592,12 +1616,26 @@ function scrollToProduct(id){
   },480);
 }
 function scrollToTop(){window.scrollTo({top:0,behavior:"smooth"});}
-function shareCatalog(){
+async function shareCatalog(){
   let url="";try{url=location.origin+location.pathname;}catch(e){url=location.href;}
-  const texto="Mira la tienda de IKI: todo lo que te hace feliz, en un solo lugar.";
+  const texto="IKI — joyas, moda y regalos con envíos a toda Colombia.";
   track("Lead",{content_name:"Compartir tienda"});
-  if(navigator.share){navigator.share({title:"IKI",text:texto,url:url}).catch(function(){});}
-  else if(navigator.clipboard&&navigator.clipboard.writeText){
+  try{
+    if(navigator.share&&navigator.canShare){
+      try{
+        const r=await fetch((TIENDA.logo&&TIENDA.logo.indexOf("http")===0)?TIENDA.logo:"logo_512.png",{mode:"cors"});
+        const b=await r.blob();
+        const file=new File([b],"iki-logo.png",{type:(b.type||"image/png")});
+        if(navigator.canShare({files:[file]})){
+          await navigator.share({text:texto,url:url,files:[file]});
+          return;
+        }
+      }catch(e){}
+      await navigator.share({title:"IKI",text:texto,url:url});
+      return;
+    }
+  }catch(e){}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(texto+" "+url).then(()=>showToast("Enlace copiado. Compártelo donde quieras")).catch(()=>window.prompt("Copia este enlace:",texto+" "+url));
   }else window.prompt("Copia este enlace:",texto+" "+url);
 }
@@ -1682,7 +1720,9 @@ function initCarouseles(){
     buildDots("carFav","dotsFav");hookScroll("carFav","dotsFav");
   }else fr.style.display="none";
   const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  const top=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,2);
+  const prioridad=["joyas","moda"].filter(c=>counts[c]);
+  const resto=Object.keys(counts).filter(c=>c!=="joyas"&&c!=="moda").sort((a,b)=>counts[b]-counts[a]);
+  const top=prioridad.concat(resto).slice(0,2);
   [["row1","car1","dots1","row1Label","row1Meta"],["row2","car2","dots2","row2Label","row2Meta"]].forEach((cfg,i)=>{
     const cat=top[i],row=$(cfg[0]),t=$(cfg[1]);
     if(!cat){row.style.display="none";return;}
