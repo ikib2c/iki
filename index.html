@@ -1725,9 +1725,9 @@ async function shareCatalog(){
     if(navigator.share&&navigator.canShare){
       const tarjeta=await crearTarjetaCompartir();
       if(tarjeta&&navigator.canShare({files:[tarjeta]})){
-        /* Solo la imagen: el nombre, el eslogan y la direccion van DIBUJADOS
-           dentro, asi texto y logo llegan juntos y nunca por separado. */
-        await navigator.share({files:[tarjeta]});
+        /* La imagen lleva logo y eslogan; el enlace viaja como texto para
+           que sea CLICLEABLE en WhatsApp (no es texto pintado en canvas). */
+        await navigator.share({text:url,files:[tarjeta]});
         return;
       }
       await navigator.share({title:"IKI",text:"IKI — joyas, moda y regalos con envíos a toda Colombia.",url:url});
@@ -1751,24 +1751,17 @@ async function crearTarjetaCompartir(){
     cv.width=1080;cv.height=1080;
     const cx=cv.getContext("2d");
     cx.fillStyle="#FFF8E9";cx.fillRect(0,0,1080,1080);
-    /* logo centrado */
-    cx.drawImage(logo,330,150,420,420);
-    /* nombre */
-    cx.textAlign="center";
-    cx.fillStyle="#242424";
-    cx.font="700 130px Montserrat, Arial, sans-serif";
-    cx.fillText("IKI",540,720);
+    /* logo transparente centrado (ya trae el nombre IKI dibujado) */
+    cx.drawImage(logo,290,220,500,500);
+    /* línea decorativa */
+    cx.fillStyle="#F5AE23";cx.fillRect(390,770,300,6);
     /* eslogan */
+    cx.textAlign="center";
     cx.fillStyle="#6B645A";
-    cx.font="500 46px Poppins, Arial, sans-serif";
-    cx.fillText("Joyas, moda y regalos",540,820);
-    cx.fillText("con envíos a toda Colombia",540,882);
-    /* direccion (clicleable al escribirla) */
-    cx.fillStyle="#242424";
-    cx.font="600 44px Montserrat, Arial, sans-serif";
-    let host="ikib2c.github.io/iki";
-    try{host=location.host+(location.pathname==="/"?"":location.pathname).replace(/^\//,"");}catch(e){}
-    cx.fillText(host,540,975);
+    cx.font="500 44px Poppins, Arial, sans-serif";
+    cx.fillText("Joyas, moda y regalos",540,850);
+    cx.font="500 38px Poppins, Arial, sans-serif";
+    cx.fillText("con envíos a toda Colombia",540,910);
     const blob=await new Promise(function(res){cv.toBlob(res,"image/png");});
     return new File([blob],"iki-tienda.png",{type:"image/png"});
   }catch(e){return null;}
