@@ -1665,7 +1665,8 @@ function sendOrder(){
   const labels={"contra-entrega":"Contra entrega (paga al recibir)","transferencia":"Transferencia Nequi al 315 637 1501 (se confirma por WhatsApp)"};
   const s=cartResumen();
   /* WhatsApp formatea *texto* como negrita: da jerarquia al pedido */
-  let m="*PEDIDO — IKI*\n\n";
+  const consec=consecutivoPedido();
+  let m="*PEDIDO — IKI* · No. "+consec+"\n\n";
   m+="*Cliente:* "+nombre+"\n*WhatsApp:* +57 "+tel+"\n";
   if(email)m+="*Email:* "+email+"\n";
   m+="\n*Entrega:* A domicilio\nDepartamento: "+dep+"\nCiudad: "+ciudad+"\n";
@@ -1687,7 +1688,7 @@ function sendOrder(){
   /* wa.me abre WhatsApp DIRECTO en cualquier dispositivo: sin selector
      de apps, sin fricción, cero pérdida de ventas por confusion. */
   if(navigator.share&&navigator.canShare&&cart.length){
-    enviarPedidoConImagen(m);
+    enviarPedidoConImagen(m,consec);
   }else{
     window.open(waLink(m),"_blank");
   }
@@ -1720,26 +1721,85 @@ function cargarImagenPedido(src){
 /* Hoja de pedido 1080 de ancho, alto segun articulos: encabezado con logo,
    una fila por producto (miniatura 150x150 + nombre + Ref + cantidad/precio)
    y pie con el total en grande. Todo en una imagen. */
-async function crearHojaPedido(){
+/* Consecutivo unico de pedido: PED-YYYYMMDD-NNN (se incrementa por dia
+   en este dispositivo y nunca se repite: la fecha avanza). */
+function consecutivoPedido(){
+  const hoy=new Date().toISOString().slice(0,10);
+  let c=null;
+  try{c=JSON.parse(localStorage.getItem("ikiPedSeq"))||null;}catch(e){}
+  if(!c||c.fecha!==hoy)c={fecha:hoy,seq:0};
+  c.seq+=1;
+  try{localStorage.setItem("ikiPedSeq",JSON.stringify(c));}catch(e){}
+  return "PED-"+hoy.replace(/-/g,"")+"-"+String(c.seq).padStart(3,"0");
+}
+/* Copia el texto del pedido al portapapeles (respaldo si el destino
+   del share descarta el texto al recibir la imagen). */
+function copiarTextoPedido(msg,silencioso){
+  const listo=silencioso?function(){}:function(){showToast("Texto del pedido copiado");};
   try{
-    const alto=300+cart.length*190+180;
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(msg).then(listo,function(){});return;}
+    const ta=document.createElement("textarea");ta.value=msg;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");listo();}finally{ta.remove();}
+  }catch(e){}
+}
+/* Corta un texto con elipsis para que nunca exceda maxW pixeles. */
+function cortarTexto(cx,txt,maxW){
+  if(cx.measureText(txt).width<=maxW)return txt;
+  let t=String(txt);
+  while(t.length>1&&cx.measureText(t+"…").width>maxW)t=t.slice(0,-1);
+  return t+"…";
+}
+/* Envuelve un texto en maxLines lineas de maxW pixeles. */
+function envolverLineas(cx,txt,maxW,maxLines){
+  const palabras=String(txt).split(" ").filter(Boolean);
+  const lineas=[];let actual="";
+  for(let i=0;i<palabras.length;i++){
+    const prueba=actual?actual+" "+palabras[i]:palabras[i];
+    if(!actual||cx.measureText(prueba).width<=maxW)actual=prueba;
+    else{lineas.push(actual);actual=palabras[i];if(lineas.length>=maxLines)break;}
+  }
+  if(actual&&lineas.length<maxLines)lineas.push(actual);
+  if(lineas.length>maxLines)lineas.length=maxLines;
+  if(lineas.join(" ")!==String(txt)&&lineas.length){
+    lineas[lineas.length-1]=cortarTexto(cx,lineas[lineas.length-1],maxW-40);
+  }
+  return lineas;
+}
+/* Hoja de pedido 1080px con COLUMNAS SEPARADAS: encabezado (logo UNA vez,
+   insignia amarilla con el No. de pedido, fecha), una fila por producto
+   (foto 150 | nombre/refs/variante en 248..748 | cant/precios en 750..1020)
+   y pie con total, envio, pago y cierre. Sin solapes: el nombre se envuelve
+   en 2 lineas y todo se corta al ancho de su columna. */
+async function crearHojaPedido(consec){
+  try{
+    const nFilas=cart.length;
+    const alto=340+nFilas*200+340;
     const cv=document.createElement("canvas");
     cv.width=1080;cv.height=alto;
     const cx=cv.getContext("2d");
+    if(!cx)return null;
     cx.fillStyle="#FFF8E9";cx.fillRect(0,0,1080,alto);
+    /* ===== Encabezado ===== */
     const logo=new Image();
     logo.src="logo_512.png";
     try{await logo.decode();}catch(e){}
-    if(logo.width)cx.drawImage(logo,60,52,150,150);
+    if(logo.width)cx.drawImage(logo,60,46,132,132);
+    cx.fillStyle="#F5AE23";cx.fillRect(600,58,420,86);
+    cx.fillStyle="#242424";cx.font="700 33px Montserrat, Arial, sans-serif";
+    cx.textAlign="center";
+    cx.fillText("No. "+(consec||consecutivoPedido()),810,113);
+    cx.textAlign="right";
+    cx.fillStyle="#6B645A";cx.font="500 27px Poppins, Arial, sans-serif";
+    cx.fillText(new Date().toLocaleDateString("es-CO")+" · "+new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}),1020,180);
     cx.textAlign="left";
-    cx.fillStyle="#242424";
-    cx.font="700 64px Montserrat, Arial, sans-serif";
-    try{const logoP=new Image();logoP.src="logo_512.png";await logoP.decode();cx.drawImage(logoP,240,52,120,120);cx.fillText("Pedido",380,120);}catch(e){cx.fillText("Pedido — IKI",240,120);}
-    cx.fillStyle="#6B645A";
-    cx.font="500 34px Poppins, Arial, sans-serif";
-    cx.fillText(new Date().toLocaleDateString("es-CO"),240,168);
-    cx.fillStyle="#F5AE23";cx.fillRect(60,232,960,6);
-    let y=290;
+    cx.fillStyle="#242424";cx.font="800 62px Montserrat, Arial, sans-serif";
+    cx.fillText("PEDIDO",60,252);
+    cx.fillStyle="#6B645A";cx.font="500 28px Poppins, Arial, sans-serif";
+    cx.fillText("IKI · Todo lo que te hace feliz",60,294);
+    cx.fillStyle="#F5AE23";cx.fillRect(60,330,960,6);
+    /* ===== Filas de productos ===== */
+    let y=380;
     for(let i=0;i<cart.length;i++){
       const it=cart[i];
       const p=prod(it.id);
@@ -1748,56 +1808,54 @@ async function crearHojaPedido(){
       if(im){
         const s=150/Math.max(im.width,im.height);
         const w=im.width*s,h=im.height*s;
-        cx.fillStyle="#FFFFFF";
-        cx.fillRect(60,y,150,150);
+        cx.fillStyle="#FFFFFF";cx.fillRect(60,y,150,150);
         cx.drawImage(im,60+(150-w)/2,y+(150-h)/2,w,h);
       }else{
-        cx.fillStyle=softOf(p.cat);
-        cx.fillRect(60,y,150,150);
-        cx.fillStyle="#2424242e";
-        cx.font="700 52px Montserrat, Arial, sans-serif";
-        cx.textAlign="center";
-        cx.fillText("IKI",135,y+95);
-        cx.textAlign="left";
+        cx.fillStyle=softOf(p.cat);cx.fillRect(60,y,150,150);
+        cx.fillStyle="#2424242e";cx.font="700 52px Montserrat, Arial, sans-serif";
+        cx.textAlign="center";cx.fillText("IKI",135,y+95);cx.textAlign="left";
       }
-      cx.fillStyle="#242424";
-      cx.font="600 38px Poppins, Arial, sans-serif";
-      cx.fillText(p.n.length>34?p.n.slice(0,33)+"…":p.n,248,y+52);
-      let linea2=y+96;
-      cx.fillStyle="#6B645A";
-      cx.font="500 30px Poppins, Arial, sans-serif";
+      /* columna de texto (248..748): nombre en 2 lineas + refs + variante */
+      cx.fillStyle="#242424";cx.font="600 36px Poppins, Arial, sans-serif";
+      const nombre=envolverLineas(cx,p.n,500,2);
+      cx.fillText(nombre[0],248,y+46);
+      if(nombre[1])cx.fillText(nombre[1],248,y+88);
+      cx.fillStyle="#6B645A";cx.font="500 26px Poppins, Arial, sans-serif";
       let refParts=[];
       if(p.cid)refParts.push("Cat: "+p.cid);
       if(p.sku)refParts.push("Ref: "+p.sku);
-      if(refParts.length){cx.fillText(refParts.join(" · "),248,linea2);linea2+=40;}
+      let linea2=y+130;
+      if(refParts.length){cx.fillText(cortarTexto(cx,refParts.join(" · "),500),248,linea2);linea2+=34;}
       if(it.var){
-        cx.fillStyle="#6B645A";
-        cx.font="500 28px Poppins, Arial, sans-serif";
-        cx.fillText(Object.keys(it.var).map(function(g){return g+": "+it.var[g];}).join(" · "),248,linea2);
+        const vtxt=Object.keys(it.var).map(function(g){return g+": "+it.var[g];}).join(" · ");
+        cx.fillText(cortarTexto(cx,vtxt,500),248,linea2);
       }
+      /* columna de precios (750..1020): cant x total + c/u */
       cx.textAlign="right";
-      cx.fillStyle="#242424";
-      cx.font="700 42px Montserrat, Arial, sans-serif";
-      cx.fillText(it.qty+" × "+cop(p.p*it.qty),1020,y+62);
+      cx.fillStyle="#242424";cx.font="700 36px Montserrat, Arial, sans-serif";
+      cx.fillText(cortarTexto(cx,it.qty+" × "+cop(p.p*it.qty),266),1020,y+58);
       if(it.qty>1){
-        cx.fillStyle="#6B645A";
-        cx.font="500 30px Poppins, Arial, sans-serif";
-        cx.fillText(cop(p.p)+" c/u",1020,y+106);
+        cx.fillStyle="#6B645A";cx.font="500 26px Poppins, Arial, sans-serif";
+        cx.fillText(cortarTexto(cx,cop(p.p)+" c/u",240),1020,y+100);
       }
       cx.textAlign="left";
-      cx.fillStyle="#EADFCB";
-      cx.fillRect(60,y+170,960,2);
-      y+=190;
+      cx.fillStyle="#EADFCB";cx.fillRect(60,y+176,960,2);
+      y+=200;
     }
-    cx.fillStyle="#242424";
-    cx.font="700 56px Montserrat, Arial, sans-serif";
-    cx.fillText("TOTAL PRODUCTOS",60,y+40);
-    cx.textAlign="right";
-    cx.fillText(cop(cartResumen().total),1020,y+40);
+    /* ===== Pie ===== */
+    const s=cartResumen();
+    cx.fillStyle="#242424";cx.font="700 50px Montserrat, Arial, sans-serif";
+    cx.fillText("TOTAL PRODUCTOS",60,y+58);
+    cx.textAlign="right";cx.fillText(cop(s.total),1020,y+58);cx.textAlign="left";
+    cx.fillStyle="#6B645A";cx.font="500 28px Poppins, Arial, sans-serif";
+    cx.fillText(cortarTexto(cx,s.count+" unidad"+(s.count===1?"":"es")+" · Envío pagado: se cotiza según la ciudad",920),60,y+108);
+    cx.fillText("Pago: contra entrega · Nequi 315 637 1501",60,y+148);
+    cx.fillStyle="#F5AE23";cx.fillRect(60,y+186,960,4);
+    cx.fillStyle="#242424";cx.font="700 36px Montserrat, Arial, sans-serif";
+    cx.textAlign="center";cx.fillText("¡Gracias por tu compra!",540,y+244);
+    cx.fillStyle="#6B645A";cx.font="500 26px Poppins, Arial, sans-serif";
+    cx.fillText(cortarTexto(cx,"WhatsApp +57 315 637 1501 · No. "+(consec||""),900),540,y+286);
     cx.textAlign="left";
-    cx.fillStyle="#6B645A";
-    cx.font="500 30px Poppins, Arial, sans-serif";
-    cx.fillText("Envío pagado: se cotiza según la ciudad · Confirmado por WhatsApp",60,y+90);
     const blob=await new Promise(function(res){cv.toBlob(res,"image/png");});
     return new File([blob],"pedido-iki.png",{type:"image/png"});
   }catch(e){return null;}
@@ -1807,11 +1865,13 @@ async function crearHojaPedido(){
    producto. El vendedor identifica visualmente lo que le piden (algunos
    proveedores no usan SKU ni referencias). navigator.share abre el
    selector del sistema; si falla, cae al texto directo por wa.me. */
-async function enviarPedidoConImagen(msg){
+async function enviarPedidoConImagen(msg,consec){
   try{
-    const hoja=await crearHojaPedido();
+    const hoja=await crearHojaPedido(consec);
     if(hoja&&navigator.canShare&&navigator.canShare({files:[hoja]})){
+      copiarTextoPedido(msg,true); /* respaldo silencioso: algunos destinos (WhatsApp Web) descartan el texto al recibir archivos */
       await navigator.share({text:msg,files:[hoja]});
+      showToast("Pedido enviado — el texto quedó copiado: pégalo en el chat si no llegó con la imagen");
       return;
     }
   }catch(e){}
