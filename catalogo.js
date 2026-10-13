@@ -1,6 +1,6 @@
 // ======================================================================
 // catalogo.js de IKI - generado automaticamente por scripts/sync_catalogos.py
-// (2026-10-12 22:46). NO editar a mano: el cron de GitHub Actions lo regenera.
+// (2026-10-13 06:25). NO editar a mano: el cron de GitHub Actions lo regenera.
 // Fuentes: gavajoyeria.com · pijamasalmayor.com/sublimados_majestic
 //          jugueteriataiwan.com · solobabys.com (catalogos publicos)
 // ======================================================================
@@ -23,7 +23,7 @@ const CATALOGO_IKI=[
 /* juguetes: 14 productos */
 {id:"t01",n:"Titere 12 Motivos",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/24434/thumb/40ec3ba6-9781-4285-9a8a-87a55185a417.webp"},
 {id:"t02",n:"Carta Uno No Mercy Cafe",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/25268/thumb/e92459eb-7791-4e97-91e9-e75b83acd783.webp"},
-{id:"t03",n:"Mula Niã‘era 3 Colores",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26526/thumb/50beeba1-12de-4f91-8d61-19e71e5508c6.webp"},
+{id:"t03",n:"Mula Niñera 3 Colores",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26526/thumb/50beeba1-12de-4f91-8d61-19e71e5508c6.webp"},
 {id:"t04",n:"Lanza Burbuja Bolsa Toys 5 Colores",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26074/thumb/d4761696-59ab-49ed-9e78-32437ad8f0eb.webp"},
 {id:"t05",n:"Paw Patrol Caja 8 Motivos",p:10000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26412/thumb/eb8a3bb9-ac72-435a-9c8c-58ff48291bce.webp"},
 {id:"t06",n:"Peluche Kuromi Luna",p:15000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26588/thumb/67a86b1e-7831-4ab7-9f9c-2dd3d3f01411.webp"},
