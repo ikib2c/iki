@@ -511,6 +511,65 @@ footer a:hover{color:var(--cr)}
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none}
 }
+/* ============ Fotos sobre fondo blanco: la imagen que no cubre el 100% del marco se ve limpia ============ */
+.ph{background:#fff}
+.lbmain{background:#fff}
+.th,.srt{background:#fff}
+/* ============ Regalos por ocasión ============ */
+.gift-budgets{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:26px}
+.gift-budgets .chip{background:#fff;box-shadow:var(--sh);font-size:13.5px;padding:10px 20px}
+.occ-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.occ{background:#fff;border-radius:22px;padding:22px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;transition:transform .25s,box-shadow .25s}
+.occ:hover{transform:translateY(-4px);box-shadow:var(--shh)}
+.occ-ic{width:46px;height:46px;border-radius:50%;background:#F5AE2322;display:grid;place-items:center;margin-bottom:2px}
+.occ-ic .ic{width:21px;height:21px}
+.occ b{font:600 15px var(--ff)}
+.occ span{font-size:12px;color:var(--mu);line-height:1.45}
+.occ-cta{font:600 12px var(--fb);color:var(--c);margin-top:6px}
+.occ:hover .occ-cta{text-decoration:underline}
+/* ============ Sección legal ============ */
+#legal{padding-top:76px}
+#legal .wrap{max-width:920px}
+.legal-data{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 26px}
+.ld-chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--bd);border-radius:999px;padding:8px 14px;font:500 12.5px var(--fb)}
+.ld-chip .ic{width:14px;height:14px;color:var(--y)}
+#legal summary{font-size:15px}
+/* ============ Panel de administración (patrón Juguetería Taiwan) ============ */
+.admin-login{max-width:420px}
+.admin-label{display:flex;flex-direction:column;gap:6px;font:500 12.5px var(--fb);margin-bottom:14px}
+.admin-label input{padding:12px;border:1.5px solid var(--bd);border-radius:12px;font:400 14px var(--fb);background:#fff}
+.admin-label input:focus{outline:none;border-color:var(--c)}
+.admin-error{display:flex;align-items:center;gap:8px;background:#FDECEF;color:var(--err);border:1px solid #F5C2CC;border-radius:10px;padding:10px 12px;font:500 12.5px var(--fb);margin-bottom:14px}
+.admin-panel{max-width:640px}
+.admin-h{font:700 14.5px var(--ff);margin:18px 0 10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.admin-h small{font:400 11.5px var(--fb);color:var(--mu)}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.admin-grid .admin-label{margin-bottom:0}
+.admin-grid input{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font:400 13px var(--fb);background:#fff}
+.admin-grid input:focus{outline:none;border-color:var(--c)}
+.admin-check{display:flex;align-items:center;gap:8px;font:500 12.5px var(--fb);min-height:40px}
+.admin-check input{width:17px;height:17px;accent-color:var(--y)}
+.admin-buscar{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font:400 13px var(--fb);background:#fff;margin-bottom:10px}
+.admin-buscar:focus{outline:none;border-color:var(--c)}
+.admin-fila{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;background:#FFFDF6;border:1px solid #F0E8D6;border-radius:10px;font-size:12.5px;margin-bottom:6px}
+.admin-fila .an{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-fila input{width:104px;padding:7px 9px;border:1.5px solid var(--bd);border-radius:8px;font:500 12px var(--fb);background:#fff}
+.admin-btn{border:0;background:var(--y);color:var(--c);border-radius:9px;padding:8px 14px;font:600 12px var(--fb);cursor:pointer;white-space:nowrap}
+.admin-btn.quitar{background:#FDECEF;color:var(--err)}
+.admin-fijados{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.admin-fijados .admin-fila{background:#FFF3D6;border-color:#EADFCB}
+.admin-lista{max-height:300px;overflow-y:auto;border:1px solid var(--bd);border-radius:12px;padding:8px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin}
+.admin-lista .gr{font:700 11px var(--fb);letter-spacing:.1em;text-transform:uppercase;color:var(--y);background:var(--c);border-radius:8px;padding:6px 10px}
+.admin-botones{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.admin-botones .btn{min-height:44px;padding:0 18px;font-size:13px}
+.admin-nota{margin-top:14px;font-size:12px;color:var(--mu);background:#FFFDF6;border:1px dashed var(--bd);border-radius:10px;padding:10px 12px;line-height:1.5}
+@media(max-width:640px){
+  .admin-panel .cod-h{padding:12px 14px}
+  .admin-grid{grid-template-columns:1fr}
+  .admin-fila{grid-template-columns:1fr auto;row-gap:4px}
+  .admin-fila input{grid-column:1/-1}
+  .admin-botones .btn{flex:1 1 calc(50% - 5px);font-size:12px;padding:0 10px}
+}
 </style>
 </head>
 <body>
@@ -673,10 +732,15 @@ footer a:hover{color:var(--cr)}
 </div></section>
 
 <!-- ============ Regalos por ocasión ============ -->
-<section id="regalos"><div class="wrap"><div class="gift rv">
-  <div><div class="eyebrow">Regalos</div><h2>Un detalle para cada ocasión</h2></div>
-  <div id="gifts"></div>
-</div></div></section>
+<section id="regalos"><div class="wrap">
+  <div class="rv" style="text-align:center;margin-bottom:32px">
+    <div class="eyebrow">Regalos</div>
+    <h2 style="font-size:clamp(26px,3.4vw,36px);margin-top:8px">Un detalle para cada ocasión</h2>
+    <p style="color:var(--mu);max-width:540px;margin:10px auto 0">Cuéntanos para quién y para qué momento: te ayudamos a escoger el regalo perfecto y lo dejamos listo para sorprender.</p>
+  </div>
+  <div class="gift-budgets rv" id="giftBudgets"></div>
+  <div class="occ-grid" id="occGrid"></div>
+</div></section>
 
 <!-- ============ Nuestra esencia ============ -->
 <section id="esencia"><div class="wrap"><div class="ess rv">
@@ -704,6 +768,20 @@ footer a:hover{color:var(--cr)}
 </div></section>
 </main>
 
+<!-- ============ Sección legal (requisitos de e-commerce en Colombia y de Meta) ============ -->
+<section id="legal"><div class="wrap">
+  <div class="rv"><div class="eyebrow">Legal</div><h2 style="font-size:clamp(26px,3.4vw,36px);margin-top:8px">Información legal y políticas</h2></div>
+  <div class="legal-data rv" id="legalData"></div>
+  <details><summary>Términos y condiciones</summary><p>IKI opera como tienda en línea de productos de estilo de vida, regalos y accesorios en Colombia. Las compras se gestionan por WhatsApp: al enviar tu pedido confirmas que los datos suministrados son veraces y aceptas estas condiciones. Los precios se publican en pesos colombianos (COP) e incluyen impuestos aplicables; el costo del envío se cotiza por separado según la ciudad de destino y se informa antes de confirmar el pedido. La disponibilidad de los productos puede variar; si una referencia se agota después de tu pedido, te lo informaremos de inmediato para ofrecerte alternativas o la devolución de lo pagado.</p></details>
+  <details><summary>Tratamiento de datos personales (Ley 1581 de 2012)</summary><p>El responsable del tratamiento es <b id="legRazon">IKI</b>. Recolectamos nombre, número de WhatsApp, correo electrónico (opcional) y dirección de entrega con la única finalidad de gestionar tu pedido, coordinar la entrega y dar respuesta a tus solicitudes. No vendemos ni cedemos tus datos a terceros. Conforme a la Ley 1581 de 2012 puedes ejercer en cualquier momento tus derechos de conocimiento, actualización, rectificación y supresión escribiendo a nuestro canal de atención. Al enviar tu pedido autorizas el uso de tus datos para los fines aquí descritos.</p></details>
+  <details><summary>Política de cookies y almacenamiento local</summary><p>Esta tienda no utiliza cookies publicitarias propias. El carrito y tu lista de favoritos se guardan en el almacenamiento local de tu propio navegador para que no pierdas tu selección; puedes borrarlos limpiando los datos del sitio en tu navegador. Si nuestra analítica está activa (Pixel de Meta o Google Analytics), estas herramientas pueden instalar cookies para medir el uso del sitio; puedes rechazarlas desde la configuración de privacidad de tu navegador.</p></details>
+  <details><summary>Derecho de retracto (Art. 47, Ley 1480 de 2011)</summary><p>En compras no presenciales tienes derecho a retractarte dentro de los <b>5 días hábiles</b> siguientes a la recepción del producto. Para ejercerlo, el producto debe estar sin uso, con su empaque original y accesorios completos. Escríbenos por WhatsApp o correo indicando tu pedido; una vez verificado el estado del producto, el reintegro del dinero se realizará en un plazo máximo de 30 días. Quedan exceptuados del retracto los productos personalizados o hechos a medida y los de uso íntimo, conforme a la ley.</p></details>
+  <details><summary>Envíos y entregas</summary><p>Despachamos a toda Colombia a través de transportadoras aliadas. Los tiempos orientativos son de 2 a 5 días hábiles en ciudades principales y de 3 a 8 en el resto del país; te compartimos la guía de envío para que hagas seguimiento. Al recibir tu pedido, revísalo frente al transportador: cualquier novedad repórtala de inmediato por WhatsApp.</p></details>
+  <details><summary>Medios de pago y seguridad</summary><p>Aceptamos pago contra entrega (pagas cuando recibes tu pedido) y transferencia por Nequi al 315 637 1501. Nunca solicitamos datos de tus tarjetas ni contraseñas bancarias: cualquier mensaje que los pida en nuestro nombre es fraudulento. La confirmación de cada pago y de cada pedido se realiza únicamente por nuestros canales oficiales de WhatsApp.</p></details>
+  <details><summary>Garantías, cambios y devoluciones (Ley 1480 de 2011)</summary><p>Todos los productos cuentan con la garantía legal de calidad e idoneidad del Estatuto del Consumidor. Si tu producto llega con fallas de fábrica o no corresponde a lo solicitado, escríbenos dentro de los <b>5 días hábiles</b> siguientes a la entrega con fotos del producto y coordinamos el cambio o la devolución según el caso. Los gastos de envío derivados de fallas imputables a la tienda son cubiertos por nosotros.</p></details>
+  <details><summary>Atención al consumidor y resolución de quejas</summary><p>Nuestro canal principal de atención es WhatsApp y respondemos en horario hábil. Si consideras que no se ha dado solución a tu solicitud, puedes acudir a la Superintendencia de Industria y Comercio (www.sic.gov.co), entidad encargada de la protección al consumidor en Colombia.</p></details>
+</div></section>
+
 <!-- ============ Banda de contacto ============ -->
 <div class="news"><div class="wrap">
   <div><h2>Pequeños hallazgos, grandes sonrisas.</h2><div>Escríbenos y cuéntanos qué estás buscando.</div></div>
@@ -726,15 +804,15 @@ footer a:hover{color:var(--cr)}
   </div>
   <div><b class="h">Ayuda</b>
     <a href="#faq">Preguntas frecuentes</a><br>
-    <a href="#faq">Envíos y entregas</a><br>
-    <a href="#faq">Cambios y garantía</a>
+    <a href="#legal">Envíos y garantías</a><br>
+    <a href="#" onclick="intentarAbrirAdmin();return false;">Administración</a>
   </div>
   <div><b class="h">Legal</b>
-    Términos y condiciones<br>
-    Tratamiento de datos<br>
-    Retracto
+    <a href="#legal">Términos y condiciones</a><br>
+    <a href="#legal">Tratamiento de datos</a><br>
+    <a href="#legal">Derecho de retracto</a>
   </div>
-  <div class="legal">© <span id="footerYear"></span> IKI · Hecho con cariño en Colombia.</div>
+  <div class="legal" id="footLegal">© IKI · Hecho con cariño en Colombia.</div>
 </div></footer>
 
 <!-- ============ Barra de pago y botones flotantes ============ -->
@@ -879,6 +957,90 @@ footer a:hover{color:var(--cr)}
   </div>
 </div>
 
+<!-- ============ Panel de administración: login ============ -->
+<div class="modal" id="adminLoginModal">
+  <div class="cod admin-login" role="dialog" aria-modal="true" aria-label="Acceso al panel de administración">
+    <div class="cod-h">
+      <span class="cod-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3"/></svg></span>
+      <div class="cod-t"><h3>Administración de la tienda</h3><p>Área privada</p></div>
+      <button class="cod-x" onclick="cerrarLoginAdmin()" aria-label="Cerrar"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="cod-b">
+      <p style="font-size:12.5px;color:var(--mu);margin-bottom:14px">Ingresa la clave para administrar identidad, datos legales, precios y contenido del inicio.</p>
+      <label class="admin-label">Tu clave
+        <input type="password" id="adminClave" autocomplete="off" placeholder="Escribe la clave aquí" onkeydown="if(event.key==='Enter'){event.preventDefault();entrarAdmin();}">
+      </label>
+      <div class="admin-error" id="adminLoginError" hidden><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 8v.1M12 11v5"/></svg> La clave no es correcta. Inténtalo de nuevo.</div>
+      <div class="admin-botones">
+        <button class="btn y" type="button" onclick="entrarAdmin()">Ingresar</button>
+        <button class="btn o" type="button" onclick="cerrarLoginAdmin()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Panel de administración ============ -->
+<div class="modal" id="adminModal">
+  <div class="cod admin-panel" role="dialog" aria-modal="true" aria-label="Panel de administración de la tienda">
+    <div class="cod-h">
+      <span class="cod-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>
+      <div class="cod-t"><h3>Panel de la tienda</h3><p>Edita identidad, legal, precios y contenido del inicio</p></div>
+      <button class="cod-x" onclick="cerrarPanelAdmin()" aria-label="Cerrar panel"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="cod-b">
+      <div class="admin-h">Identidad de la tienda</div>
+      <div class="admin-grid">
+        <label class="admin-label">Nombre<input id="adminNombre" placeholder="IKI"></label>
+        <label class="admin-label">Logo (URL; vacío = logo IKI)<input id="adminLogo" placeholder="https://…"></label>
+        <label class="admin-label">WhatsApp de pedidos (10 dígitos)<input id="adminWa" inputmode="numeric" placeholder="3156371501"></label>
+        <label class="admin-label">Email de contacto<input id="adminEmail" placeholder="tucorreo@ejemplo.com"></label>
+      </div>
+      <div class="admin-h">Datos legales <small>se muestran en la sección legal y el pie</small></div>
+      <div class="admin-grid">
+        <label class="admin-label">Razón social<input id="adminRazon" placeholder="Ej. IKI Commerce S.A.S."></label>
+        <label class="admin-label">NIT<input id="adminNit" placeholder="Ej. 901.234.567-8"></label>
+        <label class="admin-label">Dirección de atención (opcional)<input id="adminDir" placeholder="Ciudad, dirección"></label>
+      </div>
+      <div class="admin-h">Redes</div>
+      <div class="admin-grid">
+        <label class="admin-label">Instagram (sin @)<input id="adminIg" placeholder="ikitienda"></label>
+        <label class="admin-label">TikTok (sin @)<input id="adminTt" placeholder="ikitienda"></label>
+      </div>
+      <div class="admin-h">Analítica <small>solo el ID; vacío = apagada</small></div>
+      <div class="admin-grid">
+        <label class="admin-label">Pixel de Meta<input id="adminPixel" inputmode="numeric" placeholder="123456789012345"></label>
+        <label class="admin-label">Google Analytics 4<input id="adminGa4" placeholder="G-XXXXXXXXXX"></label>
+      </div>
+      <div class="admin-h">Inicio</div>
+      <input class="admin-buscar" id="adminBuscarHero" placeholder="Busca el producto destacado del héroe… ej: filigrana, pijama, peluche" oninput="buscarAdminHero()">
+      <div class="admin-fijados" id="adminResHero"></div>
+      <div class="admin-grid">
+        <label class="admin-label">Id del producto destacado (la búsqueda lo llena)<input id="adminDestacado" placeholder="j27"></label>
+        <label class="admin-label">Favoritos del carrusel (ids con comas)<input id="adminFavoritos" placeholder="j27,j21,m04,t13,t14,r02"></label>
+      </div>
+      <div class="admin-h">Comportamiento</div>
+      <div class="admin-grid">
+        <label class="admin-check"><input type="checkbox" id="adminVaciar" checked> Vaciar el carrito después de enviar el pedido</label>
+        <label class="admin-label">Nueva clave del panel (vacío = no cambiar)<input id="adminClaveNueva" autocomplete="off" placeholder="Escribe una clave nueva"></label>
+      </div>
+      <div class="admin-h">Precio exacto por producto <small>vacío = precio del proveedor</small></div>
+      <input class="admin-buscar" id="adminBuscarPrecio" placeholder="Busca un producto para fijarle el precio de venta…" oninput="buscarAdminPrecio()">
+      <div class="admin-fijados" id="adminResPrecio"></div>
+      <div id="adminFijados"></div>
+      <div class="admin-h">Lista completa de productos</div>
+      <div class="admin-lista" id="adminLista" hidden></div>
+      <div class="admin-botones">
+        <button class="btn y" type="button" onclick="aplicarPanelAdmin()"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg> Ver cambios ahora</button>
+        <button class="btn o" type="button" onclick="guardarPanelAdmin()">Guardar en MI computador</button>
+        <button class="btn o" type="button" onclick="copiarConfigAdmin()">Guardar para TODOS</button>
+        <button class="btn o" type="button" onclick="restaurarPanelAdmin()">Restaurar</button>
+        <button class="btn o" type="button" onclick="cerrarSesionAdmin()">Salir</button>
+      </div>
+      <p class="admin-nota"><b>Guardar en MI computador:</b> solo lo ves tú en este navegador. <b>Guardar para TODOS:</b> copia los bloques <b>TIENDA_DEFECTO</b> y <b>PRECIOS_DEFECTO</b> para que tu persona de confianza los reemplace en el archivo y publique. La clave de este panel es una barrera de conveniencia, no seguridad real: cámbiala y no la compartas.</p>
+    </div>
+  </div>
+</div>
+
 <!-- ============ Lightbox de fotos ============ -->
 <div id="lightbox">
   <div class="lbp">
@@ -923,12 +1085,74 @@ const CATS=[
 /* Fotos provisionales por categoría (banners del proyecto) */
 const IMG={joyas:"IKI_banner_joyas_1600x600.png",moda:"IKI_banner_pijamas_1600x600.png",juguetes:"",escolar:"",regalos:"IKI_banner_regalos_1600x600.png"};
 /* Chips de Regalos por ocasión */
-const GIFTS=["Hasta [$ A]","Hasta [$ B]","Hasta [$ C]","Cumpleaños","Agradecimiento","[Fecha especial]"];
+const GIFTS={
+  presupuestos:["Hasta $30.000","Hasta $60.000","Hasta $100.000","Más de $100.000"],
+  ocasiones:[
+    {n:"Cumpleaños",d:"Para sorprender en su día",i:"M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"},
+    {n:"Aniversario",d:"Celebra lo que son juntos",i:"M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"},
+    {n:"Baby shower",d:"Para recibir al nuevo miembro",i:"M9 2h6v4l2 3v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9l2-3zM7 13h10"},
+    {n:"Gracias",d:"Un detalle que lo dice todo",i:"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"},
+    {n:"Amistad",d:"Los amigos también se celebran",i:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8.5 10v.1M15.5 10v.1M8.5 14.5a4.5 4.5 0 0 0 7 0"},
+    {n:"Solo porque",d:"El mejor motivo es ninguno",i:"M12 3l1.9 5.9 6.1.3-4.9 3.8 1.7 5.9-4.8-3.4-4.8 3.4 1.7-5.9-4.9-3.8 6.1-.3z"}
+  ]};
 /* Productos de la tienda: generados por scripts/sync_catalogos.py en catalogo.js
    (descarga Gava, Sublimados Majestic, Jugueteria Taiwan y Solobabys; cura la
    seleccion y agrega galerias y variantes de talla/color). El cron de GitHub
    Actions lo actualiza solo: no editar a mano. */
-window.PRODUCTOS=(typeof CATALOGO_IKI!=="undefined"&&Array.isArray(CATALOGO_IKI))?CATALOGO_IKI:[];
+const CATALOGO_BASE_IKI=(typeof CATALOGO_IKI!=="undefined"&&Array.isArray(CATALOGO_IKI))?CATALOGO_IKI:[];
+
+/* ===== Ajustes editables desde el panel de administración =====
+   "Guardar en MI computador" (localStorage) + "Guardar para TODOS" copia estos
+   dos bloques para reemplazarlos en el archivo y publicarlos. */
+const TIENDA_DEFECTO={
+  nombre:"IKI",
+  logo:"logo_120.png",
+  whatsapp:"573156371501",
+  razonSocial:"",nit:"",direccion:"",email:"",
+  instagram:"",tiktok:"",
+  pixelMeta:"",ga4:"",
+  destacado:"j27",
+  favoritos:"j27,j21,m04,t13,t14,r02",
+  vaciarCarrito:true,
+  claveAdmin:"IKI123*"
+};
+const PRECIOS_DEFECTO={fijados:{}};
+const TIENDA_KEY="iki-tienda-v1",PRECIOS_KEY="iki-precios-v1";
+function cargarTienda(){
+  let g={};try{g=JSON.parse(localStorage.getItem(TIENDA_KEY))||{};}catch(e){}
+  const t=String(g.nombre||TIENDA_DEFECTO.nombre);
+  const str=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
+  return {
+    nombre:t,logo:str(g.logo,TIENDA_DEFECTO.logo),
+    whatsapp:str(g.whatsapp,TIENDA_DEFECTO.whatsapp),
+    razonSocial:str(g.razonSocial,""),nit:str(g.nit,""),direccion:str(g.direccion,""),email:str(g.email,""),
+    instagram:str(g.instagram,""),tiktok:str(g.tiktok,""),
+    pixelMeta:str(g.pixelMeta,""),ga4:str(g.ga4,""),
+    destacado:str(g.destacado,TIENDA_DEFECTO.destacado),
+    favoritos:str(g.favoritos,TIENDA_DEFECTO.favoritos),
+    vaciarCarrito:(typeof g.vaciarCarrito==="boolean")?g.vaciarCarrito:TIENDA_DEFECTO.vaciarCarrito,
+    claveAdmin:str(g.claveAdmin,TIENDA_DEFECTO.claveAdmin)
+  };
+}
+function cargarPrecios(){
+  let g={};try{g=JSON.parse(localStorage.getItem(PRECIOS_KEY))||{};}catch(e){}
+  const f={};Object.keys(g.fijados||{}).forEach(function(id){const v=g.fijados[id];if(typeof v==="number"&&v>0)f[id]=v;});
+  return {fijados:f};
+}
+let TIENDA=cargarTienda(),PRECIOS_FIJOS=cargarPrecios();
+function aplicarTienda(){
+  CONFIG.whatsapp=TIENDA.whatsapp;
+  CONFIG.destacado=TIENDA.destacado;
+  CONFIG.favoritosIds=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  CONFIG.vaciarCarritoTrasPedido=TIENDA.vaciarCarrito;
+  CONFIG.analytics={pixelMeta:TIENDA.pixelMeta,ga4:TIENDA.ga4};
+}
+function recargarPrecios(){
+  window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){return Object.assign({},p,{p:PRECIOS_FIJOS.fijados[p.id]||p.p});});
+  pagina=1;
+  renderGrid();initCarouseles();actualizarHero();renderCart();
+}
+window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){return Object.assign({},p,{p:PRECIOS_FIJOS.fijados[p.id]||p.p});});
 /* ============================================================ */
 
 /* ===== Utilidades ===== */
@@ -947,7 +1171,7 @@ const productImgs=p=>{if(!p)return[];return [p.img].concat(p.imgs||[]).filter(Bo
 const waLink=t=>"https://wa.me/"+CONFIG.whatsapp+(t?"?text="+encodeURIComponent(t):"");
 function placeholderImg(cat){
   const c=softOf(cat);
-  return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><rect width="400" height="500" fill="'+c+'"/><text x="200" y="278" font-family="Montserrat,Arial,sans-serif" font-size="92" font-weight="700" fill="#24242415" text-anchor="middle" letter-spacing="-4">IKI</text></svg>');
+  return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><rect width="400" height="500" fill="#FFFFFF"/><text x="200" y="278" font-family="Montserrat,Arial,sans-serif" font-size="92" font-weight="700" fill="'+c+'" fill-opacity="0.55" text-anchor="middle" letter-spacing="-4">IKI</text></svg>');
 }
 function imgOnError(el,cat){if(!el)return;if(el.dataset.fbk===el.src)return;el.dataset.fbk=el.src;el.onerror=null;el.src=placeholderImg(cat);}
 function lock(on){document.body.classList.toggle("noscroll",on);}
@@ -1006,7 +1230,14 @@ function renderChips(){
   $("chips").innerHTML=h;
 }
 function renderGifts(){
-  $("gifts").innerHTML=GIFTS.map(g=>'<a class="chip" target="_blank" rel="noopener" href="'+waLink("Hola IKI, busco un regalo: "+g)+'">'+esc(g)+'</a>').join("");
+  $("giftBudgets").innerHTML=GIFTS.presupuestos.map(function(p){
+    return '<a class="chip" target="_blank" rel="noopener" href="'+waLink("Hola IKI, necesito un regalo "+p.toLowerCase())+'">'+esc(p)+'</a>';
+  }).join("");
+  $("occGrid").innerHTML=GIFTS.ocasiones.map(function(o){
+    return '<a class="occ rv" target="_blank" rel="noopener" href="'+waLink("Hola IKI, busco un regalo para: "+o.n)+""+'">'
+      +'<span class="occ-ic"><svg class="ic" viewBox="0 0 24 24"><path d="'+o.i+'"/></svg></span>'
+      +'<b>'+esc(o.n)+'</b><span>'+esc(o.d)+'</span><span class="occ-cta">Pedir asesoría</span></a>';
+  }).join("");
 }
 function renderMobileMenu(){
   let h='<li><button onclick="toggleMenu();scrollToSection(\'tienda\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Todos los productos</button></li>';
@@ -1185,7 +1416,7 @@ function sugeridosPorTicket(enCarrito){
 const TIER={bajo:["Detallito","b"],medio:["Equilibrado","m"],alto:["Especial","a"]};
 function miniThumb(p){
   const imgs=productImgs(p),soft=softOf(p.cat);
-  return '<span class="th" style="background-color:'+soft+(imgs.length?';background-image:url(\''+esc(imgs[0])+'\')':"")+'">'+(imgs.length?"":"<b>IKI</b>")+'</span>';
+  return '<span class="th"'+(imgs.length?' style="background-image:url(\''+esc(imgs[0])+'\')"':"")+'>'+(imgs.length?"":"<b>IKI</b>")+'</span>';
 }
 function renderCart(){
   const box=$("cartItems");
@@ -1454,7 +1685,7 @@ function searchProducts(){
   const r=PRODUCTOS.filter(p=>p.n.toLowerCase().includes(q)||labelOf(p.cat).toLowerCase().includes(q)).slice(0,8);
   box.innerHTML=r.length?r.map(p=>{
     const imgs=productImgs(p);
-    return '<button type="button" class="sri" onclick="scrollToProduct(\''+escJs(p.id)+'\')"><span class="srt" style="background-color:'+softOf(p.cat)+(imgs.length?';background-image:url(\''+esc(imgs[0])+'\')':"")+'">'+(imgs.length?"":"IKI")+'</span><span><b>'+esc(p.n)+'</b><i>'+cop(p.p)+' · '+esc(labelOf(p.cat))+'</i></span></button>';
+    return '<button type="button" class="sri" onclick="scrollToProduct(\''+escJs(p.id)+'\')"><span class="srt"'+(imgs.length?' style="background-image:url(\''+esc(imgs[0])+'\')"':"")+'>'+(imgs.length?"":"IKI")+'</span><span><b>'+esc(p.n)+'</b><i>'+cop(p.p)+' · '+esc(labelOf(p.cat))+'</i></span></button>';
   }).join(""):'<div class="sri"><span class="srt" style="background-color:var(--cr)">IKI</span><span><b>Sin resultados</b><i>Prueba con otra palabra</i></span></div>';
   box.style.display="block";
 }
@@ -1692,12 +1923,210 @@ function compactarHeader(){
   ultimoY=y;
 }
 
+/* ===== Identidad en vivo (nombre, logo, legal, enlaces) ===== */
+function aplicarIdentidad(){
+  const nombre=TIENDA.nombre||"IKI";
+  $("brandTxt").textContent=nombre;
+  const limg=document.querySelector(".brand img");
+  if(limg){limg.src=TIENDA.logo||TIENDA_DEFECTO.logo;limg.onerror=function(){limg.style.display="none";};limg.style.display="";}
+  document.title=nombre+" — Todo lo que te hace feliz, en un solo lugar";
+  const saludo=waLink("Hola "+nombre+", tengo una pregunta.");
+  ["waHdr","waMenu","waNews","waFab","waFoot"].forEach(function(id){const e=$(id);if(e)e.href=saludo;});
+  /* sección legal: datos del negocio */
+  const razon=$("legRazon");if(razon)razon.textContent=TIENDA.razonSocial||"IKI";
+  const datos=[];
+  datos.push({t:TIENDA.razonSocial||"IKI",i:"M3 21h18M5 21V10l7-7 7 7v11M9 21v-6h6v6"});
+  if(TIENDA.nit)datos.push({t:"NIT "+TIENDA.nit,i:"M4 9h16v12H4zM4 6h16v3H4M9 9h6"});
+  if(TIENDA.direccion)datos.push({t:TIENDA.direccion,i:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 12l3.5-3.5"});
+  if(TIENDA.email)datos.push({t:TIENDA.email,i:"M3 6h18v12H3zM3 6l9 7 9-7"});
+  datos.push({t:"WhatsApp "+fmtWa(TIENDA.whatsapp),i:"M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"});
+  const ld=$("legalData");
+  if(ld)ld.innerHTML=datos.map(function(d){return '<span class="ld-chip"><svg class="ic" viewBox="0 0 24 24"><path d="'+d.i+'"/></svg>'+esc(d.t)+'</span>';}).join("");
+  const fl=$("footLegal");
+  if(fl)fl.textContent="© "+new Date().getFullYear()+" "+(TIENDA.razonSocial||nombre)+(TIENDA.nit?(" · NIT "+TIENDA.nit):"")+" · Hecho con cariño en Colombia.";
+}
+function fmtWa(n){const d=String(n||"").replace(/\D/g,"").replace(/^57/,"");return d.replace(/(\d{3})(\d{3})(\d{4})/,"$1 $2 $3");}
+function normWa(v){const d=String(v||"").replace(/\D/g,"");if(!d)return TIENDA_DEFECTO.whatsapp;if(d.length===10)return "57"+d;return d;}
+
+/* ===== Panel de administración ===== */
+function sesionAdmin(){try{return sessionStorage.getItem("iki-admin")==="1";}catch(e){return false;}}
+function intentarAbrirAdmin(){sesionAdmin()?abrirPanelAdmin():mostrarLoginAdmin();}
+function mostrarLoginAdmin(){
+  const m=$("adminLoginModal");if(!m)return;
+  $("adminClave").value="";$("adminLoginError").hidden=true;
+  m.classList.add("show");
+  setTimeout(function(){try{$("adminClave").focus();}catch(e){}},80);
+}
+function cerrarLoginAdmin(){$("adminLoginModal").classList.remove("show");}
+function entrarAdmin(){
+  const c=$("adminClave").value;
+  if(c&&c===TIENDA.claveAdmin){
+    try{sessionStorage.setItem("iki-admin","1");}catch(e){}
+    cerrarLoginAdmin();abrirPanelAdmin();
+    showToast("Bienvenido al panel de la tienda");
+  }else{
+    $("adminLoginError").hidden=false;
+    const err=$("adminLoginError");
+    if(err){err.classList.remove("admin-error");void err.offsetWidth;err.classList.add("admin-error");}
+    $("adminClave").value="";
+  }
+}
+function cerrarSesionAdmin(){try{sessionStorage.removeItem("iki-admin");}catch(e){}cerrarPanelAdmin();showToast("Sesión cerrada");}
+function abrirPanelAdmin(){
+  pintarPanelAdmin();
+  $("adminModal").classList.add("show");
+  const b=$("adminModal").querySelector(".cod-b");if(b)b.scrollTop=0;
+}
+function cerrarPanelAdmin(){$("adminModal").classList.remove("show");}
+
+function filaAdmin(p,precioFijo){
+  return '<div class="admin-fila"><span class="an" title="'+esc(p.n)+'">'+esc(p.n)+'</span>'
+    +(precioFijo?'<span class="admin-badge" style="font:700 10px Poppins;color:var(--c);background:var(--y);border-radius:999px;padding:3px 8px">fijo</span>':"")
+    +'<input type="number" min="1" step="100" value="'+(precioFijo||"")+'" placeholder="'+cop(p.p)+'" title="Precio de venta. Vacío = automático" onchange="fijarPrecioAdmin(\''+escJs(p.id)+'\',this.value)"></div>';
+}
+function pintarPanelAdmin(){
+  $("adminNombre").value=TIENDA.nombre;
+  $("adminLogo").value=(TIENDA.logo!==TIENDA_DEFECTO.logo)?TIENDA.logo:"";
+  $("adminWa").value=String(TIENDA.whatsapp).replace(/^57/,"");
+  $("adminEmail").value=TIENDA.email;
+  $("adminRazon").value=TIENDA.razonSocial;$("adminNit").value=TIENDA.nit;$("adminDir").value=TIENDA.direccion;
+  $("adminIg").value=TIENDA.instagram;$("adminTt").value=TIENDA.tiktok;
+  $("adminPixel").value=TIENDA.pixelMeta;$("adminGa4").value=TIENDA.ga4;
+  $("adminDestacado").value=TIENDA.destacado;
+  $("adminFavoritos").value=TIENDA.favoritos;
+  $("adminVaciar").checked=TIENDA.vaciarCarrito;
+  $("adminClaveNueva").value="";
+  $("adminResHero").innerHTML="";$("adminResPrecio").innerHTML="";$("adminBuscarHero").value="";$("adminBuscarPrecio").value="";
+  pintarFijadosAdmin();
+  pintarListaAdmin();
+}
+function pintarFijadosAdmin(){
+  const ids=Object.keys(PRECIOS_FIJOS.fijados);
+  $("adminFijados").innerHTML=ids.length?ids.map(function(id){
+    const p=CATALOGO_BASE_IKI.find(function(x){return x.id===id;});
+    return '<div class="admin-fila" style="background:#FFF3D6"><span class="an">'+esc(p?p.n:id)+'</span>'
+      +'<span style="font:700 12px Poppins">'+cop(PRECIOS_FIJOS.fijados[id])+'</span>'
+      +'<button class="admin-btn quitar" type="button" onclick="quitarFijadoAdmin(\''+escJs(id)+'\')">Quitar</button></div>';
+  }).join(""):"";
+}
+function pintarListaAdmin(){
+  const la=$("adminLista");
+  la.hidden=false;
+  const grupos={};
+  CATALOGO_BASE_IKI.forEach(function(p){(grupos[p.cat]=grupos[p.cat]||[]).push(p);});
+  let h="";
+  Object.keys(grupos).sort().forEach(function(c){
+    h+='<div class="gr">'+esc(labelOf(c))+" ("+grupos[c].length+")</div>";
+    grupos[c].forEach(function(p){h+=filaAdmin(p,PRECIOS_FIJOS.fijados[p.id]);});
+  });
+  la.innerHTML=h;
+}
+function buscarAdminHero(){
+  const q=$("adminBuscarHero").value.trim().toLowerCase();
+  if(q.length<2){$("adminResHero").innerHTML="";return;}
+  const r=CATALOGO_BASE_IKI.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,6);
+  $("adminResHero").innerHTML=r.length?r.map(function(p){
+    const es=(TIENDA.destacado===p.id);
+    return '<div class="admin-fila"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(PRECIOS_FIJOS.fijados[p.id]||p.p)+'</span>'
+      +'<button class="admin-btn" type="button" '+(es?"disabled style='opacity:.5'":"")+' onclick="destacarAdminHero(\''+escJs(p.id)+'\')">'+(es?"Destacado":"Destacar")+'</button></div>';
+  }).join(""):'<div class="admin-nota">Sin resultados para "'+esc(q)+'".</div>';
+}
+function destacarAdminHero(id){
+  TIENDA.destacado=id;
+  $("adminDestacado").value=id;
+  aplicarTienda();actualizarHero();
+  pintarFijadosAdmin();
+  showToast("Producto destacado actualizado");
+}
+function buscarAdminPrecio(){
+  const q=$("adminBuscarPrecio").value.trim().toLowerCase();
+  if(q.length<2){$("adminResPrecio").innerHTML="";return;}
+  const r=CATALOGO_BASE_IKI.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,8);
+  $("adminResPrecio").innerHTML=r.length?r.map(function(p){return filaAdmin(p,PRECIOS_FIJOS.fijados[p.id]);}).join(""):'<div class="admin-nota">Sin resultados para "'+esc(q)+'".</div>';
+}
+function fijarPrecioAdmin(id,valor){
+  const v=parseFloat(valor);
+  if(!isNaN(v)&&v>0)PRECIOS_FIJOS.fijados[id]=Math.round(v);
+  else delete PRECIOS_FIJOS.fijados[id];
+  recargarPrecios();
+  pintarFijadosAdmin();pintarListaAdmin();
+  showToast("Precio actualizado");
+}
+function quitarFijadoAdmin(id){
+  delete PRECIOS_FIJOS.fijados[id];
+  recargarPrecios();
+  pintarFijadosAdmin();pintarListaAdmin();
+}
+function leerPanelAdmin(){
+  TIENDA.nombre=$("adminNombre").value.trim()||TIENDA_DEFECTO.nombre;
+  TIENDA.logo=$("adminLogo").value.trim()||TIENDA_DEFECTO.logo;
+  TIENDA.whatsapp=normWa($("adminWa").value);
+  TIENDA.email=$("adminEmail").value.trim();
+  TIENDA.razonSocial=$("adminRazon").value.trim();TIENDA.nit=$("adminNit").value.trim();TIENDA.direccion=$("adminDir").value.trim();
+  TIENDA.instagram=$("adminIg").value.trim().replace(/^@/,"");TIENDA.tiktok=$("adminTt").value.trim().replace(/^@/,"");
+  TIENDA.pixelMeta=$("adminPixel").value.trim();TIENDA.ga4=$("adminGa4").value.trim();
+  TIENDA.destacado=$("adminDestacado").value.trim()||TIENDA_DEFECTO.destacado;
+  TIENDA.favoritos=$("adminFavoritos").value.trim()||TIENDA_DEFECTO.favoritos;
+  TIENDA.vaciarCarrito=$("adminVaciar").checked;
+  const nc=$("adminClaveNueva").value.trim();
+  if(nc)TIENDA.claveAdmin=nc;
+}
+function persistirPanel(){
+  try{localStorage.setItem(TIENDA_KEY,JSON.stringify(TIENDA));localStorage.setItem(PRECIOS_KEY,JSON.stringify(PRECIOS_FIJOS));}catch(e){}
+}
+function aplicarPanelAdmin(){
+  leerPanelAdmin();persistirPanel();
+  aplicarTienda();aplicarIdentidad();aplicarAnalitica();
+  recargarPrecios();
+  pintarPanelAdmin();
+  showToast("Cambios aplicados en toda la tienda");
+}
+function guardarPanelAdmin(){
+  leerPanelAdmin();persistirPanel();
+  aplicarTienda();aplicarIdentidad();aplicarAnalitica();
+  recargarPrecios();pintarPanelAdmin();
+  showToast("Guardado en este computador (solo tú lo ves)");
+}
+function restaurarPanelAdmin(){
+  try{localStorage.removeItem(TIENDA_KEY);localStorage.removeItem(PRECIOS_KEY);}catch(e){}
+  TIENDA=cargarTienda();PRECIOS_FIJOS=cargarPrecios();
+  aplicarTienda();aplicarIdentidad();
+  recargarPrecios();pintarPanelAdmin();
+  showToast("Valores del archivo restaurados");
+}
+function codigoConfigAdmin(){
+  leerPanelAdmin();
+  const L=[];
+  L.push("const TIENDA_DEFECTO={");
+  L.push(" nombre:"+JSON.stringify(TIENDA.nombre)+",");
+  L.push(" logo:"+JSON.stringify(TIENDA.logo)+",");
+  L.push(" whatsapp:"+JSON.stringify(TIENDA.whatsapp)+",");
+  L.push(" razonSocial:"+JSON.stringify(TIENDA.razonSocial)+",nit:"+JSON.stringify(TIENDA.nit)+",direccion:"+JSON.stringify(TIENDA.direccion)+",email:"+JSON.stringify(TIENDA.email)+",");
+  L.push(" instagram:"+JSON.stringify(TIENDA.instagram)+",tiktok:"+JSON.stringify(TIENDA.tiktok)+",");
+  L.push(" pixelMeta:"+JSON.stringify(TIENDA.pixelMeta)+",ga4:"+JSON.stringify(TIENDA.ga4)+",");
+  L.push(" destacado:"+JSON.stringify(TIENDA.destacado)+",");
+  L.push(" favoritos:"+JSON.stringify(TIENDA.favoritos)+",");
+  L.push(" vaciarCarrito:"+TIENDA.vaciarCarrito+",");
+  L.push(" claveAdmin:"+JSON.stringify(TIENDA.claveAdmin));
+  L.push("};");
+  L.push("const PRECIOS_DEFECTO={fijados:"+JSON.stringify(PRECIOS_FIJOS.fijados)+"};");
+  return L.join("\n");
+}
+function copiarConfigAdmin(){
+  const codigo=codigoConfigAdmin();
+  persistirPanel();
+  aplicarTienda();aplicarIdentidad();aplicarAnalitica();recargarPrecios();pintarPanelAdmin();
+  const listo=function(){showToast("Copiado: reemplaza TIENDA_DEFECTO y PRECIOS_DEFECTO en index.html y publica");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(codigo).then(listo).catch(function(){window.prompt("Copia este bloque:",codigo);});
+  }else window.prompt("Copia este bloque:",codigo);
+}
+
 /* ===== Inicio ===== */
 document.addEventListener("DOMContentLoaded",function(){
+  aplicarTienda();
+  aplicarIdentidad();
   aplicarAnalitica();
-  const saludo=waLink("Hola IKI, tengo una pregunta.");
-  ["waHdr","waMenu","waNews","waFab","waFoot"].forEach(function(id){const e=$(id);if(e)e.href=saludo;});
-  $("footerYear").textContent=new Date().getFullYear();
   renderSubnav();renderBubbles();renderChips();renderGifts();renderGrid();
   initCarouseles();iniciarDeriva();actualizarHero();renderMobileMenu();
   renderCart();
@@ -1713,6 +2142,13 @@ document.addEventListener("DOMContentLoaded",function(){
     },180);
   });
   window.addEventListener("scroll",compactarHeader,{passive:true});
+  document.addEventListener("keydown",function(e){
+    if(e.ctrlKey&&e.shiftKey&&(e.key==="A"||e.key==="a")){
+      e.preventDefault();
+      ($("adminModal").classList.contains("show"))?cerrarPanelAdmin():intentarAbrirAdmin();
+    }
+  });
+  if(new URLSearchParams(window.location.search).has("admin"))intentarAbrirAdmin();
   /* Buscador */
   const si=$("searchInput");
   si.addEventListener("input",searchProducts);
@@ -1743,6 +2179,8 @@ document.addEventListener("DOMContentLoaded",function(){
   /* Teclado global */
   document.addEventListener("keydown",function(e){
     if(e.key==="Escape"){
+      if($("adminModal").classList.contains("show"))return cerrarPanelAdmin();
+      if($("adminLoginModal").classList.contains("show"))return cerrarLoginAdmin();
       const lbx=$("lightbox");
       if(lbx&&lbx.classList.contains("show"))return closeLightbox();
       if($("orderModal").classList.contains("show"))return closeOrderForm();
@@ -1779,6 +2217,8 @@ document.addEventListener("DOMContentLoaded",function(){
       if(!dentro)toggleCart(false);
     }
     if(e.target===$("orderModal"))closeOrderForm();
+    if(e.target===$("adminLoginModal"))cerrarLoginAdmin();
+    if(e.target===$("adminModal"))cerrarPanelAdmin();
     if(e.target===$("lightbox"))closeLightbox();
   });
   /* Revelado al desplazarse y carga incremental */
