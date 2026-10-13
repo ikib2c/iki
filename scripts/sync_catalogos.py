@@ -249,13 +249,13 @@ def curar_joyas_gava(prods, h2c):
     REEMPLAZO_HANDLE = {"set-perla-copia": "set-perla-cruz-copia"}  # evita nombre duplicado
     orden = ["anillos", "silver-gold", "aretes-con-piedras", "brazalete", "cadena", "candongas",
              "choker", "earcuff", "filigrana", "pulseras", "topos", "coleccion-flores",
-             "coleccion-piedra-jade", "campana", "coleccion-de-insectos"]
+             "coleccion-piedra-jade", "campana", "coleccion-de-insectos", "esmeralda-lab"]
     COLEC_NOMBRES = {"anillos": "Anillos", "silver-gold": "Aretes", "aretes-con-piedras": "Aretes con Piedras",
                       "brazalete": "Brazalete", "cadena": "Cadena", "candongas": "Candongas",
                       "choker": "Collares", "earcuff": "Earcuff", "filigrana": "Filigrana",
                       "pulseras": "Pulseras", "topos": "Topos", "coleccion-flores": "Colección Flores",
                       "coleccion-piedra-jade": "Colección Piedra Jade", "campana": "Pulsera Religiosas",
-                      "coleccion-de-insectos": "Colección de Insectos"}
+                      "coleccion-de-insectos": "Colección de Insectos", "esmeralda-lab": "Esmeralda de Laboratorio"}
     por_h = {p["handle"]: p for p in prods}
     vistos, sel = set(), []
     for h in orden:

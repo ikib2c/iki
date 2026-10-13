@@ -1917,18 +1917,21 @@ function iniciarDeriva(){
 }
 
 /* ===== Héroe ===== */
-/* Hero: galería de esmeraldas de laboratorio (solo escritorio) */
+/* Hero: galería de esmeraldas de laboratorio (solo escritorio).
+   Cada foto es CLICABLE y lleva directo a la tarjeta del producto. */
 const HERO_ESMERALDAS={
-  imgs:["https://cdn.shopify.com/s/files/1/0755/0605/7437/files/f319de92-e3ff-4a18-9985-c39ee53d1190.jpg?v=1764563805","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-04at11.31.44AM_5.jpg?v=1762277000","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-04at11.31.44AM_6.jpg?v=1762276872","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7088.jpg?v=1777432786","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6416.jpg?v=1776184658","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7092.jpg?v=1777433423"],
-  nombres:["Pulsera de Covergold Rodinado","Set Victoriano","Set Victoriano","Laurel Esmeralda","Arete Doble Flor","M\u00e1ndale Florida"],
-  precios:[20000,20000,20000,220000,228000,268000]
+  imgs:["https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-10-22at9.03.57PM.jpg?v=1761216320","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/03CDC1D8-063E-4F4C-9B68-CECDAAECEE31.jpg?v=1785771546","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/1945b65d-b119-45e0-a037-f1793f6943b5.jpg?v=1783349961","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/9933edf1-a72c-4734-a8fe-ed2432f5c8d2.jpg?v=1783294294","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-11at12.55.29AM_3.jpg?v=1762863930","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/B9DC3BF9-1A78-4C5A-B83F-33913CE3F669.jpg?v=1785772593"],
+  nombres:["Topo Camelia verde esmeralda","Cadena Cuadrada de esmeralda 8mm","Set gota con esmeralda de laborator","Anillo con esmeralda de laboratorio","Pulsera con dije Esmeralda Gota 8mm","Set Gota de esmeralda con Circ\u00c3\u00b3n 1"],
+  precios:[31000,55000,120000,60000,55000,199000],
+  ids:["j84","j171","j302","j200","j178","j326"]
 };
 function actualizarHero(){
   const gal=$("heroGal");
   if(!gal)return;
   let h="";
   for(let i=0;i<HERO_ESMERALDAS.imgs.length;i++){
-    h+='<div class="hg-item" onclick="scrollToSection(\'tienda\')" role="button" tabindex="0" aria-label="Ver '+HERO_ESMERALDAS.nombres[i]+'">'
+    const pid=HERO_ESMERALDAS.ids[i];
+    h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+HERO_ESMERALDAS.nombres[i]+'">'
       +'<img src="'+HERO_ESMERALDAS.imgs[i]+'" alt="'+HERO_ESMERALDAS.nombres[i]+'" decoding="async" loading="eager">'
       +'<div class="hg-info"><b>'+HERO_ESMERALDAS.nombres[i]+'</b><span>'+cop(HERO_ESMERALDAS.precios[i])+'</span></div>'
       +'</div>';
