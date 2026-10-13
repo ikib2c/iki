@@ -472,9 +472,14 @@ def escribir_catalogo_js(secciones):
     total = 0
     for prefijo, cat, prov, items in secciones:
         lineas.append("/* %s: %d productos */" % (cat, len(items)))
+        claves = set()
         for p in items:
             clave = (prefijo, p["nombre"].lower())
-            num = previos.get(clave) or num_libre(prefijo)
+            if clave in previos and clave not in claves:
+                num = previos[clave]
+            else:
+                num = num_libre(prefijo)
+            claves.add(clave)
             partes = ['{id:"%s%02d"' % (prefijo, num), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov]
             imgs = p.get("imgs") or []
             if imgs:
