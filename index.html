@@ -1495,11 +1495,9 @@ function sendOrder(){
   m+="Envío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
   if(notas)m+="\n\n*Notas:* "+notas;
   track("Lead",{value:s.total,currency:"COP",num_items:s.count,content_name:"Pedido WhatsApp"});
-  if(navigator.share&&navigator.canShare&&cart.length){
-    enviarPedidoConImagen(m);
-  }else{
-    window.open(waLink(m),"_blank");
-  }
+  /* wa.me abre WhatsApp DIRECTO en cualquier dispositivo: sin selector
+     de apps, sin fricción, cero pérdida de ventas por confusion. */
+  window.open(waLink(m),"_blank");
   closeOrderForm();
   showToast("¡Pedido enviado! Termina de confirmarlo por WhatsApp");
   if(CONFIG.vaciarCarritoTrasPedido){
@@ -1513,20 +1511,6 @@ function sendOrder(){
   }
 }
 
-/* Envia el pedido por WhatsApp con una HOJA-RESUMEN: una sola imagen con la
-   miniatura, nombre, cantidad y precio de TODOS los articulos del pedido.
-   Asi cada producto se identifica con su foto (los que no tienen referencia)
-   y la hoja llega como UNA imagen con el texto del pedido como caption. */
-async function enviarPedidoConImagen(msg){
-  try{
-    const hoja=await crearHojaPedido();
-    if(hoja&&navigator.canShare({files:[hoja]})){
-      await navigator.share({text:msg,files:[hoja]});
-      return;
-    }
-  }catch(e){}
-  window.open(waLink(msg),"_blank");
-}
 
 /* Carga una imagen del catalogo para dibujarla en canvas (con CORS del CDN).
    Si falla devuelve null y se dibuja el marcador de la categoria. */
