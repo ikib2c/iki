@@ -50,7 +50,7 @@ h1,h2,h3{font-family:var(--ff);letter-spacing:-.02em;line-height:1.15}
 #hdr{position:sticky;top:0;z-index:60;background:#FFF8E9f2;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
 .hd{display:grid;grid-template-columns:auto minmax(240px,480px) auto;align-items:center;gap:16px;max-width:1180px;margin:0 auto;padding:11px 26px}
 .brand{justify-self:start;display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:0;padding:0}
-.brand img{height:44px;display:block;mix-blend-mode:multiply}
+.brand img{height:44px;display:block}
 .brand .bt{font:700 26px var(--ff);letter-spacing:-.02em;color:var(--c)}
 .sbox{position:relative;display:flex}
 .sbox input{flex:1;min-width:0;border:1.5px solid var(--bd);border-right:0;background:#fff;border-radius:999px 0 0 999px;padding:11px 18px;font:400 14px var(--fb);color:var(--c)}
@@ -222,6 +222,12 @@ h1,h2,h3{font-family:var(--ff);letter-spacing:-.02em;line-height:1.15}
 .qty{display:grid;grid-template-rows:0fr;opacity:0;overflow:hidden;transition:grid-template-rows .3s,opacity .25s,margin .3s}
 .qty.open{grid-template-rows:1fr;opacity:1;margin-top:10px}
 .qty>div{min-height:0;overflow:hidden}
+.vargrps{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.vargrp .varlb{display:block;font:500 11px var(--fb);letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:5px}
+.varchips{display:flex;gap:6px;flex-wrap:wrap}
+.vchip{border:1.5px solid var(--bd);background:#fff;color:var(--c);border-radius:999px;padding:7px 13px;font:500 12.5px var(--fb);cursor:pointer;transition:.15s}
+.vchip:hover{border-color:var(--c)}
+.vchip.on{background:var(--c);color:var(--cr);border-color:var(--c);font-weight:600}
 .stepper{display:flex;align-items:center;gap:6px;background:var(--cr);border:1px solid var(--bd);border-radius:12px;padding:9px 12px}
 .stepper button{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--bd);background:#fff;font-size:17px;cursor:pointer;line-height:1;color:var(--c)}
 .stepper button:hover{border-color:var(--c)}
@@ -280,9 +286,9 @@ footer a:hover{color:var(--cr)}
 /* ============ Barra de pago, botones flotantes y avisos ============ */
 .pay{position:fixed;left:50%;bottom:88px;transform:translate(-50%,16px);opacity:0;visibility:hidden;transition:.3s;z-index:54;width:min(92%,400px)}
 .pay.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
-.pay .in{display:flex;align-items:center;gap:12px;background:var(--c);color:var(--cr);border-radius:999px;padding:12px 20px;box-shadow:var(--shh);cursor:pointer;border:0;width:100%}
+.pay .in{display:flex;align-items:center;gap:12px;background:var(--y);color:var(--c);border-radius:999px;padding:12px 20px;box-shadow:0 10px 30px #24242459;cursor:pointer;border:0;width:100%}
 .pay .pc{position:relative;display:grid;place-items:center}
-.pay .cnt{position:absolute;top:-8px;right:-10px;background:var(--y);color:var(--c);font:700 10.5px var(--fb);min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 3px}
+.pay .cnt{position:absolute;top:-8px;right:-10px;background:var(--c);color:var(--y);font:700 10.5px var(--fb);min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 3px}
 .pay .pl{font:600 14px var(--fb)}
 .pay .pt{margin-left:auto;font:600 14px var(--ff)}
 .fabs{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:12px;z-index:55}
@@ -485,12 +491,17 @@ footer a:hover{color:var(--cr)}
   .qtg{padding:9px;font-size:12px}
   .card:has(.qty.open){grid-column:1/-1}
 }
+@media(max-width:600px){
+  .modal{padding:0}
+  .cod{max-width:100%;height:100%;max-height:100%;border-radius:0}
+}
 @media(max-width:480px){
   .hero h1{font-size:30px}
   .frow{grid-template-columns:1fr}
   .fg input,.fg select,.fg textarea{font-size:16px}
   .fabs{right:12px;bottom:12px;gap:10px}
   .fab{width:48px;height:48px}
+  .fab.sh{display:none}
   .gift{padding:22px}
   .trust .wrap{grid-template-columns:1fr}
 }
@@ -504,13 +515,13 @@ footer a:hover{color:var(--cr)}
 </head>
 <body>
 <a class="skip" href="#tienda">Ir a los productos</a>
-<div class="top">Envío a todo el país · [CONDICIÓN DE ENVÍO GRATIS]</div>
+<div class="top">Envíos a todo el país · Paga contra entrega o por Nequi</div>
 
 <!-- ============ Encabezado ============ -->
 <header id="hdr">
   <div class="hd">
     <button class="brand" onclick="scrollToTop()" aria-label="IKI, volver al inicio">
-      <img src="Logo%20IKI%20con%20corona%20y%20sonrisa.png" alt="" onerror="this.style.display='none'">
+      <img src="logo_120.png" alt="IKI" onerror="this.style.display='none'">
       <span class="bt" id="brandTxt">IKI</span>
     </button>
     <div class="sbox">
@@ -624,7 +635,7 @@ footer a:hover{color:var(--cr)}
   <div class="rv">
     <div class="eyebrow">Joyas y accesorios</div>
     <h2>Detalles que brillan</h2>
-    <p>Piezas para usar todos los días o para regalar. Conoce materiales y medidas en cada ficha. [DESCRIBE TU SELECCIÓN]</p>
+    <p>Piezas para usar todos los días o para regalar, con materiales y diseños cuidados en cada ficha.</p>
     <button class="btn y" onclick="filterProducts('joyas')">Ver joyas</button>
   </div>
   <div class="dfr rv"><div class="dbox" style="--soft:#FBE3AE"><b>IKI</b><img src="IKI_banner_joyas_1600x600.png" alt="Joyas y accesorios IKI" loading="lazy" onerror="this.remove()"></div></div>
@@ -654,10 +665,10 @@ footer a:hover{color:var(--cr)}
 
 <!-- ============ Confianza ============ -->
 <section class="trust"><div class="wrap">
-  <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h11v7H3zM14 12h4l3 3v1h-7zM6.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6M17.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6"/></svg></div><b>Envío nacional</b><span>Llegamos a todo el país. [PLAZOS Y COSTOS]</span></div>
+  <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h11v7H3zM14 12h4l3 3v1h-7zM6.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6M17.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6"/></svg></div><b>Envío nacional</b><span>Llegamos a todo el país. El envío se cotiza según tu ciudad.</span></div>
   <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M2 6h20v12H2zM2 10h20M6 14h5"/></svg></div><b>Contra entrega o Nequi</b><span>Paga al recibir o transfiere al 315 637 1501.</span></div>
   <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"/></svg></div><b>Regalos con sentido</b><span>Opciones por presupuesto y ocasión.</span></div>
-  <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6zM9 12l2 2 4-4"/></svg></div><b>Calidad cuidada</b><span>Productos seleccionados. [POLÍTICA DE CAMBIOS]</span></div>
+  <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6zM9 12l2 2 4-4"/></svg></div><b>Calidad cuidada</b><span>Productos seleccionados y revisados antes de despachar.</span></div>
   <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></div><b>Atención por WhatsApp</b><span>Pedidos y dudas con respuesta rápida.</span></div>
 </div></section>
 
@@ -685,11 +696,11 @@ footer a:hover{color:var(--cr)}
 <!-- ============ Preguntas frecuentes ============ -->
 <section id="faq"><div class="wrap">
   <div class="rv"><div class="eyebrow">Ayuda</div><h2>Preguntas frecuentes</h2></div>
-  <details><summary>¿Hacen envíos a todo el país?</summary><p>[Respuesta con costos y plazos reales]</p></details>
+  <details><summary>¿Hacen envíos a todo el país?</summary><p>Sí, despachamos a todo el país. El costo del envío depende de tu ciudad y lo confirmamos por WhatsApp junto con tu pedido.</p></details>
   <details><summary>¿Qué medios de pago aceptan?</summary><p>Aceptamos pago contra entrega (pagas al recibir tu pedido) y transferencia por Nequi al 315 637 1501. Confirmamos tu pago por WhatsApp.</p></details>
-  <details><summary>¿Cómo hago un cambio o devolución?</summary><p>[Respuesta según tu política y la normativa colombiana]</p></details>
+  <details><summary>¿Cómo hago un cambio o devolución?</summary><p>Escríbenos por WhatsApp dentro de los 5 días hábiles después de recibir tu pedido y coordinamos la solución.</p></details>
   <details><summary>¿Puedo pedir algo que no veo en la tienda?</summary><p>Sí, escríbenos por WhatsApp la referencia o una foto de lo que buscas y lo cotizamos.</p></details>
-  <details><summary>¿Puedo enviar mi compra como regalo?</summary><p>[Confirma si puedes incluir empaque de regalo o mensaje dedicatorio]</p></details>
+  <details><summary>¿Puedo enviar mi compra como regalo?</summary><p>Sí: escríbelo en el paso de notas del pedido y lo tenemos en cuenta al preparar tu envío.</p></details>
 </div></section>
 </main>
 
@@ -704,7 +715,7 @@ footer a:hover{color:var(--cr)}
   <div>
     <b style="font:700 28px var(--ff);letter-spacing:-.02em;text-transform:none;color:var(--cr)">IKI</b><br>
     Todo lo que te hace feliz,<br>en un solo lugar.<br>
-    @[usuario] · <a id="waFoot" href="#" target="_blank" rel="noopener">WhatsApp 315 637 1501</a>
+    <a id="waFoot" href="#" target="_blank" rel="noopener">WhatsApp 315 637 1501</a>
   </div>
   <div><b class="h">Tienda</b>
     <button class="flink" onclick="filterProducts('joyas')">Joyas y accesorios</button>
@@ -723,7 +734,7 @@ footer a:hover{color:var(--cr)}
     Tratamiento de datos<br>
     Retracto
   </div>
-  <div class="legal">© <span id="footerYear"></span> IKI · [Razón social y NIT] · Hecho con cariño en Colombia.</div>
+  <div class="legal">© <span id="footerYear"></span> IKI · Hecho con cariño en Colombia.</div>
 </div></footer>
 
 <!-- ============ Barra de pago y botones flotantes ============ -->
@@ -737,7 +748,7 @@ footer a:hover{color:var(--cr)}
 <div class="fabs">
   <a class="fab wa" id="waFab" href="#" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></a>
   <button class="fab sh" onclick="shareCatalog()" aria-label="Compartir la tienda"><svg class="ic" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.3"/><circle cx="17" cy="5.5" r="2.3"/><circle cx="17" cy="18.5" r="2.3"/><path d="M8.1 10.9l6.8-4.1M8.1 13.1l6.8 4.1"/></svg></button>
-  <button class="fab ca" onclick="toggleCart()" aria-label="Ver carrito"><svg class="ic" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8zM9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="cnt" id="floatingCartCount">0</span></button>
+  <button class="fab ca" id="cartFab" onclick="toggleCart()" aria-label="Ver carrito"><svg class="ic" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8zM9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="cnt" id="floatingCartCount">0</span></button>
   <button class="fab tp" onclick="scrollToTop()" aria-label="Ir arriba"><svg class="ic" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 </div>
 
@@ -799,7 +810,7 @@ footer a:hover{color:var(--cr)}
         </div>
         <div class="sec fh" data-fase="3">
           <div class="sec-t"><span class="pn">3</span> Entrega</div>
-          <p class="trust-ln"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h11v7H3zM14 12h4l3 3v1h-7zM6.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6"/></svg> Envío a domicilio · [PLAZOS Y COSTOS]</p>
+          <p class="trust-ln"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h11v7H3zM14 12h4l3 3v1h-7zM6.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6"/></svg> Envío a domicilio · El costo se confirma por WhatsApp</p>
           <div class="frow">
             <div class="fg">
               <label for="customerDept">Departamento *</label>
@@ -824,8 +835,8 @@ footer a:hover{color:var(--cr)}
           </div>
           <div class="frow">
             <div class="fg">
-              <label for="customerHood">Barrio *</label>
-              <input id="customerHood" type="text" placeholder="Ej. El Poblado, Chapinero" required>
+              <label for="customerHood">Barrio (opcional)</label>
+              <input id="customerHood" type="text" placeholder="Ej. El Poblado, Chapinero">
               <div class="fe" aria-live="polite"></div>
             </div>
             <div class="fg">
@@ -888,6 +899,7 @@ footer a:hover{color:var(--cr)}
     <div class="lbup" id="lbUpsell"><h4>También te puede interesar</h4><div class="lbupt" id="lbUpsellTrack"></div></div>
   </div>
 </div>
+<script src="catalogo.js"></script>
 <script>
 /* ============================================================
    CONFIGURACIÓN: edita solo este bloque
@@ -912,93 +924,11 @@ const CATS=[
 const IMG={joyas:"IKI_banner_joyas_1600x600.png",moda:"IKI_banner_pijamas_1600x600.png",juguetes:"",escolar:"",regalos:"IKI_banner_regalos_1600x600.png"};
 /* Chips de Regalos por ocasión */
 const GIFTS=["Hasta [$ A]","Hasta [$ B]","Hasta [$ C]","Cumpleaños","Agradecimiento","[Fecha especial]"];
-/* Productos: id, n (nombre), p (precio COP), cat, img (URL), antes (precio anterior), imgs (galeria).
-   Joyas: gavajoyeria.com · Moda: pijamasalmayor.com/sublimados_majestic · Juguetes y escolar: jugueteriataiwan.com
-   Bebé y combos de regalo: solobabys.com. Nombres y precios tomados del catalogo publico de cada proveedor:
-   validar y alojar fotos propias antes de publicar. */
-
-const PRODUCTOS=[
-
- {id:"m01",n:"Pantalon Corsert con Correa",p:101000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/4tadmh9gyr4_1785265645028.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/5gge4qs841i_1785265643351.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/dl2x4jnxe3_1785265644228.jpg"]},
- {id:"m02",n:"Conjunto Chaleco Manga Larga",p:99000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/8wnqa90gpdk_1785260378609.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/eepqj0kkki_1785260380195.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/i4pfvsooro_1785260381599.jpg"]},
- {id:"m03",n:"Pantalon Camisera Pareja",p:95000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/kyjp725ch0b_1784991424843.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/gj9mbzg1muj_1784991425941.jpg"]},
- {id:"m04",n:"Pijama Trio Pareja",p:94000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/tjxjxutxyaj_1785205292625.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/0dtnxoi0pkn_1785205293918.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/dbutyu72hmi_1785205295164.jpg"]},
- {id:"m05",n:"Pijama Pareja Corta",p:66000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/k8f75qd94x_1791060978764.webp",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/58zk3ks8zc8_1791060981039.webp","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/kafff78tl9p_1791060983126.webp"]},
- {id:"m06",n:"Pantalon Trio Plus",p:48000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/3ccjn2e0yqn_1785010981212.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/8bsjy1w4vm8_1785010982250.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/0grg20ayzalt_1785010983431.jpg"]},
- {id:"m07",n:"Set Lupita",p:46000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/ep029rxa8a9_1785718833355.webp",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/o6ou261rof_1785718835015.webp","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/ch7c1xk3gmj_1785718836622.webp"]},
- {id:"m08",n:"Set Creta",p:46000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/6bowpox83om_1785716981956.webp",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/v68nkytfsr8_1785716984074.webp","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/9807sc5e5qu_1785716985843.webp"]},
- {id:"m09",n:"Short Camisera Plus",p:44000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/l8f7zp228yi_1785250753887.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/oeyvsdhwuys_1785250754794.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/9wvw8k12dzr_1785250755604.jpg"]},
- {id:"m10",n:"Levantadora Trio",p:44000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/di0tb0nyeql_1784907641551.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/88xtjzxo4co_1784907643295.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/sh71l6aqocs_1784907644126.jpg"]},
- {id:"m11",n:"Pantalon Camisa Hombre",p:41000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/mn99r1y1ls_1784949944792.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/xphp261cxy_1784949946306.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/llqqjuc9dsc_1784949947055.jpg"]},
- {id:"m12",n:"Chaqueta Antifluido",p:40000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/bbfyrwx0vfu_1785213166473.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/63bgywf42hn_1785213167803.jpg","https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/vdkx90z5a3g_1785213169306.jpg"]},
- {id:"m13",n:"Bermuda Hombre",p:38000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/ya25i5av86q_1784947907589.jpg",imgs:["https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/vximuwlfwha_1784947908555.jpg"]},
- {id:"m14",n:"Pijama en Satin",p:34000,cat:"moda",img:"https://dowbsbxvxjzjjhyqmyfr.supabase.co/storage/v1/object/public/archivos/xd9j7q8l55_1785211668886.jpg"},
- {id:"t01",n:"Titere 12 Motivos",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/24434/thumb/40ec3ba6-9781-4285-9a8a-87a55185a417.webp"},
- {id:"t02",n:"Carta Uno No Mercy Cafe",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/25268/thumb/e92459eb-7791-4e97-91e9-e75b83acd783.webp"},
- {id:"t03",n:"Mula Niñera 3 Colores",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26526/thumb/50beeba1-12de-4f91-8d61-19e71e5508c6.webp"},
- {id:"t04",n:"Lanza Burbuja Bolsa Toys 5 Colores",p:8000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26074/thumb/d4761696-59ab-49ed-9e78-32437ad8f0eb.webp"},
- {id:"t05",n:"Paw Patrol Caja 8 Motivos",p:10000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26412/thumb/eb8a3bb9-ac72-435a-9c8c-58ff48291bce.webp"},
- {id:"t06",n:"Peluche Kuromi Luna",p:15000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26588/thumb/67a86b1e-7831-4ab7-9f9c-2dd3d3f01411.webp"},
- {id:"t07",n:"Lego Magnetico 32 Pc",p:15000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/28898/thumb/621f0ab0-e0f8-4cfa-a425-d6eb0e77f39b.webp"},
- {id:"t08",n:"Burbujero Mil Burbujas Pilas Cj Bubble Gun 4 Motivos",p:16000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/30523/thumb/fe6f444a-ebca-4fea-bc42-198023f51e3a.webp"},
- {id:"t09",n:"Magnetic Chess Caja 2 Motivos",p:25000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/27739/thumb/fdd34804-cac8-4487-aed3-f6362d2af9ba.webp"},
- {id:"t10",n:"Letras Numeros y Figuras en Madera",p:30000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/29069/thumb/98a749ed-1170-4e48-a0a7-064549c0aa34.webp"},
- {id:"t11",n:"Rompecabezas Burj al Arab X1000 Piezas",p:35000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/26212/thumb/7decb305-682a-4de5-b4b1-103adc6fa6c8.webp"},
- {id:"t12",n:"Carro Todo Terreno Armable X220 Pcs",p:50000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/30384/thumb/c7c86dee-f9c9-4d9d-ac09-a2bab06d40e1.webp"},
- {id:"t13",n:"Pista Neon Carro Pila Luz con Numero",p:55000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/30533/thumb/e1e78f2f-8d84-458a-8f73-afdac0a201e3.webp"},
- {id:"t14",n:"Peluche Capibara Bailarin",p:70000,cat:"juguetes",img:"https://jugueteriataiwan.com/storage/products/25038/thumb/54108869-14e4-4c18-b41e-fde734a0a0f5.webp"},
- {id:"s01",n:"Libro para Colorear con Stikers",p:2000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/24262/thumb/b5732749-6d72-447c-8d94-9611f5fb81b4.webp"},
- {id:"s02",n:"Lapicero Grande 10 Minas Dinosaurio Surtido",p:2500,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/26763/thumb/2e7ac439-abfe-42c3-8400-cf79465dc8ed.webp"},
- {id:"s03",n:"Set Resaltador Neon X6",p:6000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/27957/thumb/9854ed5c-9119-4691-a6de-d5c51e9acee6.webp"},
- {id:"s04",n:"Diario Mariposa 4 Colores",p:7000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/27650/thumb/1214f508-5895-4140-bfca-4967bf10e51b.webp"},
- {id:"s05",n:"Diario Gatos 4 Colores",p:7000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/27597/thumb/40b6e212-6484-4cac-91b1-c5fbb1d936a5.webp"},
- {id:"s06",n:"Diario Frutas 4 Motivos",p:7000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/27651/thumb/457deaf5-19ed-4999-89be-a75d03606585.webp"},
- {id:"s07",n:"Flauta Dulce",p:8000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/28244/thumb/2ff8b062-99d6-4b59-9615-54557d103ccc.webp"},
- {id:"s08",n:"Kit de Arte Infantil 220 Piezas Madera",p:50000,cat:"escolar",img:"https://jugueteriataiwan.com/storage/products/26819/thumb/7c0e5d7f-ada3-42ce-947f-ad287ee1d648.webp"},
- {id:"b01",n:"Cepillo Lengua Only Baby",p:6000,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT-2026-06-10T193401.800.webp?v=1781138064",antes:8571},
- {id:"b02",n:"Aspirador Nasal Only Baby",p:6500,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/aspirador-nasal-azul-para-bebe.webp?v=1774108168",antes:7000},
- {id:"b03",n:"Set Manicure Bebé",p:6500,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT_81.webp?v=1780001979",antes:9286},
- {id:"b04",n:"Vajilla Love With para Bebé",p:7500,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/39.webp?v=1774040907",antes:9000},
- {id:"b05",n:"Cepillo Dental Siliconado 360° para Bebés",p:7500,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT_62.webp?v=1779825817"},
- {id:"b06",n:"Termómetro Digital Infantil",p:8500,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPTImage2jul2026_07_22_20a.m.webp?v=1782994980",antes:12143},
- {id:"b07",n:"Chupa Fruta Only Baby",p:9000,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT-2026-06-09T215325.108.webp?v=1781060037",antes:12857},
- {id:"b08",n:"Mordedor Control Only Baby",p:9900,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPTImage2jul2026_07_10_28a.m.webp?v=1782994278",antes:14143},
- {id:"b09",n:"Rascaencias Jirafa Lw3",p:10000,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/1740126304665_1.webp?v=1775065667",antes:14000},
- {id:"b10",n:"Babero Siliconado Ajustable",p:10000,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPTImage1jul2026_10_45_36p.m.webp?v=1782964027",antes:14286},
- {id:"b11",n:"Pañitos Happy y Soft x100",p:10400,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/55.webp?v=1774123726",antes:14857},
- {id:"b12",n:"Tetero Only Baby Natural 2oz / 60ml",p:10500,cat:"bebe",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT_Image_5_may_2026_10_26_07_a.m..webp?v=1777995497",antes:13600},
- {id:"r01",n:"Combo Cuidado Esencial para Bebé + Pañalera",p:145900,cat:"regalos",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ImagendeCodex28sept2026_07_21_50.webp?v=1790598153",antes:208000},
- {id:"r02",n:"Combo Todo para Bebé",p:93400,cat:"regalos",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT_-_2026-06-02T202102.310.webp?v=1780449734"},
- {id:"r03",n:"Combo Todo lo que tu Bebé Necesita",p:88000,cat:"regalos",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPT-2026-06-10T181553.409.webp?v=1781133660"},
- {id:"r04",n:"Combo Cobija + Almohada + Cuellero",p:86000,cat:"regalos",img:"https://cdn.shopify.com/s/files/1/0967/4584/9142/files/ChatGPTImage1jul2026_11_54_36a.m.webp?v=1782924955",antes:122857},
- {id:"j01",n:"Anillo de insectos Covergold Rodinado",p:22000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/932306da-4772-4e39-be43-de4d13bd28e5.jpg?v=1760202777"},
- {id:"j02",n:"Topos de abeja",p:23000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/ee2d43fe-dd9b-45e7-b0aa-d20423e0a23d.jpg?v=1764560701"},
- {id:"j03",n:"Candongas con piedra Blanca",p:25000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6004.jpg?v=1790015005"},
- {id:"j04",n:"Topo de insecto",p:26000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-10at9.41.17AM_2.jpg?v=1762786974"},
- {id:"j05",n:"Candongas Plateadas",p:27000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_5913.jpg?v=1790015004"},
- {id:"j06",n:"Brazalete de Rodio",p:34000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7463.jpg?v=1777681469"},
- {id:"j07",n:"Maxi Arete Flor",p:35000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_1828.jpg?v=1777677206"},
- {id:"j08",n:"Anillo en Covergold Rodinado",p:36000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsApp-Image-2025-02-11-at-10.09.50-AM_777aff2b-5ef5-4016-adc0-7e0a8ad7d93a.jpg?v=1745622256"},
- {id:"j09",n:"Dije de cruz con piedra Jade",p:36000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6407.jpg?v=1790018788"},
- {id:"j10",n:"Maxi Topo Flor",p:37000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_1831.jpg?v=1777677493"},
- {id:"j11",n:"Set Perla",p:39000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/7B9E7BCD-5865-4EA3-B9D7-28E36E07612B.jpg?v=1789187502"},
- {id:"j12",n:"Set Perla Flor",p:39000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/715A3AFD-109C-4A38-9F96-C5C6C65D68FD.jpg?v=1789187502"},
- {id:"j13",n:"Pulsera Sagrado Corazón de Jesús",p:39000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_5857.jpg?v=1780231634"},
- {id:"j14",n:"Pulsera de San Benito",p:47000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/b406b0d6-de09-4be2-9c28-ef81d5c35a5b.jpg?v=1780764813"},
- {id:"j15",n:"Set Flores Esmaltada mariposa",p:48000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-10-22at9.03.33PM_1.jpg?v=1761219869"},
- {id:"j16",n:"Cadena con dije de insecto",p:48000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-05at9.24.53PM_3.jpg?v=1762400049"},
- {id:"j17",n:"Set Flores Esmaltada",p:55000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-10-22at4.06.52PM.jpg?v=1761220562",imgs:["https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-10-22at9.03.50PM_1.jpg?v=1761220562"]},
- {id:"j18",n:"Pulsera Religiosa con perlas San Benito",p:57000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7323.jpg?v=1777763324"},
- {id:"j19",n:"Dije con piedra Jade",p:59000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6406.jpg?v=1790018789"},
- {id:"j20",n:"Aretes Mostacilla Bruma Ivory",p:67000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7316.jpg?v=1777686151"},
- {id:"j21",n:"Aretes Mostacilla Aro Imperial",p:72000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7356.jpg?v=1777687252"},
- {id:"j22",n:"Brazalete Insecto",p:78000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-10at9.43.46AM.jpg?v=1762788018"},
- {id:"j23",n:"Collar en perla con dije de flores",p:82000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6320.jpg?v=1790041671"},
- {id:"j24",n:"Collar en perla con dije de hoja",p:82000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6309.jpg?v=1790041671"},
- {id:"j25",n:"Trío de Brazalete de Rodio",p:92000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7328.jpg?v=1777698956"},
- {id:"j26",n:"Medallón de Protección Sagrado Corazón de Jesús",p:110000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_5831.jpg?v=1780234198",imgs:["https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_5832.jpg?v=1780234198","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_5835.jpg?v=1780234198"]},
- {id:"j27",n:"Aretes de Filigrana",p:120000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7102.jpg?v=1777460067"},
- {id:"j28",n:"Arete Flor Imperial",p:180000,cat:"joyas",img:"https://cdn.shopify.com/s/files/1/0755/0605/7437/files/21213A1D-1A1D-4180-83B3-3CEC2A705B12.jpg?v=1776651780"}];
+/* Productos de la tienda: generados por scripts/sync_catalogos.py en catalogo.js
+   (descarga Gava, Sublimados Majestic, Jugueteria Taiwan y Solobabys; cura la
+   seleccion y agrega galerias y variantes de talla/color). El cron de GitHub
+   Actions lo actualiza solo: no editar a mano. */
+window.PRODUCTOS=(typeof CATALOGO_IKI!=="undefined"&&Array.isArray(CATALOGO_IKI))?CATALOGO_IKI:[];
 /* ============================================================ */
 
 /* ===== Utilidades ===== */
@@ -1043,7 +973,7 @@ function track(ev,params){
 }
 
 /* ===== Estado ===== */
-let cart=ls("iki-cart",[]),favs=ls("iki-favs",[]),selQty={},filter="todo",onlyFav=false,orden="n",pagina=1,listadoActual=[],upsellAbierto=true;
+let cart=ls("iki-cart",[]),favs=ls("iki-favs",[]),selQty={},selVar={},filter="todo",onlyFav=false,orden="n",pagina=1,listadoActual=[],upsellAbierto=true;
 function cartResumen(){let count=0,total=0;cart.forEach(it=>{const p=prod(it.id);if(p){count+=it.qty;total+=p.p*it.qty}});return{count:count,total:total};}
 
 /* ===== Navegación y categorías ===== */
@@ -1115,6 +1045,7 @@ function tarjetaHTML(p){
   +'<div class="prow"><span class="pr">'+cop(p.p)+'</span>'+((p.antes&&p.antes>p.p)?'<s class="ant">Antes '+cop(p.antes)+'</s>':"")+'</div>'
   +'<button class="qtg" type="button" id="tg-'+esc(id)+'" aria-expanded="false" aria-controls="q-'+esc(id)+'" onclick="toggleQty(\''+escJs(id)+'\')"><span>Elegir cantidad</span><svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>'
   +'<div class="qty" id="q-'+esc(id)+'"><div>'
+  +(p.var?varChipsHTML(p,id):"")
   +'<div class="stepper"><button type="button" aria-label="Quitar una unidad" onclick="changeQty(\''+escJs(id)+'\',-1)">−</button><b id="qv-'+esc(id)+'">1</b><button type="button" aria-label="Agregar una unidad" onclick="changeQty(\''+escJs(id)+'\',1)">+</button><span class="unit">'+cop(p.p)+' c/u</span></div>'
   +'<div class="qsub"><span>Subtotal de esta selección</span><b id="qs-'+esc(id)+'">'+cop(p.p)+'</b></div>'
   +'<button class="addbtn" type="button" onclick="addSelected(\''+escJs(id)+'\')">Agregar al carrito</button>'
@@ -1150,6 +1081,12 @@ function toggleFavFilter(){
 }
 
 /* ===== Tarjetas: cantidad, favoritos y agregar ===== */
+/* ===== Variantes (talla, color, tipo de sublimado) ===== */
+function curVar(id){const p=prod(id);if(!p||!p.var)return {};const o={};Object.keys(p.var).forEach(function(g){o[g]=(selVar[id]&&selVar[id][g])||p.var[g][0];});return o;}
+function varTxt(v){if(!v)return "";return " ("+Object.keys(v).map(function(g){return g+": "+v[g];}).join(", ")+")";}
+function varKey(v){if(!v)return "";return Object.keys(v).sort().map(function(g){return g+":"+v[g];}).join("|");}
+function varChipsHTML(p,id){const sel=curVar(id);return '<div class="vargrps">'+Object.keys(p.var).map(function(g){return '<div class="vargrp"><span class="varlb">'+esc(g)+'</span><div class="varchips">'+p.var[g].map(function(v){return '<button type="button" class="vchip'+(v===sel[g]?" on":"")+'" data-g="'+esc(g)+'" data-v="'+esc(v)+'" onclick="setVar(\''+escJs(id)+'\',\''+escJs(g)+'\',\''+escJs(v)+'\')">'+esc(v)+'</button>';}).join("")+'</div></div>';}).join("")+'</div>';}
+function setVar(id,grupo,val){selVar[id]=selVar[id]||{};selVar[id][grupo]=val;const card=$("product-"+id);if(card){card.querySelectorAll(".vchip").forEach(function(b){if(b.dataset.g===grupo)b.classList.toggle("on",b.dataset.v===val);});}}
 function toggleQty(id,forzar){
   const q=$("q-"+id),btn=$("tg-"+id);
   if(!q)return;
@@ -1170,21 +1107,20 @@ function changeQty(id,d){
   if(qs)qs.textContent=cop(p.p*q);
 }
 function addSelected(id){
-  const q=selQty[id]||1,p=prod(id);
-  addToCart(id,q);
+  const q=selQty[id]||1,p=prod(id),v=curVar(id);
+  addToCart(id,q,Object.keys(v).length?v:null);
   selQty[id]=1;
   const qv=$("qv-"+id),qs=$("qs-"+id);
   if(qv)qv.textContent=1;
   if(qs&&p)qs.textContent=cop(p.p);
-  showToast("Agregado: "+(p?p.n:"producto")+". Completa tu pedido");
   openOrderForm();
 }
 function quickAdd(id,abrir){
   if(abrir===undefined)abrir=true;
-  addToCart(id,1);
-  const p=prod(id);
-  showToast("Agregado: "+(p?p.n:"producto"));
+  const v=curVar(id);
+  addToCart(id,1,Object.keys(v).length?v:null);
   if(abrir)openOrderForm();
+  else{const p=prod(id);showToast("Agregado: "+(p?p.n:"producto"));}
 }
 function toggleFav(id){
   const i=favs.indexOf(id);
@@ -1202,9 +1138,10 @@ function verProducto(id){
 }
 
 /* ===== Carrito ===== */
-function addToCart(id,qty){
-  const it=cart.find(x=>x.id===id);
-  if(it)it.qty+=qty;else cart.push({id:id,qty:qty});
+function addToCart(id,qty,vari){
+  const k=varKey(vari||null);
+  const it=cart.find(x=>x.id===id&&varKey(x.var)===k);
+  if(it)it.qty+=qty;else cart.push({id:id,qty:qty,var:vari||null});
   sv("iki-cart",cart);
   const p=prod(id);
   if(p)track("AddToCart",{content_name:p.n,content_type:"product",contents:[{id:id,quantity:qty}],value:p.p*qty,currency:"COP"});
@@ -1259,12 +1196,14 @@ function renderCart(){
   $("payBar").classList.toggle("show",s.count>0);
   updateCounts();
   if(!cart.length){
-    box.innerHTML='<div class="cd-empty"><svg class="ic" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8zM9 8V6a3 3 0 0 1 6 0v2"/></svg><p>Tu carrito está vacío.</p></div>';
+    box.innerHTML='<div class="cd-empty"><svg class="ic" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8zM9 8V6a3 3 0 0 1 6 0v2"/></svg><p>Tu carrito está vacío.</p><button class="btn o" style="margin-top:14px" onclick="toggleCart(false);scrollToSection(\'tienda\')">Explorar productos</button></div>';
   }else{
     box.innerHTML=cart.map((it,i)=>{
       const p=prod(it.id);if(!p)return"";
       return '<div class="cit">'+miniThumb(p)
-      +'<div class="inf"><span class="nm">'+esc(p.n)+'</span><span class="un">'+cop(p.p)+' c/u</span><span class="ln">'+cop(p.p*it.qty)+'</span>'
+      +'<div class="inf"><span class="nm">'+esc(p.n)+'</span>'
+      +(it.var?'<span class="un">'+esc(Object.keys(it.var).map(function(g){return g+": "+it.var[g];}).join(" · "))+'</span>':"")
+      +'<span class="un">'+cop(p.p)+' c/u</span><span class="ln">'+cop(p.p*it.qty)+'</span>'
       +'<span class="qrow"><button class="qb" type="button" onclick="updateCartQty('+i+',-1)" aria-label="Quitar una unidad">−</button><b>'+it.qty+'</b><button class="qb" type="button" onclick="updateCartQty('+i+',1)" aria-label="Agregar una unidad">+</button>'
       +'<button class="del" type="button" onclick="removeCartItem('+i+')" aria-label="Eliminar del carrito"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6.5 7l1 13h9l1-13M10 11v5M14 11v5"/></svg></button></span>'
       +'</div></div>';
@@ -1305,7 +1244,9 @@ function renderOrderSummary(){
   el.innerHTML=cart.map((it,i)=>{
     const p=prod(it.id);if(!p)return"";
     return '<div class="osr">'+miniThumb(p)
-    +'<div class="inf"><span class="nm">'+esc(p.n)+'</span><div class="stpr"><button type="button" onclick="changeOrderQty('+i+',-1)" aria-label="Quitar una unidad">−</button><b>'+it.qty+'</b><button type="button" onclick="changeOrderQty('+i+',1)" aria-label="Agregar una unidad">+</button></div></div>'
+    +'<div class="inf"><span class="nm">'+esc(p.n)+'</span>'
+    +(it.var?'<span class="osl" style="padding:2px 0;font-size:11px">'+esc(Object.keys(it.var).map(function(g){return g+": "+it.var[g];}).join(" · "))+'</span>':"")
+    +'<div class="stpr"><button type="button" onclick="changeOrderQty('+i+',-1)" aria-label="Quitar una unidad">−</button><b>'+it.qty+'</b><button type="button" onclick="changeOrderQty('+i+',1)" aria-label="Agregar una unidad">+</button></div></div>'
     +'<b class="pp">'+cop(p.p*it.qty)+'</b></div>';
   }).join("")
   +'<div class="osl env"><span>Envío</span><span>Pagado: se cotiza según tu ciudad y se confirma por WhatsApp</span></div>';
@@ -1369,7 +1310,7 @@ function faseDatos(){
   return !!(n&&t&&!codFieldError(n)&&!codFieldError(t)&&(e?codFieldError(e)==="":true));
 }
 function faseEntrega(){
-  return ["customerDept","customerCity","customerHood","customerAddress"].every(id=>{const f=$(id);return f&&codFieldError(f)==="";});
+  return ["customerDept","customerCity","customerAddress"].every(id=>{const f=$(id);return f&&codFieldError(f)==="";});
 }
 function updateFases(inter){
   const secs=document.querySelectorAll("#orderForm .sec[data-fase]");
@@ -1425,9 +1366,11 @@ function sendOrder(){
   let m="Hola IKI, quiero hacer este pedido.\n\n";
   m+="Cliente: "+nombre+"\nWhatsApp: +57 "+tel+"\n";
   if(email)m+="Email: "+email+"\n";
-  m+="\nEntrega: A domicilio\nDepartamento: "+dep+"\nCiudad: "+ciudad+"\nBarrio: "+barrio+"\nDirección: "+dir+"\n";
+  m+="\nEntrega: A domicilio\nDepartamento: "+dep+"\nCiudad: "+ciudad+"\n";
+  if(barrio)m+="Barrio: "+barrio+"\n";
+  m+="Dirección: "+dir+"\n";
   m+="\nPago: "+(labels[pago]||pago)+"\n\nProductos:\n";
-  cart.forEach(it=>{const p=prod(it.id);if(p)m+="\u2022 "+it.qty+" x "+p.n+" — "+cop(p.p*it.qty)+" ("+cop(p.p)+" c/u)\n";});
+  cart.forEach(it=>{const p=prod(it.id);if(p)m+="\u2022 "+it.qty+" x "+p.n+(it.var?varTxt(it.var):"")+" — "+cop(p.p*it.qty)+" ("+cop(p.p)+" c/u)\n";});
   m+="\nSubtotal: "+cop(s.total)+"\nEnvío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
   if(notas)m+="\n\nNotas: "+notas;
   track("Lead",{value:s.total,currency:"COP",num_items:s.count,content_name:"Pedido WhatsApp"});
@@ -1753,8 +1696,7 @@ function compactarHeader(){
 document.addEventListener("DOMContentLoaded",function(){
   aplicarAnalitica();
   const saludo=waLink("Hola IKI, tengo una pregunta.");
-  ["waHdr","waMenu","waNews","waFab"].forEach(id=>{const e=$(id);if(e)e.href=saludo;});
-  $("waFoot").href=saludo;
+  ["waHdr","waMenu","waNews","waFab","waFoot"].forEach(function(id){const e=$(id);if(e)e.href=saludo;});
   $("footerYear").textContent=new Date().getFullYear();
   renderSubnav();renderBubbles();renderChips();renderGifts();renderGrid();
   initCarouseles();iniciarDeriva();actualizarHero();renderMobileMenu();
