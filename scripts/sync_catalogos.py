@@ -358,14 +358,12 @@ def curar_taiwan(base, categorias, lo, hi, n=None):
             continue
         por_cat[p["category"]].append({"nombre": titulo(nombre), "precio": precio, "imgs": [p["image"]],
                                         "sku": (str(p.get("sku") or "").strip() or None)})
-    sel, vistos, v4 = [], set(), set()
+    sel, vistos = [], set()
     for c, lst in por_cat.items():
         for x in lst:
-            clave = " ".join(x["nombre"].lower().split()[:4])
-            if x["nombre"].lower() in vistos or clave in v4:
+            if x["nombre"].lower() in vistos:
                 continue
             vistos.add(x["nombre"].lower())
-            v4.add(clave)
             sel.append(x)
     sel.sort(key=lambda x: x["precio"])
     for x in sel:
@@ -399,7 +397,7 @@ def curar_solobabys(prods, h2c):
         if "Combos" in i["cols"] and 30000 <= i["precio"] <= 200000:
             if not any(c["nombre"] == i["nombre"] for c in combos):
                 combos.append(i)
-        elif "Combos" not in i["cols"] and 5000 <= i["precio"] <= 160000:
+        elif "Combos" not in i["cols"] and 5000 <= i["precio"] <= 500000:
             bebes.append(i)
     combos.sort(key=lambda x: -x["precio"])
     sel_b = sorted(bebes, key=lambda x: x["precio"])
