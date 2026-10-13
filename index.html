@@ -527,6 +527,10 @@ footer a:hover{color:var(--cr)}
 .admin-grid input:focus{outline:none;border-color:var(--c)}
 .admin-check{display:flex;align-items:center;gap:8px;font:500 12.5px var(--fb);min-height:40px}
 .admin-check input{width:17px;height:17px;accent-color:var(--y)}
+.admin-cat-fila{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;padding:8px;border-bottom:1px dashed var(--bd)}
+.admin-cat-fila:last-child{border-bottom:0}
+.admin-cat-fila .ic{width:20px;height:20px}
+.admin-cat-nombre{font:600 13px var(--fb);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .admin-buscar{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font:400 13px var(--fb);background:#fff;margin-bottom:10px}
 .admin-buscar:focus{outline:none;border-color:var(--c)}
 .admin-fila{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;background:#FFFDF6;border:1px solid #F0E8D6;border-radius:10px;font-size:12.5px;margin-bottom:6px}
@@ -541,6 +545,41 @@ footer a:hover{color:var(--cr)}
 .admin-botones{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .admin-botones .btn{min-height:44px;padding:0 18px;font-size:13px}
 .admin-nota{margin-top:14px;font-size:12px;color:var(--mu);background:#FFFDF6;border:1px dashed var(--bd);border-radius:10px;padding:10px 12px;line-height:1.5}
+@media(min-width:901px){
+  /* Escritorio: galeria a la izquierda; nombre, boton y sugerencias a la derecha.
+     Todo visible sin scroll en una pantalla normal. */
+  .lbp{display:grid;grid-template-columns:minmax(300px,430px) minmax(300px,1fr);grid-template-rows:auto minmax(0,1fr);column-gap:22px;padding:20px 22px}
+  .lbx{position:absolute;top:14px;right:14px}
+  .lbgal{grid-column:1;grid-row:1/3}
+  .lbmain{width:min(400px,calc((92vh - 210px)*0.8))}
+  .lbinf{grid-column:2;grid-row:1;margin-top:38px;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:12px}
+  .lbcap{white-space:normal;overflow:visible;text-overflow:clip;font-size:15.5px;line-height:1.35}
+  .lbcta{justify-content:center;padding:12px 20px;font-size:13.5px}
+  .lbup{grid-column:2;grid-row:2;margin-top:2px;padding-top:14px;min-height:0;overflow-y:auto;scrollbar-width:thin}
+  .lbupt{padding-bottom:8px}
+  .lbi{flex:0 0 132px}
+}
+@media(max-width:768px){
+  .admin-panel{max-width:100%!important;width:100%!important;border-radius:0!important}
+  .admin-panel .cod-h{padding:12px 14px;flex-wrap:wrap;gap:6px}
+  .admin-panel .cod-t h3{font-size:16px}
+  .admin-panel .cod-t p{font-size:11px}
+  .cod-b{padding:14px 12px 8px}
+  .admin-h{font-size:13px;margin:16px 0 8px}
+  .admin-h small{font-size:10.5px}
+  .admin-grid{grid-template-columns:1fr}
+  .admin-check{font-size:12.5px;min-height:38px}
+  .admin-cat-fila{padding:8px 6px;gap:6px}
+  .admin-cat-fila .admin-check{min-height:32px;font-size:11.5px}
+  .admin-cat-nombre{font-size:12.5px}
+  .admin-fila{grid-template-columns:auto 1fr auto auto;row-gap:4px;padding:6px 8px;font-size:12px}
+  .admin-fila .an{font-size:12px;white-space:normal}
+  .admin-botones{gap:6px}
+  .admin-botones .btn{flex:1 1 calc(50% - 4px);font-size:11.5px;padding:0 8px;min-height:42px}
+  .admin-buscar{font-size:14px;padding:12px 13px}
+  .admin-lista{max-height:260px}
+}
+@media(min-width:1100px){.admin-panel{max-width:720px}}
 @media(max-width:640px){
   .admin-panel .cod-h{padding:12px 14px}
   .admin-grid{grid-template-columns:1fr}
@@ -946,6 +985,25 @@ footer a:hover{color:var(--cr)}
       <input class="admin-buscar" id="adminBuscarFav" placeholder="Busca productos para el carrusel de favoritos…" oninput="buscarAdminFav()">
       <div class="admin-fijados" id="adminResFav"></div>
       <div class="admin-fijados" id="adminFavoritosLista"></div>
+      <div class="admin-h">Visibilidad <small>oculta lo que no quieras mostrar en la tienda</small></div>
+      <div class="admin-grid">
+      <label class="admin-check" style="grid-column:1/-1"><input type="checkbox" id="adminVerHero" onchange="toggleSeccion('hero',this.checked)" checked> Mostrar galería de portada (héroe)</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerMarquee" onchange="toggleSeccion('marquee',this.checked)" checked> Mostrar marquesina</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCategorias" onchange="toggleSeccion('categorias',this.checked)" checked> Mostrar burbujas de categorías</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCarruseles" onchange="toggleSeccion('carruseles',this.checked)" checked> Mostrar carruseles</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerConfianza" onchange="toggleSeccion('confianza',this.checked)" checked> Mostrar franja de confianza</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerFaq" onchange="toggleSeccion('faq',this.checked)" checked> Mostrar preguntas frecuentes</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerContacto" onchange="toggleSeccion('contacto',this.checked)" checked> Mostrar banda de contacto</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCarFav" onchange="toggleCarrusel('favoritos',this.checked)" checked> Mostrar carrusel de favoritos</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar1" onchange="toggleCarrusel('row1',this.checked)" checked> Mostrar carrusel 1</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar2" onchange="toggleCarrusel('row2',this.checked)" checked> Mostrar carrusel 2</label>
+      </div>
+      <div class="admin-h">Categorías visibles <small>desmarca para ocultar la categoría de toda la tienda</small></div>
+      <div class="admin-lista" id="adminCatsVis"></div>
+      <div class="admin-h">Ocultar productos <small>busca por nombre o código IKI-XXXX</small></div>
+      <input class="admin-buscar" id="adminBuscarOcultar" placeholder="Buscar producto para ocultar o mostrar…" oninput="buscarAdminOcultar()">
+      <div class="admin-fijados" id="adminResOcultar"></div>
+      <div class="admin-fijados" id="adminOcultosLista"></div>
       <div class="admin-h">Comportamiento de la tienda</div>
       <div class="admin-grid">
         <label class="admin-check"><input type="checkbox" id="adminContraEntrega" checked> Ofrecer <strong>pago contra entrega</strong> (el cliente paga al recibir). Desmárcala y solo quedará Transferencia</label>
@@ -1039,7 +1097,11 @@ const TIENDA_DEFECTO={
   favoritos:"j243,j262,j315,j244,j222,j178",
   pagoContraEntrega:true,
   vaciarCarrito:true,
-  claveAdmin:"IKI123*"
+  claveAdmin:"IKI123*",
+  categoriasOcultas:"",
+  productosOcultos:"",
+  seccionesOcultas:"",
+  carruselesOcultos:""
 };
 const PRECIOS_DEFECTO={
   margenGlobal:0,
@@ -1067,7 +1129,11 @@ function cargarTienda(){
     favoritos:str(g.favoritos,TIENDA_DEFECTO.favoritos),
     pagoContraEntrega:si(g.pagoContraEntrega,TIENDA_DEFECTO.pagoContraEntrega),
     vaciarCarrito:si(g.vaciarCarrito,TIENDA_DEFECTO.vaciarCarrito),
-    claveAdmin:str(g.claveAdmin,TIENDA_DEFECTO.claveAdmin)
+    claveAdmin:str(g.claveAdmin,TIENDA_DEFECTO.claveAdmin),
+    categoriasOcultas:str(g.categoriasOcultas,""),
+    productosOcultos:str(g.productosOcultos,""),
+    seccionesOcultas:str(g.seccionesOcultas,""),
+    carruselesOcultos:str(g.carruselesOcultos,"")
   };
 }function cargarPrecios(){
   let g={};try{g=JSON.parse(localStorage.getItem(PRECIOS_KEY))||{};}catch(e){}
@@ -1183,7 +1249,7 @@ function cartResumen(){let count=0,total=0;cart.forEach(it=>{const p=prod(it.id)
 /* ===== Navegación y categorías ===== */
 function renderSubnav(){
   let h='<button type="button" class="snl" data-c="todo" onclick="filterProducts(\'todo\')">Todo</button>';
-  CATS.forEach(c=>h+='<button type="button" class="snl" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+'</button>');
+  CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<button type="button" class="snl" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+'</button>');
   h+='<span class="sn-sep"></span><button type="button" class="snl" onclick="scrollToSection(\'faq\')">Ayuda</button>';
   $("subnavTrack").innerHTML=h;
   ajustarSubnav();
@@ -1195,7 +1261,7 @@ function renderBubbles(){
   PRODUCTOS.forEach(p=>{desde[p.cat]=Math.min(desde[p.cat],p.p)});
   const minAll=Math.min.apply(null,Object.values(desde));
   let h='<button type="button" class="bub" data-c="todo" onclick="filterProducts(\'todo\')"><span class="bp" style="background:#fff"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span><span class="bl">Todas</span><span class="bq">desde '+cop(minAll)+'</span></button>';
-  CATS.forEach(c=>{
+  CATS.filter(c=>!catOculta(c.id)).forEach(c=>{
     const conImg=PRODUCTOS.find(p=>p.cat===c.id&&productImgs(p).length);
     const img=conImg?productImgs(conImg)[0]:(IMG[c.id]||"");
     h+='<button type="button" class="bub" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')" aria-label="Ver '+esc(c.n)+'"><span class="bp"'+(img?' style="background-color:'+c.c+';background-image:url(\''+esc(img)+'\')"':' style="background:'+c.c+'"')+'>'+(img?"":'<svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>')+'</span><span class="bl">'+esc(c.n)+'</span><span class="bq">desde '+cop(desde[c.id])+'</span></button>';
@@ -1205,13 +1271,13 @@ function renderBubbles(){
 function scrollCats(d){const t=$("catsTrack");if(t)t.scrollBy({left:d*300,behavior:"smooth"});}
 function renderChips(){
   const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  let h='<button type="button" class="chip" data-c="todo" onclick="filterProducts(\'todo\')">Todo <small>'+PRODUCTOS.length+'</small></button>';
-  CATS.forEach(c=>h+='<button type="button" class="chip" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+' <small>'+(counts[c.id]||0)+'</small></button>');
+  let h='<button type="button" class="chip" data-c="todo" onclick="filterProducts(\'todo\')">Todo <small>'+PRODUCTOS.filter(p=>!prodOculto(p.id)&&!catOculta(p.cat)).length+'</small></button>';
+  CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<button type="button" class="chip" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+' <small>'+(counts[c.id]||0)+'</small></button>');
   $("chips").innerHTML=h;
 }
 function renderMobileMenu(){
   let h='<li><button onclick="toggleMenu();scrollToSection(\'tienda\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Todos los productos</button></li>';
-  CATS.forEach(c=>h+='<li><button onclick="toggleMenu();filterProducts(\''+escJs(c.id)+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>'+esc(c.n)+'</button></li>');
+  CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<li><button onclick="toggleMenu();filterProducts(\''+escJs(c.id)+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>'+esc(c.n)+'</button></li>');
   h+='<li><button onclick="toggleMenu();scrollToSection(\'favoritos\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg>Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()"></button></li>';
   h+='<li><button onclick="toggleMenu();scrollToSection(\'faq\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2A2.6 2.6 0 0 1 12 7.4c1.4 0 2.5 1 2.5 2.2 0 2.2-2.5 2-2.5 4M12 17h.01"/></svg>Preguntas frecuentes</button></li>';
   $("mobileMenuList").innerHTML=h;
@@ -1225,7 +1291,7 @@ function syncActive(){
 
 /* ===== Catálogo ===== */
 function listado(){
-  let l=PRODUCTOS.filter(p=>(filter==="todo"||p.cat===filter)&&(!onlyFav||favs.includes(p.id)));
+  let l=PRODUCTOS.filter(p=>(filter==="todo"||p.cat===filter)&&(!onlyFav||favs.includes(p.id))&&!prodOculto(p.id)&&!catOculta(p.cat));
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
@@ -1936,24 +2002,26 @@ function scrollCarousel(d,tid){
 function initCarouseles(){
   const sel=CONFIG.favoritosIds.map(prod).filter(Boolean);
   const fr=$("favoritos");
-  if(sel.length>=2){
+  const vis=sel.filter(p=>!prodOculto(p.id));
+  if(vis.length>=2&&!carruselOculto("favoritos")){
     fr.style.display="";
-    $("favRowMeta").textContent=sel.length+" selecciones de la tienda";
+    $("favRowMeta").textContent=vis.length+" selecciones de la tienda";
     const t=$("carFav");t.innerHTML="";
-    sel.forEach(p=>t.appendChild(crearItemCarro(p)));
+    vis.forEach(p=>t.appendChild(crearItemCarro(p)));
     buildDots("carFav","dotsFav");hookScroll("carFav","dotsFav");
   }else fr.style.display="none";
   const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  const prioridad=["joyas","moda"].filter(c=>counts[c]);
-  const resto=Object.keys(counts).filter(c=>c!=="joyas"&&c!=="moda").sort((a,b)=>counts[b]-counts[a]);
+  const prioridad=["joyas","moda"].filter(c=>counts[c]&&!catOculta(c));
+  const resto=Object.keys(counts).filter(c=>c!=="joyas"&&c!=="moda"&&!catOculta(c)).sort((a,b)=>counts[b]-counts[a]);
   const top=prioridad.concat(resto).slice(0,2);
   [["row1","car1","dots1","row1Label","row1Meta"],["row2","car2","dots2","row2Label","row2Meta"]].forEach((cfg,i)=>{
     const cat=top[i],row=$(cfg[0]),t=$(cfg[1]);
-    if(!cat){row.style.display="none";return;}
+    if(!cat||carruselOculto(cfg[0])){row.style.display="none";return;}
+    row.style.display="";
     $(cfg[3]).textContent=labelOf(cat);
     $(cfg[4]).textContent=counts[cat]+" producto"+(counts[cat]===1?"":"s");
     t.innerHTML="";
-    PRODUCTOS.filter(p=>p.cat===cat).forEach(p=>t.appendChild(crearItemCarro(p)));
+    PRODUCTOS.filter(p=>p.cat===cat&&!prodOculto(p.id)).forEach(p=>t.appendChild(crearItemCarro(p)));
     buildDots(cfg[1],cfg[2]);hookScroll(cfg[1],cfg[2]);
   });
   iniciarAutoplay();
@@ -2029,7 +2097,7 @@ function actualizarHero(){
   let h="";
   ids.forEach(function(pid){
     const p=window.PRODUCTOS.find(function(x){return x.id===pid;});
-    if(!p||!p.img)return;
+    if(!p||!p.img||prodOculto(pid))return;
     h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+p.n+'">'
       +'<img src="'+p.img+'" alt="'+p.n+'" decoding="async" loading="eager">'
       +'<div class="hg-info"><b>'+p.n+'</b><span>'+cop(p.p)+'</span></div>'
@@ -2119,6 +2187,24 @@ function normWa(v){const d=String(v||"").replace(/\D/g,"");if(!d)return"";if(d.l
 
 /* ===== Contra entrega on/off ===== */
 function contraEntregaActiva(){return TIENDA.pagoContraEntrega!==false;}
+/* ===== Visibilidad: categorias, productos, secciones, carruseles ===== */
+function ocultasLista(str){return String(str||"").split(",").map(function(s){return s.trim();}).filter(Boolean);}
+function catOculta(id){return ocultasLista(TIENDA.categoriasOcultas).includes(id);}
+function prodOculto(id){return ocultasLista(TIENDA.productosOcultos).includes(id);}
+function seccionOculta(id){return ocultasLista(TIENDA.seccionesOcultas).includes(id);}
+function carruselOculto(id){return ocultasLista(TIENDA.carruselesOcultos).includes(id);}
+function aplicarSeccionesVisibles(){
+  const mapa={hero:".hero",marquee:".marquee",carruseles:".carsec",categorias:".catsbar",confianza:".trust",faq:"#faq",contacto:".news"};
+  Object.keys(mapa).forEach(function(k){
+    const el=document.querySelector(mapa[k]);
+    if(el)el.style.display=seccionOculta(k)?"none":"";
+  });
+}
+function aplicarVisibilidad(){
+  aplicarSeccionesVisibles();
+  renderSubnav();renderBubbles();renderChips();renderGrid();initCarouseles();renderMobileMenu();
+  actualizarHero();
+}
 function aplicarContraEntrega(){
   const activa=contraEntregaActiva();
   document.querySelectorAll('[data-solo-contra-entrega]').forEach(function(el){el.style.display=activa?"":"none";});
@@ -2195,6 +2281,7 @@ function pintarPanelAdmin(){
   $("adminResHero").innerHTML="";$("adminResPrecio").innerHTML="";$("adminResFav").innerHTML="";
   $("adminBuscarHero").value="";$("adminBuscarPrecio").value="";$("adminBuscarFav").value="";
   pintarFijadosAdmin();
+  pintarVisibilidadAdmin();
   pintarPreviewAdmin();
 }
 function pintarCategoriasAdmin(){
@@ -2278,6 +2365,92 @@ function pintarListaAdmin(){
     });
   });
   la.innerHTML=h;
+}
+/* ===== Admin: visibilidad ===== */
+function pintarVisibilidadAdmin(){
+  const oc=ocultasLista(TIENDA.categoriasOcultas);
+  let h="";
+  CATS.forEach(function(c){
+    const vis=!oc.includes(c.id);
+    h+='<div class="admin-cat-fila">'
+      +'<svg class="ic" viewBox="0 0 24 24" style="color:var(--y)"><path d="'+c.i+'"/></svg>'
+      +'<span class="admin-cat-nombre">'+esc(c.n)+'</span>'
+      +'<label class="admin-check" style="min-height:0;font-size:12px"><input type="checkbox" '+(vis?"checked":"")+' onchange="toggleCategoriaVis(\''+escJs(c.id)+'\',this.checked)"> Visible</label>'
+      +'</div>';
+  });
+  $("adminCatsVis").innerHTML=h;
+  const secs={hero:"adminVerHero",marquee:"adminVerMarquee",categorias:"adminVerCategorias",carruseles:"adminVerCarruseles",confianza:"adminVerConfianza",faq:"adminVerFaq",contacto:"adminVerContacto"};
+  Object.keys(secs).forEach(function(k){const el=$(secs[k]);if(el)el.checked=!seccionOculta(k);});
+  const cars={favoritos:"adminVerCarFav",row1:"adminVerCar1",row2:"adminVerCar2"};
+  Object.keys(cars).forEach(function(k){const el=$(cars[k]);if(el)el.checked=!carruselOculto(k);});
+  pintarOcultosAdmin();
+}
+function toggleSeccion(id,visible){
+  let l=ocultasLista(TIENDA.seccionesOcultas);
+  if(visible)l=l.filter(function(x){return x!==id;});
+  else if(!l.includes(id))l.push(id);
+  TIENDA.seccionesOcultas=l.join(",");
+  aplicarSeccionesVisibles();persistirPanel();pintarVisibilidadAdmin();
+}
+function toggleCarrusel(id,visible){
+  let l=ocultasLista(TIENDA.carruselesOcultos);
+  if(visible)l=l.filter(function(x){return x!==id;});
+  else if(!l.includes(id))l.push(id);
+  TIENDA.carruselesOcultos=l.join(",");
+  initCarouseles();persistirPanel();pintarVisibilidadAdmin();
+}
+function toggleCategoriaVis(id,visible){
+  let l=ocultasLista(TIENDA.categoriasOcultas);
+  if(visible)l=l.filter(function(x){return x!==id;});
+  else if(!l.includes(id))l.push(id);
+  TIENDA.categoriasOcultas=l.join(",");
+  if(catOculta(filter))filter="todo";
+  aplicarVisibilidad();persistirPanel();pintarVisibilidadAdmin();
+}
+function buscarAdminOcultar(){
+  const q=$("adminBuscarOcultar").value.trim().toLowerCase();
+  if(q.length<2){$("adminResOcultar").innerHTML="";return;}
+  const ocultos=ocultasLista(TIENDA.productosOcultos);
+  const r=window.PRODUCTOS.filter(function(p){
+    return p.n.toLowerCase().includes(q)||(p.cid||"").toLowerCase().includes(q);
+  }).slice(0,6);
+  $("adminResOcultar").innerHTML=r.length?r.map(function(p){
+    const oculto=ocultos.includes(p.id);
+    return '<div class="admin-fila" style="grid-template-columns:auto 1fr auto auto">'
+      +'<img src="'+p.img+'" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:8px">'
+      +'<span class="an">'+esc(p.n.slice(0,34))+'</span>'
+      +'<span style="font:600 11px Poppins;color:var(--mu)">'+(p.cid||"")+'</span>'
+      +'<button class="admin-btn'+(oculto?"":" quitar")+'" type="button" onclick="toggleProductoOculto(\''+escJs(p.id)+'\')">'+(oculto?"Mostrar":"Ocultar")+'</button>'
+      +'</div>';
+  }).join(""):'<div class="admin-nota">Sin resultados.</div>';
+}
+function toggleProductoOculto(id){
+  let l=ocultasLista(TIENDA.productosOcultos);
+  const estaba=l.includes(id);
+  if(estaba)l=l.filter(function(x){return x!==id;});
+  else l.push(id);
+  TIENDA.productosOcultos=l.join(",");
+  renderGrid();renderChips();initCarouseles();actualizarHero();
+  persistirPanel();pintarOcultosAdmin();
+  $("adminResOcultar").innerHTML="";$("adminBuscarOcultar").value="";
+  showToast(estaba?"Producto visible en la tienda":"Producto oculto de la tienda");
+}
+function pintarOcultosAdmin(){
+  const ocultos=ocultasLista(TIENDA.productosOcultos);
+  let h="";
+  if(ocultos.length){
+    h='<p style="font:600 11px Poppins;color:var(--mu);margin:0 0 6px">OCULTOS ('+ocultos.length+'):</p>';
+    ocultos.forEach(function(id){
+      const p=window.PRODUCTOS.find(function(x){return x.id===id;});
+      if(!p)return;
+      h+='<div class="admin-fila" style="grid-template-columns:auto 1fr auto;background:#FDECEF;border-color:#F5C2CC">'
+        +'<img src="'+p.img+'" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:8px">'
+        +'<span class="an">'+esc(p.n.slice(0,34))+'</span>'
+        +'<button class="admin-btn" type="button" onclick="toggleProductoOculto(\''+escJs(id)+'\')">Mostrar</button>'
+        +'</div>';
+    });
+  }
+  $("adminOcultosLista").innerHTML=h;
 }
 function pintarPreviewAdmin(){
   const el=$("adminPreview");
@@ -2394,21 +2567,21 @@ function persistirPanel(){
 }
 function aplicarPanelAdmin(){
   leerPanelAdmin();persistirPanel();
-  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();aplicarVisibilidad();
   recargarPrecios();
   pintarPanelAdmin();
   showToast("Cambios aplicados en toda la tienda");
 }
 function guardarPanelAdmin(){
   leerPanelAdmin();persistirPanel();
-  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();aplicarVisibilidad();
   recargarPrecios();pintarPanelAdmin();
   showToast("Guardado en este computador");
 }
 function restaurarPanelAdmin(){
   try{localStorage.removeItem(TIENDA_KEY);localStorage.removeItem(PRECIOS_KEY);}catch(e){}
   TIENDA=cargarTienda();PRECIOS=cargarPrecios();
-  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();aplicarVisibilidad();
   recargarPrecios();pintarPanelAdmin();
   showToast("Valores del archivo restaurados");
 }
@@ -2427,7 +2600,11 @@ function codigoConfigAdmin(){
   L.push(" favoritos:"+JSON.stringify(TIENDA.favoritos)+",");
   L.push(" pagoContraEntrega:"+TIENDA.pagoContraEntrega+",");
   L.push(" vaciarCarrito:"+TIENDA.vaciarCarrito+",");
-  L.push(" claveAdmin:"+JSON.stringify(TIENDA.claveAdmin));
+  L.push(" claveAdmin:"+JSON.stringify(TIENDA.claveAdmin)+",");
+  L.push(" categoriasOcultas:"+JSON.stringify(TIENDA.categoriasOcultas)+",");
+  L.push(" productosOcultos:"+JSON.stringify(TIENDA.productosOcultos)+",");
+  L.push(" seccionesOcultas:"+JSON.stringify(TIENDA.seccionesOcultas)+",");
+  L.push(" carruselesOcultos:"+JSON.stringify(TIENDA.carruselesOcultos));
   L.push("};");
   L.push("const PRECIOS_DEFECTO={");
   L.push(" margenGlobal:"+PRECIOS.margenGlobal+",");
@@ -2443,7 +2620,7 @@ function codigoConfigAdmin(){
 function copiarConfigAdmin(){
   const codigo=codigoConfigAdmin();
   persistirPanel();
-  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();recargarPrecios();pintarPanelAdmin();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();aplicarVisibilidad();recargarPrecios();pintarPanelAdmin();
   const listo=function(){showToast("Copiado: pega TIENDA_DEFECTO y PRECIOS_DEFECTO en index.html");};
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(codigo).then(listo).catch(function(){window.prompt("Copia este bloque:",codigo);});
@@ -2458,6 +2635,7 @@ document.addEventListener("DOMContentLoaded",function(){
   renderSubnav();renderBubbles();renderChips();renderGrid();
   initCarouseles();iniciarDeriva();actualizarHero();renderMobileMenu();
   renderCart();
+  aplicarSeccionesVisibles();
   measureHeader();
   window.addEventListener("resize",function(){
     clearTimeout(window.__rt);
