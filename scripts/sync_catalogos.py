@@ -260,17 +260,14 @@ def curar_joyas_gava(prods, h2c):
     vistos, sel = set(), []
     for h in orden:
         nombre_colec = COLEC_NOMBRES[h]
-        tomados = 0
         for p in prods:
-            if tomados >= 3:
-                break
             if nombre_colec not in h2c.get(p["handle"], []):
                 continue
             h_real = REEMPLAZO_HANDLE.get(p["handle"], p["handle"])
             if h_real != p["handle"] and h_real in por_h:
                 p = por_h[h_real]
             precio = float(p["variants"][0]["price"]) if p.get("variants") else 0
-            if not (20000 <= precio <= 200000) or not p.get("images"):
+            if not (5000 <= precio <= 500000) or not p.get("images"):
                 continue
             nombre = re.sub(r"\s+", " ", p["title"]).strip()
             nombre = FIX.get(nombre, titulo(nombre))
@@ -281,7 +278,6 @@ def curar_joyas_gava(prods, h2c):
                         "imgs": ["https:" + im["src"] if im["src"].startswith("//") else im["src"]
                                  for im in p["images"][:4]],
                         "var": None})
-            tomados += 1
     sel.sort(key=lambda x: x["precio"])  # ids estables: j01 = mas economico
     return sel
 
@@ -348,7 +344,7 @@ ETIQ_TW = {"jugueteria": "Juguetería", "juego-de-mesa": "Juego de mesa", "burbu
            "colecciones": "Colecciones", "armatodo": "Armatodo", "escolar": "Escolar",
            "peluches": "Peluches", "hogar": "Hogar", "bebe": "Bebé"}
 
-def curar_taiwan(base, categorias, lo, hi, n):
+def curar_taiwan(base, categorias, lo, hi, n=None):
     """Seleccion alternada entre categorias con dedupe de nombres parecidos."""
     por_cat = {c: [] for c in categorias}
     for p in base:
@@ -363,23 +359,14 @@ def curar_taiwan(base, categorias, lo, hi, n):
         por_cat[p["category"]].append({"nombre": titulo(nombre), "precio": precio, "imgs": [p["image"]],
                                         "sku": (str(p.get("sku") or "").strip() or None)})
     sel, vistos, v4 = [], set(), set()
-    while len(sel) < n:
-        added = False
-        for c, lst in por_cat.items():
-            while lst:
-                x = lst.pop(0)
-                clave = " ".join(x["nombre"].lower().split()[:4])
-                if x["nombre"].lower() in vistos or clave in v4:
-                    continue
-                vistos.add(x["nombre"].lower())
-                v4.add(clave)
-                sel.append(x)
-                added = True
-                break
-            if len(sel) >= n:
-                break
-        if not added:
-            break
+    for c, lst in por_cat.items():
+        for x in lst:
+            clave = " ".join(x["nombre"].lower().split()[:4])
+            if x["nombre"].lower() in vistos or clave in v4:
+                continue
+            vistos.add(x["nombre"].lower())
+            v4.add(clave)
+            sel.append(x)
     sel.sort(key=lambda x: x["precio"])
     for x in sel:
         x["var"] = None
@@ -415,15 +402,7 @@ def curar_solobabys(prods, h2c):
         elif "Combos" not in i["cols"] and 5000 <= i["precio"] <= 160000:
             bebes.append(i)
     combos.sort(key=lambda x: -x["precio"])
-    vistos, sel_b = {}, []
-    for b in sorted(bebes, key=lambda x: x["precio"]):
-        k = b["tipo"] or b["nombre"].split()[0].lower()
-        if vistos.get(k, 0) >= 3:
-            continue
-        vistos[k] = vistos.get(k, 0) + 1
-        sel_b.append(b)
-        if len(sel_b) >= 30:
-            break
+    sel_b = sorted(bebes, key=lambda x: x["precio"])
     return sel_b, combos[:10]
 
 # ============================================================================
@@ -531,8 +510,8 @@ if __name__ == "__main__":
     print("== Curando seleccion de la tienda ==")
     joyas = curar_joyas_gava(gava, gava_cols)
     moda = curar_moda_majestic(majestic)
-    juguetes = curar_taiwan(taiwan, ["jugueteria", "peluches", "burbujeros", "armatodo", "didactico", "juego-de-mesa"], 8000, 90000, 24)
-    escolar = curar_taiwan(taiwan, ["escolar"], 2000, 60000, 12)
+    juguetes = curar_taiwan(taiwan, ["jugueteria", "peluches", "burbujeros", "armatodo", "didactico", "juego-de-mesa", "cacharro", "piñateria", "animales", "colecciones", "slime", "deporte", "termos"], 500, 200000)
+    escolar = curar_taiwan(taiwan, ["escolar", "cubo-rubik"], 500, 200000)
     bebes, combos = curar_solobabys(solobabys, sb_cols)
     print("  joyas=%d moda=%d juguetes=%d escolar=%d bebe=%d regalos=%d" % (len(joyas), len(moda), len(juguetes), len(escolar), len(bebes), len(combos)))
 

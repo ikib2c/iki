@@ -479,7 +479,25 @@ footer a:hover{color:var(--cr)}
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none}
 }
-/* ============ Fotos sobre fondo blanco: la imagen que no cubre el 100% del marco se ve limpia ============ */
+/* ============ Hero: galería de esmeraldas de laboratorio ============ */
+.hero{position:relative;overflow:hidden;padding:0;margin-top:-1px}
+.hero-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:0;height:min(72vh,680px)}
+.hero-gal .hg-item{position:relative;overflow:hidden;cursor:pointer}
+.hero-gal .hg-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.hero-gal .hg-item:hover img{transform:scale(1.06)}
+.hero-gal .hg-item::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(36,36,36,.55));opacity:0;transition:opacity .3s}
+.hero-gal .hg-item:hover::after{opacity:1}
+.hero-gal .hg-info{position:absolute;bottom:14px;left:14px;right:14px;color:#fff;opacity:0;transform:translateY(10px);transition:.3s;z-index:2}
+.hero-gal .hg-item:hover .hg-info{opacity:1;transform:none}
+.hero-gal .hg-info b{font:600 15px var(--fb);display:block;text-shadow:0 1px 4px #0006}
+.hero-gal .hg-info span{font:600 14px var(--ff);text-shadow:0 1px 4px #0006}
+.hero-tag{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:5;pointer-events:none}
+.hero-tag span{font:700 clamp(48px,7vw,84px) var(--ff);letter-spacing:-.03em;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.45);display:block;line-height:1}
+.hero-tag b{font:600 clamp(14px,2vw,20px) var(--fb);color:#fff;text-shadow:0 2px 12px #0008;display:block;margin:8px 0 4px}
+.hero-tag small{font:400 clamp(12px,1.5vw,15px) var(--fb);color:#ffffffcc;text-shadow:0 1px 8px #0008;display:block}
+@media(max-width:900px){.hero{display:none}}
+
+/* ============ Fotos sobre fondo blanco ============ */
 .ph{background:#fff}
 .lbmain{background:#fff}
 .th,.srt{background-color:#fff}
@@ -553,7 +571,7 @@ footer a:hover{color:var(--cr)}
 <!-- ============ Menú móvil ============ -->
 <div class="mmov" id="menuOverlay" onclick="toggleMenu()"></div>
 <aside class="mm" id="mobileMenu" aria-label="Menú">
-  <div class="mm-h"><span class="mm-t">IKI</span>
+  <div class="mm-h"><span class="mm-t"><img src="logo_120.png" alt="IKI" style="height:36px;display:block" onerror="this.style.display='none'"></span>
     <button class="ib" onclick="toggleMenu()" aria-label="Cerrar menú"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <ul class="mm-list" id="mobileMenuList"></ul>
@@ -564,37 +582,14 @@ footer a:hover{color:var(--cr)}
 
 <main>
 <!-- ============ Héroe ============ -->
-<section class="hero"><div class="wrap hero-g">
-  <div class="rv">
-    <div class="eyebrow">Tienda online · Colombia</div>
-    <h1>Todo lo que te hace feliz, <em>en un solo lugar.</em></h1>
-    <p class="lead">Joyas, moda, pijamas, juguetes, útiles escolares y regalos seleccionados, con una compra fácil y confiable.</p>
-    <div class="hben">
-      <span class="hb"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h11v7H3zM14 12h4l3 3v1h-7zM6.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6M17.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6"/></svg>Envíos a todo el país</span>
-      <span class="hb"><svg class="ic" viewBox="0 0 24 24"><path d="M2 6h20v12H2zM2 10h20M6 14h5"/></svg>Pago contra entrega y Nequi</span>
-      <span class="hb"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg>Pago seguro</span>
-      <span class="hb"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12l9-9h9v9l-9 9zM16.5 7.5v.01"/></svg>Precios claros</span>
-    </div>
-    <div class="hero-cta">
-      <button class="btn y" onclick="scrollToSection('tienda')">Explorar tienda</button>
-      <button class="btn o" onclick="filterProducts('regalos')">Ver regalos</button>
-    </div>
-  </div>
-  <div class="hero-card" id="heroCard" style="visibility:hidden">
-    <div class="hc">
-      <div class="ph" id="heroFrame" role="button" tabindex="0" aria-label="Ver producto destacado">
-        <b class="mono">IKI</b>
-        <img id="heroImg" alt="" decoding="async">
-      </div>
-      <span class="hc-chip" id="heroCat"></span>
-      <h3 id="heroName"></h3>
-      <p class="desc">Producto destacado del catálogo. Confirmamos disponibilidad y detalles por WhatsApp.</p>
-      <div class="precio"><b id="heroPrice"></b><s id="heroAntes" hidden></s></div>
-      <button class="hc-cta" id="heroBtn" type="button">Ver producto y comprar</button>
-      <div class="hc-ship"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h11v7H3zM14 12h4l3 3v1h-7zM6.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6M17.5 19a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6"/></svg>Envíos a toda Colombia</div>
-    </div>
-  </div>
-</div></section>
+<section class="hero">
+<div class="hero-gal" id="heroGal"></div>
+<div class="hero-tag">
+  <span>IKI</span>
+  <b>Esmeraldas de laboratorio</b>
+  <small>El mismo brillo, hechas de forma responsable</small>
+</div>
+</section>>
 
 <!-- ============ Categorías (burbujas) ============ -->
 <section class="catsbar" id="categorias"><div class="cwrap">
@@ -1922,30 +1917,23 @@ function iniciarDeriva(){
 }
 
 /* ===== Héroe ===== */
+/* Hero: galería de esmeraldas de laboratorio (solo escritorio) */
+const HERO_ESMERALDAS={
+  imgs:["https://cdn.shopify.com/s/files/1/0755/0605/7437/files/f319de92-e3ff-4a18-9985-c39ee53d1190.jpg?v=1764563805","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-04at11.31.44AM_5.jpg?v=1762277000","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/WhatsAppImage2025-11-04at11.31.44AM_6.jpg?v=1762276872","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7088.jpg?v=1777432786","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_6416.jpg?v=1776184658","https://cdn.shopify.com/s/files/1/0755/0605/7437/files/IMG_7092.jpg?v=1777433423"],
+  nombres:["Pulsera de Covergold Rodinado","Set Victoriano","Set Victoriano","Laurel Esmeralda","Arete Doble Flor","M\u00e1ndale Florida"],
+  precios:[20000,20000,20000,220000,228000,268000]
+};
 function actualizarHero(){
-  const card=$("heroCard"),p=prod(CONFIG.destacado);
-  if(!p){card.style.display="none";return;}
-  const imgs=productImgs(p),f=$("heroFrame"),im=$("heroImg");
-  f.style.setProperty("--soft",softOf(p.cat));
-  if(imgs.length){
-    f.classList.add("has-img");
-    f.style.setProperty("--img",'url("'+imgs[0]+'")');
-    im.src=imgs[0];im.alt=p.n;
-    im.onerror=function(){imgOnError(im,p.cat);};
-  }else im.style.display="none";
-  $("heroCat").innerHTML='<svg class="ic" viewBox="0 0 24 24"><path d="'+iconPath(p.cat)+'"/></svg>'+esc(labelOf(p.cat));
-  $("heroCat").style.setProperty("--soft",softOf(p.cat));
-  $("heroName").textContent=p.n;
-  $("heroPrice").textContent=cop(p.p);
-  const an=$("heroAntes");
-  if(p.antes&&p.antes>p.p){an.hidden=false;an.textContent="Antes "+cop(p.antes);}else an.hidden=true;
-  const ir=()=>scrollToProduct(p.id);
-  $("heroBtn").onclick=ir;
-  f.onclick=ir;
-  f.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();ir();}};
-  card.style.visibility="visible";
-  const hc=card.querySelector(".hc");
-  if(hc)hc.classList.add("in");
+  const gal=$("heroGal");
+  if(!gal)return;
+  let h="";
+  for(let i=0;i<HERO_ESMERALDAS.imgs.length;i++){
+    h+='<div class="hg-item" onclick="scrollToSection(\'tienda\')" role="button" tabindex="0" aria-label="Ver '+HERO_ESMERALDAS.nombres[i]+'">'
+      +'<img src="'+HERO_ESMERALDAS.imgs[i]+'" alt="'+HERO_ESMERALDAS.nombres[i]+'" decoding="async" loading="eager">'
+      +'<div class="hg-info"><b>'+HERO_ESMERALDAS.nombres[i]+'</b><span>'+cop(HERO_ESMERALDAS.precios[i])+'</span></div>'
+      +'</div>';
+  }
+  gal.innerHTML=h;
 }
 
 /* ===== Encabezado ===== */
