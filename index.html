@@ -26,6 +26,11 @@
 --sh:0 1px 2px #2424240d,0 10px 30px #24242412;--shh:0 2px 4px #24242410,0 18px 44px #24242422;
 --ff:"Montserrat",sans-serif;--fb:"Poppins",sans-serif}
 *{box-sizing:border-box;margin:0}
+/* El header movil pliega su barra de categorias al hacer scroll: ese cambio de
+   altura activaria el "scroll anchoring" del navegador (que reajusta el scroll
+   para compensar) y el listener lo lee como scroll contrario, generando un
+   bucle pliega/despliega = parpadeo. Desactivarlo elimina el bucle. */
+html{overflow-anchor:none}
 html{scroll-behavior:smooth}
 body{background:var(--cr);color:var(--c);font:400 15px/1.6 var(--fb);-webkit-font-smoothing:antialiased}
 img{max-width:100%}a{color:inherit;text-decoration:none}button{font-family:inherit}
@@ -430,6 +435,12 @@ footer a:hover{color:var(--cr)}
 /* ============ Responsive ============ */
 @media(max-width:900px){
   .hero{display:none}
+  /* Barra de categorias: se pliega con transform (GPU) en vez de max-height
+     (layout). El transform no dispara reflow del resto de la pagina, es
+     instantaneo en la GPU y nunca titila. will-change + backface-visibility
+     promueven la barra a su propia capa compositora. */
+  .subnav{max-height:none;overflow:hidden;transform:translateY(0);transition:transform .25s ease;will-change:transform;backface-visibility:hidden}
+  #hdr.compacta .subnav{transform:translateY(-100%);max-height:48px}
   .hd{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;position:relative}
   .brand{flex:1}
   .brand img{height:38px}
@@ -1946,15 +1957,49 @@ function measureHeader(){
   ajustarSubnav();
 }
 let ultimoY=0;
+/* El header pliega la barra de categorias en movil al bajar, y la despliega
+   al subir. Para que NUNCA titile:
+   1. Umbral de 18px: los micro-scrolls y vibraciones del scroll elastico de
+      iOS/Android no alcanzan a alternar el estado.
+   2. Cooldown de 250ms: aunque el scroll oscile rapidamente, el estado no
+      cambia mas de una vez cada cuarto de segundo.
+   3. Si el dedo sigue en la pantalla (touch activo), no se despliega: la
+      barra solo regresa cuando la persona termino de escrolear. */
+let compactaCooldown=0;
 function compactarHeader(){
   const h=$("hdr");if(!h)return;
-  const y=window.scrollY,movil=window.matchMedia("(max-width:900px)").matches;
+  const y=window.scrollY;
+  const movil=window.matchMedia("(max-width:900px)").matches;
+  const ahora=Date.now();
   const antes=h.classList.contains("compacta");
-  if(movil&&y>ultimoY+6&&y>170)h.classList.add("compacta");
-  else if(!movil||y<ultimoY-6||y<=170)h.classList.remove("compacta");
-  if(h.classList.contains("compacta")!==antes)measureHeader();
+  const delta=y-ultimoY;
+  if(!movil){
+    if(antes)h.classList.remove("compacta");
+    ultimoY=y;
+    return;
+  }
+  /* cooldown: no togglear mas de una vez cada 250ms */
+  if(ahora-compactaCooldown<250){
+    ultimoY=y;
+    return;
+  }
+  const tocando=document.documentElement.hasAttribute("data-touch");
+  if(y>170&&delta>18){
+    /* bajar: pliega */
+    if(!antes){h.classList.add("compacta");compactaCooldown=ahora;measureHeader();}
+  }else if((y<=170||delta<-18)&&!tocando){
+    /* subir o cerca del inicio: despliega (solo si el dedo ya solto) */
+    if(antes){h.classList.remove("compacta");compactaCooldown=ahora;measureHeader();}
+  }
   ultimoY=y;
 }
+/* Marca cuando el dedo toca la pantalla para que la barra no se
+   despliegue en medio de un gesto de scroll. */
+(function(){
+  const d=document.documentElement;
+  d.addEventListener("touchstart",function(){d.setAttribute("data-touch","1")},{passive:true});
+  d.addEventListener("touchend",function(){setTimeout(function(){d.removeAttribute("data-touch")},80)},{passive:true});
+})();
 
 /* ===== Identidad en vivo (nombre, logo, legal, enlaces) ===== */
 function aplicarIdentidad(){
