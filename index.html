@@ -173,16 +173,6 @@ h1,h2,h3{font-family:var(--ff);letter-spacing:-.02em;line-height:1.15}
 .mq span::after{content:"";position:absolute;right:-3px;top:50%;width:5px;height:5px;border-radius:50%;background:var(--y);transform:translateY(-50%)}
 @keyframes mq{to{transform:translateX(-50%)}}
 /* ============ Banda oscura de joyas ============ */
-.dark{background:var(--c);color:var(--cr);margin-top:58px;padding:76px 0}
-.dark .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:60px;align-items:center}
-.dark .eyebrow{color:#FFF8E9a6}
-.dark h2{font-size:clamp(28px,3.6vw,44px);margin:10px 0 16px}
-.dark p{color:#FFF8E9b8;max-width:440px;margin:0 0 28px;font-size:16px}
-.dfr{position:relative;justify-self:center;width:min(380px,100%)}
-.dfr::before{content:"";position:absolute;inset:-14px;border:1px solid #F5AE2380;border-radius:32px}
-.dbox{position:relative;aspect-ratio:5/4;border-radius:24px;overflow:hidden;background:var(--soft,#FBE3AE);display:grid;place-items:center}
-.dbox b{font:700 54px var(--ff);color:#ffffff17;position:relative;z-index:1}
-.dbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
 /* ============ Catálogo ============ */
 #tienda{padding-top:62px}
 .tbar{position:sticky;top:var(--hh,86px);z-index:45;background:#FFF8E9f2;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:12px 0 10px;border-bottom:1px solid var(--bd);margin-bottom:22px}
@@ -456,8 +446,6 @@ footer a:hover{color:var(--cr)}
   .hero-card::before{inset:14px -14px -14px 14px}
   .trust .wrap{grid-template-columns:1fr 1fr;gap:22px;padding-top:24px;padding-bottom:24px}
   footer .wrap{grid-template-columns:1fr 1fr}
-  .dark .wrap{grid-template-columns:1fr;gap:36px}
-  .dark{padding:52px 0}
   .cwrap{padding:0 12px}
 }
 @media(max-width:768px){
@@ -647,17 +635,6 @@ footer a:hover{color:var(--cr)}
   <span>Envíos a todo el país</span><span>Pequeños hallazgos, grandes sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
   <span>Envíos a todo el país</span><span>Pequeños hallazgos, grandes sonrisas</span><span>Pago seguro</span><span>Precios claros</span><span>Regala una sonrisa</span><span>Atención por WhatsApp</span>
 </div></div>
-
-<!-- ============ Joyas: banda oscura ============ -->
-<section class="dark" id="joyas"><div class="wrap">
-  <div class="rv">
-    <div class="eyebrow">Joyas y accesorios</div>
-    <h2>Detalles que brillan</h2>
-    <p>Piezas para usar todos los días o para regalar, con materiales y diseños cuidados en cada ficha.</p>
-    <button class="btn y" onclick="filterProducts('joyas')">Ver joyas</button>
-  </div>
-  <div class="dfr rv"><div class="dbox" style="--soft:#FBE3AE"><b>IKI</b><img src="IKI_banner_joyas_1600x600.png" alt="Joyas y accesorios IKI" loading="lazy" onerror="this.remove()"></div></div>
-</div></section>
 
 <!-- ============ Catálogo ============ -->
 <section id="tienda"><div class="wrap">

@@ -1,12 +1,20 @@
 # IKI --- Brief de identidad de marca y manual para diseño
 
-**Versión:** 1.1\
+**Versión:** 1.2\
 **Fecha:** octubre de 2026\
 **Mercado:** Colombia\
-**Modelo de negocio:** comercio electrónico\
-**Etapa:** concepto / preparación de lanzamiento\
+**Modelo de negocio:** comercio electrónico (venta por WhatsApp)\
+**Etapa:** tienda publicada y operativa en GitHub Pages\
 **Documento para:** diseñador/a de branding, diseñador/a web, empaque,
 fotografía y contenido
+
+> **Cambios de la versión 1.2:** la sección 19 (index v1) pasa a ser
+> referencia histórica; la nueva sección 21 documenta el sistema real
+> publicado: arquitectura de archivos, paleta aplicada, tipografía,
+> páginas (`index.html` + `legal.html`), catálogo de 4 proveedores con
+> variantes y galerías, sincronización automática cada 6 horas y panel
+> de administración. La paleta de la sección 7 se actualiza con la
+> categoría Bebé y los marcos fotográficos en blanco.
 
 > **Cambios de la versión 1.1:** se añade la sección 19 con la
 > especificación del index web actual (`index.html`), se agregan los
@@ -363,7 +371,15 @@ y miniaturas. El texto que va encima es siempre carbón `#242424`.
   Escolar                `#BDE8C7`      11,5 : 1
 
   Regalos                `#E3DAFD`      11,6 : 1
+
+  Bebé                   `#C9E4F7`      —
   ------------------------------------------------------------------------
+
+Los **marcos de fotografía** (tarjetas de producto, carruseles, miniaturas
+del carrito y lightbox) usan **fondo blanco puro `#FFFFFF`** de borde a
+borde: la foto se muestra completa (`object-fit: contain`) sin capas de
+color ni desenfoque. Los tonos suaves de la tabla quedan reservados para
+las burbujas de categoría, chips de variante y etiquetas.
 
 Contrastes de referencia (calculados con la fórmula WCAG; confirmar con
 una herramienta antes de publicar): carbón sobre amarillo `#F5AE23`
@@ -435,14 +451,14 @@ detalles si realmente aporta valor. Para mantener el sistema simple, la
 recomendación principal es usar solo dos familias en las piezas finales.
 
   -----------------------------------------------------------------------
-  Familia                 Función                 Pesos recomendados
+  Familia                 Función                 Pesos aplicados en web
   ----------------------- ----------------------- -----------------------
-  Montserrat              Titulares, navegación   SemiBold 600, Bold 700
-                          destacada y mensajes de 
-                          campaña                 
+  Montserrat              Titulares, navegación   500, 600 y 700
+                          destacada, mensajes de 
+                          campaña y precios       
 
-  Poppins                 Texto de interfaz,      Regular 400, Medium
-                          descripciones, botones  500, SemiBold 600
+  Poppins                 Texto de interfaz,      400, 500 y 600
+                          descripciones, botones  
                           y cuerpo                
 
   Nunito (opcional)       Etiquetas amigables o   Regular 400, SemiBold
@@ -838,10 +854,16 @@ Solicitar una cotización separada por fases:
 
 ------------------------------------------------------------------------
 
-## 19. Especificación del index web actual
+## 19. Especificación del index web v1 (histórica)
 
-Esta sección documenta el `index.html` de IKI tal como está hoy, para que
-el equipo de diseño y desarrollo lo continúe sin reinterpretarlo.
+> **Nota v1.2:** esta sección documenta la **primera versión** del index,
+ya reemplazada por el sistema descrito en la sección 21 (tienda con
+catálogo externo `catalogo.js`, variantes, panel de administración y
+página legal propia). Se conserva como referencia histórica del
+punto de partida.
+
+Esta sección documenta el `index.html` de IKI tal como estaba en la
+versión 1.1, para que el equipo entienda la evolución sin reinterpretarla.
 
 ### 19.1 Alcance y estado
 
@@ -1048,7 +1070,124 @@ textos.
 
 ------------------------------------------------------------------------
 
-## 20. Resumen ejecutivo para el diseñador
+## 20. Sistema publicado v1.2 (arquitectura real del proyecto)
+
+Esta sección documenta **lo que está publicado hoy** en
+`https://ikib2c.github.io/iki/` y en el repositorio `github.com/ikib2c/iki`.
+
+### 20.1 Arquitectura de archivos
+
+| Archivo / carpeta            | Rol |
+|------------------------------|-----|
+| `index.html`                 | Tienda completa en un archivo (HTML + CSS + JS sin dependencias salvo Google Fonts) |
+| `catalogo.js`                | Catálogo activo (80 productos curados con galerías y variantes); lo genera el cron y no se edita a mano |
+| `legal.html`                 | Página legal propia: 8 políticas con anclas, índice y datos del negocio desde el panel |
+| `scripts/sync_catalogos.py`  | Descarga los 4 proveedores, normaliza, cura la selección, escribe `catalogo.js` y los 4 Excel |
+| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, commitea y publica los cambios |
+| `*_Catalogo.xlsx` (4)        | Excel completos por proveedor: Gava (897), Sublimados Majestic (87), Juguetería Taiwan (1.626), Solobabys (135) |
+| `logo_120.png` / `logo_512.png` | Logo transparente en tamaños web (derivados del icono 2048) |
+| `IKI_icono_*`, banners, favicons | Activos de marca y favicon del sitio |
+
+### 20.2 Paleta aplicada en la tienda
+
+- **Principales:** carbón `#242424` (texto, botones, encabezado del carrito),
+  amarillo `#F5AE23` (acciones, barra de pago, acentos) y crema `#FFF8E9`
+  (fondo general).
+- **Funcionales:** texto secundario `#6B645A`, divisores `#EADFCB`,
+  favoritos coral `#F36B76`, error `#B42318`, éxito `#237A57`.
+- **Tonos suaves por categoría** (burbujas y etiquetas):
+  Joyas `#FBE3AE` · Moda `#FAD0D4` · Juguetes `#C6EEE9` ·
+  Escolar `#BDE8C7` · Regalos `#E3DAFD` · **Bebé `#C9E4F7`**.
+- **Fotografía:** marcos con **fondo blanco puro** y `object-fit: contain`
+  (producto completo, sin recortes ni desenfoque); miniaturas del carrito,
+  buscador y resumen del pedido también en `contain`.
+
+### 20.3 Tipografía aplicada
+
+- **Montserrat** 500/600/700: titulares, etiquetas de sección, precios y
+  nombre del logo.
+- **Poppins** 400/500/600: cuerpo, menús, chips, formularios y botones.
+- Cargadas desde Google Fonts; sin otras familias ni iconos emoji.
+- **Iconografía:** SVG de línea (trazo 1,6–1,7, extremos redondeados)
+  inline; sin emojis ni 3D.
+
+### 20.4 Catálogo y categorías
+
+- **6 categorías:** Joyas y accesorios (28) · Moda y pijamas (14) ·
+  Juguetes (14) · Escolar (8) · Bebé (12) · Regalos (4 combos).
+- **4 proveedores sincronizados:**
+  - Joyas — Gava Joyería (gavajoyeria.com, Shopify)
+  - Moda — Sublimados Majestic (pijamasalmayor.com, Supabase)
+  - Juguetes y Escolar — Juguetería Taiwan (catalogo.js público)
+  - Bebé y Regalos — Solobabys (solobabys.com, Shopify)
+- **Variantes por producto:** tallas (pijamas) y colores (Solobabys) como
+  chips preseleccionados en la ficha; viajan en el mensaje de WhatsApp.
+- **Galerías:** fotos adicionales por producto (lightbox con miniaturas).
+- **Sincronización:** GitHub Actions cada 6 horas regenera `catalogo.js`
+  y los 4 Excel; GitHub Pages publica el resultado solo.
+
+### 20.5 Páginas y estructura del index
+
+1. Barra superior (envíos y medios de pago) · encabezado fijo con logo
+   transparente, buscador con sugerencias, favoritos, carrito y menú
+   móvil · subnavegación por categorías.
+2. Héroe: eslogan, chips de beneficios y tarjeta del producto destacado
+   (configurable desde el panel).
+3. Burbujas de categoría con foto y precio "desde".
+4. Carruseles: "Los favoritos de IKI" + fila por categoría (autoplay que
+   respeta `prefers-reduced-motion`).
+5. Marquesina de beneficios.
+6. Catálogo: contador, orden, chips de filtro, tarjetas con favorito,
+   alta rápida, panel de cantidad con variantes y paginación incremental.
+7. Franja de confianza (5 apoyos).
+8. FAQ desplegable.
+9. Banda de contacto por WhatsApp, pie con enlaces legales a
+   `legal.html` y acceso al panel.
+10. Flotantes: WhatsApp con pulso, compartir, carrito con badge,
+    "Pagar pedido" (barra amarilla) y aviso toast.
+
+### 20.6 Checkout por WhatsApp (estilo COD por fases)
+
+- Agregar un producto abre el formulario con fases progresivas:
+  1) pedido editable con sugeridos por ticket · 2) datos ·
+  3) entrega (departamento, ciudad, dirección; barrio opcional) ·
+  4) pago: contra entrega o Nequi 315 637 1501 · 5) notas.
+- Validación en vivo por campo, botón que guía el siguiente paso y mensaje
+  de WhatsApp con productos, variantes, subtotal y datos del cliente.
+- Barrio opcional y vaciado automático del carrito tras enviar.
+
+### 20.7 Panel de administración
+
+- Acceso con clave (default configurable `IKI123*`): enlace "Administración"
+  del pie, `?admin=1` o Ctrl+Shift+A.
+- Editable sin tocar código: nombre, logo, WhatsApp, email, redes,
+  **datos legales** (razón social, NIT, dirección), analítica (Pixel de
+  Meta y GA4), producto destacado, favoritos del carrusel, comportamiento
+  y **precio exacto por producto** (buscador + lista completa).
+- "Guardar en MI computador" (localStorage, instantáneo) y
+  "Guardar para TODOS" (copia los bloques `TIENDA_DEFECTO` y
+  `PRECIOS_DEFECTO` para publicarlos en el archivo).
+
+### 20.8 Accesibilidad y comportamiento
+
+- Enlace para saltar al contenido, foco visible, cierre con Escape,
+  `aria-` en botones y paneles, áreas táctiles ≥ 44 px.
+- `prefers-reduced-motion`: sin autoplay ni deriva de categorías.
+- Responsive desde 380 px: checkout a pantalla completa en móvil,
+  grid de 2 columnas, barra de filtros estática en pantallas pequeñas.
+- QA/E2E automatizados (jsdom): 78 verificaciones del flujo completo.
+
+### 20.9 Pendientes operativos (heredados del brief)
+
+- Dominio propio y URL absoluta de `og:image` / datos estructurados.
+- Razón social y NIT reales (editables desde el panel).
+- Alojar fotos propias de producto (hoy en CDN de los proveedores).
+- Políticas de envío con costos y plazos definitivos por ciudad.
+- Verificar la disponibilidad del nombre en la SIC.
+
+------------------------------------------------------------------------
+
+## 21. Resumen ejecutivo para el diseñador
 
 Desarrollar un sistema de branding para **IKI**, una tienda online
 colombiana de precio medio que reúne joyas, ropa, pijamas, juguetes,
