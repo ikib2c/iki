@@ -1988,38 +1988,51 @@ async function shareCatalog(){
         await navigator.share({text:url,files:[tarjeta]});
         return;
       }
-      await navigator.share({title:"IKI",text:"IKI — joyas, moda y regalos con envíos a toda Colombia.",url:url});
+      await navigator.share({title:"IKI",text:"IKI — joyas, moda, juguetes, bebé y ropa urbana con envíos a toda Colombia. Paga contra entrega o por Nequi.",url:url});
       return;
     }
   }catch(e){}
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    const texto="IKI — joyas, moda y regalos con envíos a toda Colombia.";
+    const texto="IKI — joyas, moda, juguetes, bebé y ropa urbana con envíos a toda Colombia. Paga contra entrega o por Nequi.";
     navigator.clipboard.writeText(texto+" "+url).then(()=>showToast("Enlace copiado. Compártelo donde quieras")).catch(()=>window.prompt("Copia este enlace:",texto+" "+url));
   }else window.prompt("Copia este enlace:","IKI — joyas, moda y regalos "+url);
 }
 
 /* Tarjeta para compartir: 1080x1080 con logo transparente, nombre, eslogan
    y direccion dibujados en canvas. Todo en una sola imagen. */
+/* Tarjeta para compartir la tienda (1080x1080, lista para estados y chats):
+   logo, eslogan, categorias, QR ESCANEABLE hacia la tienda y URL en insignia.
+   Estrategia: quien recibe la imagen escanea y entra directo al catalogo. */
 async function crearTarjetaCompartir(){
   try{
-    const logo=new Image();
-    logo.src="logo_512.png";
-    await logo.decode();
+    const logo=new Image();logo.src="logo_512.png";
+    const qr=new Image();qr.src="qr_iki.png"; /* apunta a https://ikib2c.github.io/iki/ */
+    try{await logo.decode();}catch(e){}
+    try{await qr.decode();}catch(e){}
     const cv=document.createElement("canvas");
     cv.width=1080;cv.height=1080;
     const cx=cv.getContext("2d");
+    if(!cx)return null;
     cx.fillStyle="#FFF8E9";cx.fillRect(0,0,1080,1080);
-    /* logo transparente centrado (ya trae el nombre IKI dibujado) */
-    cx.drawImage(logo,290,220,500,500);
-    /* línea decorativa */
-    cx.fillStyle="#F5AE23";cx.fillRect(390,770,300,6);
-    /* eslogan */
     cx.textAlign="center";
-    cx.fillStyle="#6B645A";
-    cx.font="500 44px Poppins, Arial, sans-serif";
-    cx.fillText("Joyas, moda y regalos",540,850);
-    cx.font="500 38px Poppins, Arial, sans-serif";
-    cx.fillText("con envíos a toda Colombia",540,910);
+    if(logo.width)cx.drawImage(logo,390,70,300,300);
+    cx.fillStyle="#242424";
+    cx.font="800 47px Montserrat, Arial, sans-serif";
+    cx.fillText("Todo lo que te hace feliz,",540,455);
+    cx.fillText("en un solo lugar",540,512);
+    cx.fillStyle="#6B645A";cx.font="500 29px Poppins, Arial, sans-serif";
+    cx.fillText("Joyas · Moda · Juguetes · Bebé · Ropa urbana y más",540,568);
+    cx.fillStyle="#F5AE23";cx.fillRect(440,600,200,5);
+    /* QR sobre fondo blanco: escanea y entra a la tienda */
+    cx.fillStyle="#FFFFFF";cx.fillRect(390,632,300,300);
+    if(qr.width)cx.drawImage(qr,415,657,250,250);
+    cx.fillStyle="#6B645A";cx.font="600 27px Poppins, Arial, sans-serif";
+    cx.fillText("Escanea y descubre el catálogo",540,965);
+    /* insignia amarilla con la URL */
+    cx.fillStyle="#F5AE23";cx.fillRect(260,990,540,64);
+    cx.fillStyle="#242424";cx.font="800 34px Montserrat, Arial, sans-serif";
+    let url="";try{url=location.origin+location.pathname;}catch(e){url=location.href;}
+    cx.fillText((url||"ikib2c.github.io/iki").replace(/^https?:\/\//,"").replace(/\/$/,""),540,1033);
     const blob=await new Promise(function(res){cv.toBlob(res,"image/png");});
     return new File([blob],"iki-tienda.png",{type:"image/png"});
   }catch(e){return null;}
@@ -2266,9 +2279,17 @@ function aplicarIdentidad(){
   document.title=nombre+" — Todo lo que te hace feliz, en un solo lugar";
   const waPed=TIENDA.whatsappPedidos||TIENDA_DEFECTO.whatsappPedidos;
   const waAte=TIENDA.whatsappAtencion||waPed;
-  const saludoPed=waLink("Hola "+nombre+", quiero hacer un pedido.");
-  const saludoAte=waLink("Hola "+nombre+", tengo una pregunta.");
-  ["waHdr","waMenu","waNews","waFab","waFoot"].forEach(function(id){const e=$(id);if(e)e.href=saludoAte;});
+  /* Mensajes de CONTACTO (no pedidos): contextual por punto de entrada y
+     con el numero de ATENCION, para que el vendedor sepa que busca el
+     cliente antes de responder. */
+  const saludos={
+    waHdr:"Hola "+nombre+", estoy viendo su tienda en línea y quiero más información sobre sus productos. ¿Me ayudan?",
+    waMenu:"Hola "+nombre+", quiero hacer una consulta sobre sus productos. ¿Me ayudan?",
+    waNews:"Hola "+nombre+", tengo una duda sobre productos, precios o envíos. ¿Me ayudan?",
+    waFab:"Hola "+nombre+", vengo de su tienda en línea y quiero más información.",
+    waFoot:"Hola "+nombre+", quiero información sobre sus productos y envíos a mi ciudad."
+  };
+  Object.keys(saludos).forEach(function(id){const e=$(id);if(e)e.href="https://wa.me/"+waAte+"?text="+encodeURIComponent(saludos[id]);});
   /* seccion legal */
   const razon=$("legRazon");if(razon)razon.textContent=TIENDA.razonSocial||"IKI";
   const datos=[];
