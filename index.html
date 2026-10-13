@@ -1128,7 +1128,7 @@ const TIENDA_DEFECTO={
   instagram:"",tiktok:"",
   pixelMeta:"",ga4:"",
   heroIds:"j180,j182,j213,j225,j247,j283",
-  favoritos:"j180,j182,j213,j225,j247,j283,u01,u04,u17,b120,b119,r01,r04",
+  favoritos:"j180,j182,j213,j225,j247,j283,u01,u04,u17,b120,b119,r01,r04,t409",
   pagoContraEntrega:true,
   vaciarCarrito:true,
   claveAdmin:"IKI123*",
@@ -1182,6 +1182,11 @@ function cargarTienda(){
     T.heroIds=TIENDA_DEFECTO.heroIds;
     T.favoritos=TIENDA_DEFECTO.favoritos;
     T.heroeV=2;
+  }
+  /* Migracion favoritos v2: la curacion oficial pasa a 14 items (Lego Pokemon) */
+  if((parseInt(g.favoritosV)||0)<2){
+    T.favoritos=TIENDA_DEFECTO.favoritos;
+    T.favoritosV=2;
   }
   return T;
 }function cargarPrecios(){
