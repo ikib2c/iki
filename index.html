@@ -887,51 +887,82 @@ footer a:hover{color:var(--cr)}
   <div class="cod admin-panel" role="dialog" aria-modal="true" aria-label="Panel de administración de la tienda">
     <div class="cod-h">
       <span class="cod-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>
-      <div class="cod-t"><h3>Panel de la tienda</h3><p>Edita identidad, legal, precios y contenido del inicio</p></div>
+      <div class="cod-t"><h3>Panel de la tienda</h3><p>Edita identidad, ganancias, precios y contenido</p></div>
       <button class="cod-x" onclick="cerrarPanelAdmin()" aria-label="Cerrar panel"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="cod-b">
+
       <div class="admin-h">Identidad de la tienda</div>
       <div class="admin-grid">
         <label class="admin-label">Nombre<input id="adminNombre" placeholder="IKI"></label>
         <label class="admin-label">Logo (URL; vacío = logo IKI)<input id="adminLogo" placeholder="https://…"></label>
-        <label class="admin-label">WhatsApp de pedidos (10 dígitos)<input id="adminWa" inputmode="numeric" placeholder="3156371501"></label>
+        <label class="admin-label">WhatsApp de pedidos (10 dígitos)<input id="adminWaPedidos" inputmode="numeric" placeholder="3156371501"></label>
+        <label class="admin-label">WhatsApp de atención (vacío = mismo)<input id="adminWaAtencion" inputmode="numeric" placeholder="3156371501"></label>
         <label class="admin-label">Email de contacto<input id="adminEmail" placeholder="tucorreo@ejemplo.com"></label>
       </div>
+
       <div class="admin-h">Datos legales <small>se muestran en la sección legal y el pie</small></div>
       <div class="admin-grid">
         <label class="admin-label">Razón social<input id="adminRazon" placeholder="Ej. IKI Commerce S.A.S."></label>
         <label class="admin-label">NIT<input id="adminNit" placeholder="Ej. 901.234.567-8"></label>
         <label class="admin-label">Dirección de atención (opcional)<input id="adminDir" placeholder="Ciudad, dirección"></label>
       </div>
-      <div class="admin-h">Redes</div>
+
+      <div class="admin-h">Redes y analítica</div>
       <div class="admin-grid">
         <label class="admin-label">Instagram (sin @)<input id="adminIg" placeholder="ikitienda"></label>
-        <label class="admin-label">TikTok (sin @)<input id="adminTt" placeholder="ikitienda"></label>
+        <label class="admin-label">TikTok (sin @)<input id="adminTiktok" placeholder="ikitienda"></label>
+        <label class="admin-label">Pixel de Meta (vacío = apagado)<input id="adminPixel" inputmode="numeric" placeholder="123456789012345"></label>
+        <label class="admin-label">Google Analytics 4 (vacío = apagado)<input id="adminGa4" placeholder="G-XXXXXXXXXX"></label>
       </div>
-      <div class="admin-h">Analítica <small>solo el ID; vacío = apagada</small></div>
+
+      <div class="admin-h">Ganancias <small>cómo quieres ganar en la tienda</small></div>
       <div class="admin-grid">
-        <label class="admin-label">Pixel de Meta<input id="adminPixel" inputmode="numeric" placeholder="123456789012345"></label>
-        <label class="admin-label">Google Analytics 4<input id="adminGa4" placeholder="G-XXXXXXXXXX"></label>
+        <label class="admin-label">¿Cuánto quieres ganar? (%)
+          <input id="adminMargen" type="number" min="0" step="1" placeholder="25">
+        </label>
+        <label class="admin-label">¿Te cambiaron los costos? (×1 = igual)
+          <input id="adminMultiplicador" type="number" min="0.01" step="0.05" placeholder="1">
+        </label>
+        <label class="admin-label">Precios terminados en números redondos
+          <select id="adminRedondeo">
+            <option value="0">Sin redondeo</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="500">500</option>
+            <option value="1000">1.000</option>
+          </select>
+        </label>
       </div>
-      <div class="admin-h">Inicio</div>
-      <input class="admin-buscar" id="adminBuscarHero" placeholder="Busca el producto destacado del héroe… ej: filigrana, pijama, peluche" oninput="buscarAdminHero()">
+
+      <div class="admin-h">Ganancia por categoría <small>deja vacío para usar la ganancia general</small></div>
+      <div class="admin-cats" id="adminCats"></div>
+
+      <div class="admin-h">Inicio: producto destacado y favoritos</div>
+      <input class="admin-buscar" id="adminBuscarHero" placeholder="Busca el producto del héroe… ej: filigrana, pijama, peluche" oninput="buscarAdminHero()">
       <div class="admin-fijados" id="adminResHero"></div>
       <div class="admin-grid">
-        <label class="admin-label">Id del producto destacado (la búsqueda lo llena)<input id="adminDestacado" placeholder="j27"></label>
-        <label class="admin-label">Favoritos del carrusel (ids con comas)<input id="adminFavoritos" placeholder="j27,j21,m04,t13,t14,r02"></label>
+        <label class="admin-label">Id del producto destacado<input id="adminDestacado" placeholder="j243"></label>
       </div>
-      <div class="admin-h">Comportamiento</div>
+      <input class="admin-buscar" id="adminBuscarFav" placeholder="Busca productos para el carrusel de favoritos…" oninput="buscarAdminFav()">
+      <div class="admin-fijados" id="adminResFav"></div>
+      <div class="admin-fijados" id="adminFavoritosLista"></div>
+
+      <div class="admin-h">Comportamiento de la tienda</div>
       <div class="admin-grid">
-        <label class="admin-check"><input type="checkbox" id="adminVaciar" checked> Vaciar el carrito después de enviar el pedido</label>
+        <label class="admin-check"><input type="checkbox" id="adminContraEntrega" checked> Ofrecer <strong>pago contra entrega</strong> (el cliente paga al recibir). Desmárcala y solo quedará Transferencia</label>
+        <label class="admin-check"><input type="checkbox" id="adminVaciar" checked> Vaciar el carrito después de enviar el pedido (evita pedidos duplicados)</label>
         <label class="admin-label">Nueva clave del panel (vacío = no cambiar)<input id="adminClaveNueva" autocomplete="off" placeholder="Escribe una clave nueva"></label>
       </div>
-      <div class="admin-h">Precio exacto por producto <small>vacío = precio del proveedor</small></div>
+
+      <div class="admin-h">Precio exacto por producto <small>se vende tal cual, sin ganancia extra</small></div>
       <input class="admin-buscar" id="adminBuscarPrecio" placeholder="Busca un producto para fijarle el precio de venta…" oninput="buscarAdminPrecio()">
       <div class="admin-fijados" id="adminResPrecio"></div>
       <div id="adminFijados"></div>
+
       <div class="admin-h">Lista completa de productos</div>
       <div class="admin-lista" id="adminLista" hidden></div>
+
       <div class="admin-botones">
         <button class="btn y" type="button" onclick="aplicarPanelAdmin()"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg> Ver cambios ahora</button>
         <button class="btn o" type="button" onclick="guardarPanelAdmin()">Guardar en MI computador</button>
@@ -939,7 +970,8 @@ footer a:hover{color:var(--cr)}
         <button class="btn o" type="button" onclick="restaurarPanelAdmin()">Restaurar</button>
         <button class="btn o" type="button" onclick="cerrarSesionAdmin()">Salir</button>
       </div>
-      <p class="admin-nota"><b>Guardar en MI computador:</b> solo lo ves tú en este navegador. <b>Guardar para TODOS:</b> copia los bloques <b>TIENDA_DEFECTO</b> y <b>PRECIOS_DEFECTO</b> para que tu persona de confianza los reemplace en el archivo y publique. La clave de este panel es una barrera de conveniencia, no seguridad real: cámbiala y no la compartas.</p>
+      <p class="admin-nota"><b>Guardar en MI computador:</b> solo lo ves tú. <b>Guardar para TODOS:</b> copia los bloques <b>TIENDA_DEFECTO</b> y <b>PRECIOS_DEFECTO</b> para pegarlos en el archivo y publicarlos. La clave es una barrera de conveniencia, no seguridad real.</p>
+      <div class="admin-preview" id="adminPreview"></div>
     </div>
   </div>
 </div>
@@ -1000,52 +1032,109 @@ const CATALOGO_BASE_IKI=(typeof CATALOGO_IKI!=="undefined"&&Array.isArray(CATALO
 const TIENDA_DEFECTO={
   nombre:"IKI",
   logo:"logo_120.png",
-  whatsapp:"573156371501",
+  whatsappPedidos:"573156371501",
+  whatsappAtencion:"",          // vacío = mismo que pedidos
   razonSocial:"",nit:"",direccion:"",email:"",
   instagram:"",tiktok:"",
   pixelMeta:"",ga4:"",
-  destacado:"j40",
-  favoritos:"j40,j42,m04,t20,t22,r02",
+  destacado:"j243",
+  favoritos:"j243,j262,j315,j244,j222,j178",
+  pagoContraEntrega:true,
   vaciarCarrito:true,
   claveAdmin:"IKI123*"
 };
-const PRECIOS_DEFECTO={fijados:{}};
+const PRECIOS_DEFECTO={
+  margenGlobal:0,
+  multiplicadorBase:1,
+  redondeo:0,
+  margenesPorCategoria:{},
+  temporadaIds:[],
+  margenTemporada:0.35,
+  preciosPersonalizados:{}
+};
 const TIENDA_KEY="iki-tienda-v1",PRECIOS_KEY="iki-precios-v1";
 function cargarTienda(){
   let g={};try{g=JSON.parse(localStorage.getItem(TIENDA_KEY))||{};}catch(e){}
   const t=String(g.nombre||TIENDA_DEFECTO.nombre);
   const str=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
+  const si=(v,d)=>(typeof v==="boolean")?v:d;
   return {
     nombre:t,logo:str(g.logo,TIENDA_DEFECTO.logo),
-    whatsapp:str(g.whatsapp,TIENDA_DEFECTO.whatsapp),
+    whatsappPedidos:str(g.whatsappPedidos,TIENDA_DEFECTO.whatsappPedidos),
+    whatsappAtencion:str(g.whatsappAtencion,TIENDA_DEFECTO.whatsappAtencion),
     razonSocial:str(g.razonSocial,""),nit:str(g.nit,""),direccion:str(g.direccion,""),email:str(g.email,""),
     instagram:str(g.instagram,""),tiktok:str(g.tiktok,""),
     pixelMeta:str(g.pixelMeta,""),ga4:str(g.ga4,""),
     destacado:str(g.destacado,TIENDA_DEFECTO.destacado),
     favoritos:str(g.favoritos,TIENDA_DEFECTO.favoritos),
-    vaciarCarrito:(typeof g.vaciarCarrito==="boolean")?g.vaciarCarrito:TIENDA_DEFECTO.vaciarCarrito,
+    pagoContraEntrega:si(g.pagoContraEntrega,TIENDA_DEFECTO.pagoContraEntrega),
+    vaciarCarrito:si(g.vaciarCarrito,TIENDA_DEFECTO.vaciarCarrito),
     claveAdmin:str(g.claveAdmin,TIENDA_DEFECTO.claveAdmin)
   };
-}
-function cargarPrecios(){
+}function cargarPrecios(){
   let g={};try{g=JSON.parse(localStorage.getItem(PRECIOS_KEY))||{};}catch(e){}
-  const f={};Object.keys(g.fijados||{}).forEach(function(id){const v=g.fijados[id];if(typeof v==="number"&&v>0)f[id]=v;});
-  return {fijados:f};
-}
-let TIENDA=cargarTienda(),PRECIOS_FIJOS=cargarPrecios();
+  const num=(v,d)=>(typeof v==="number"&&isFinite(v)&&v>=0)?v:d;
+  const mg={};Object.assign(mg,PRECIOS_DEFECTO.margenesPorCategoria);
+  Object.keys(g.margenesPorCategoria||{}).forEach(function(c){
+    const m=g.margenesPorCategoria[c];
+    if(typeof m==="number"&&isFinite(m)&&m>=0)mg[c]=m;
+  });
+  const fij={};Object.keys(g.preciosPersonalizados||g.fijados||{}).forEach(function(id){
+    const p=(g.preciosPersonalizados||g.fijados)[id];
+    if(typeof p==="number"&&isFinite(p)&&p>0)fij[id]=p;
+  });
+  const temp=Array.isArray(g.temporadaIds)?g.temporadaIds.filter(function(id){return typeof id==="string"&&id}):(PRECIOS_DEFECTO.temporadaIds||[]).slice();
+  return {
+    margenGlobal:num(g.margenGlobal,PRECIOS_DEFECTO.margenGlobal),
+    multiplicadorBase:Math.max(0.01,num(g.multiplicadorBase,PRECIOS_DEFECTO.multiplicadorBase)),
+    redondeo:num(g.redondeo,PRECIOS_DEFECTO.redondeo),
+    margenesPorCategoria:mg,
+    temporadaIds:temp,
+    margenTemporada:num(g.margenTemporada,PRECIOS_DEFECTO.margenTemporada),
+    preciosPersonalizados:fij
+  };
+}let TIENDA=cargarTienda(),PRECIOS=cargarPrecios();
 function aplicarTienda(){
-  CONFIG.whatsapp=TIENDA.whatsapp;
+  CONFIG.whatsapp=TIENDA.whatsappPedidos;
+  CONFIG.whatsappPedidos=TIENDA.whatsappPedidos;
+  CONFIG.whatsappAtencion=TIENDA.whatsappAtencion||TIENDA.whatsappPedidos;
   CONFIG.destacado=TIENDA.destacado;
   CONFIG.favoritosIds=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
   CONFIG.vaciarCarritoTrasPedido=TIENDA.vaciarCarrito;
+  CONFIG.pagoContraEntrega=TIENDA.pagoContraEntrega;
   CONFIG.analytics={pixelMeta:TIENDA.pixelMeta,ga4:TIENDA.ga4};
 }
+/* ===== Motor de precios (inspirado en Jugueteria Taiwan) =====
+   precioFinal = base × multiplicador × (1 + margen) → redondeado
+   Prioridad: 1.precio exacto → 2.margen temporada → 3.margen categoria → 4.margen global */
+function redondearPrecio(n){
+  const r=PRECIOS.redondeo;
+  if(!r||r<=0)return Math.round(n);
+  return Math.max(r,Math.round(n/r)*r);
+}
+function precioFinal(p){
+  const fijado=PRECIOS.preciosPersonalizados[p.id];
+  if(typeof fijado==="number"&&fijado>0)return redondearPrecio(fijado);
+  let margen;
+  if((PRECIOS.temporadaIds||[]).includes(p.id)){
+    margen=PRECIOS.margenTemporada;
+  } else if(PRECIOS.margenesPorCategoria[p.cat]!==undefined){
+    margen=PRECIOS.margenesPorCategoria[p.cat];
+  } else {
+    margen=PRECIOS.margenGlobal;
+  }
+  return redondearPrecio(p.p*PRECIOS.multiplicadorBase*(1+margen));
+}
 function recargarPrecios(){
-  window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){return Object.assign({},p,{p:PRECIOS_FIJOS.fijados[p.id]||p.p});});
+  window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){
+    return Object.assign({},p,{p:precioFinal(p)});
+  });
   pagina=1;
   renderGrid();initCarouseles();actualizarHero();renderCart();
 }
-window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){return Object.assign({},p,{p:PRECIOS_FIJOS.fijados[p.id]||p.p});});
+window.PRODUCTOS=CATALOGO_BASE_IKI.map(function(p){
+  return Object.assign({},p,{p:precioFinal(p)});
+});
 /* ============================================================ */
 
 /* ===== Utilidades ===== */
@@ -1992,23 +2081,44 @@ function aplicarIdentidad(){
   const limg=document.querySelector(".brand img");
   if(limg){limg.src=TIENDA.logo||TIENDA_DEFECTO.logo;limg.onerror=function(){limg.style.display="none";};limg.style.display="";}
   document.title=nombre+" — Todo lo que te hace feliz, en un solo lugar";
-  const saludo=waLink("Hola "+nombre+", tengo una pregunta.");
-  ["waHdr","waMenu","waNews","waFab","waFoot"].forEach(function(id){const e=$(id);if(e)e.href=saludo;});
-  /* sección legal: datos del negocio */
+  const waPed=TIENDA.whatsappPedidos||TIENDA_DEFECTO.whatsappPedidos;
+  const waAte=TIENDA.whatsappAtencion||waPed;
+  const saludoPed=waLink("Hola "+nombre+", quiero hacer un pedido.");
+  const saludoAte=waLink("Hola "+nombre+", tengo una pregunta.");
+  ["waHdr","waMenu","waNews","waFab","waFoot"].forEach(function(id){const e=$(id);if(e)e.href=saludoAte;});
+  /* seccion legal */
   const razon=$("legRazon");if(razon)razon.textContent=TIENDA.razonSocial||"IKI";
   const datos=[];
   datos.push({t:TIENDA.razonSocial||"IKI",i:"M3 21h18M5 21V10l7-7 7 7v11M9 21v-6h6v6"});
   if(TIENDA.nit)datos.push({t:"NIT "+TIENDA.nit,i:"M4 9h16v12H4zM4 6h16v3H4M9 9h6"});
   if(TIENDA.direccion)datos.push({t:TIENDA.direccion,i:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 12l3.5-3.5"});
   if(TIENDA.email)datos.push({t:TIENDA.email,i:"M3 6h18v12H3zM3 6l9 7 9-7"});
-  datos.push({t:"WhatsApp "+fmtWa(TIENDA.whatsapp),i:"M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"});
+  datos.push({t:"WhatsApp "+fmtWa(waAte),i:"M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"});
   const ld=$("legalData");
   if(ld)ld.innerHTML=datos.map(function(d){return '<span class="ld-chip"><svg class="ic" viewBox="0 0 24 24"><path d="'+d.i+'"/></svg>'+esc(d.t)+'</span>';}).join("");
   const fl=$("footLegal");
   if(fl)fl.innerHTML="© "+new Date().getFullYear()+" "+(TIENDA.razonSocial||nombre)+(TIENDA.nit?(" · NIT "+TIENDA.nit):"")+' · Hecho con <img src="logo_120.png" alt="" style="height:12px;vertical-align:-1px" onerror="this.remove()"> en Colombia.';
 }
 function fmtWa(n){const d=String(n||"").replace(/\D/g,"").replace(/^57/,"");return d.replace(/(\d{3})(\d{3})(\d{4})/,"$1 $2 $3");}
-function normWa(v){const d=String(v||"").replace(/\D/g,"");if(!d)return TIENDA_DEFECTO.whatsapp;if(d.length===10)return "57"+d;return d;}
+function normWa(v){const d=String(v||"").replace(/\D/g,"");if(!d)return"";if(d.length===10)return "57"+d;return d;}
+
+/* ===== Contra entrega on/off ===== */
+function contraEntregaActiva(){return TIENDA.pagoContraEntrega!==false;}
+function aplicarContraEntrega(){
+  const activa=contraEntregaActiva();
+  document.querySelectorAll('[data-solo-contra-entrega]').forEach(function(el){el.style.display=activa?"":"none";});
+  const opcion=document.querySelector('input[name="paymentMethod"][value="contra-entrega"]');
+  if(opcion){
+    const etiqueta=opcion.closest(".po");
+    if(etiqueta)etiqueta.style.display=activa?"":"none";
+    if(!activa&&opcion.checked){
+      const disponible=[...document.querySelectorAll('input[name="paymentMethod"]')].find(function(r){
+        const op=r.closest(".po");return r.value!=="contra-entrega"&&(!op||op.style.display!=="none");
+      });
+      if(disponible){disponible.checked=true;updPay();}
+    }
+  }
+}
 
 /* ===== Panel de administración ===== */
 function sesionAdmin(){try{return sessionStorage.getItem("iki-admin")==="1";}catch(e){return false;}}
@@ -2041,118 +2151,217 @@ function abrirPanelAdmin(){
 }
 function cerrarPanelAdmin(){$("adminModal").classList.remove("show");}
 
-function filaAdmin(p,precioFijo){
+/* --- helpers del panel --- */
+function filaAdmin(p,esFijo){
   return '<div class="admin-fila"><span class="an" title="'+esc(p.n)+'">'+esc(p.n)+'</span>'
-    +(precioFijo?'<span class="admin-badge" style="font:700 10px Poppins;color:var(--c);background:var(--y);border-radius:999px;padding:3px 8px">fijo</span>':"")
-    +'<input type="number" min="1" step="100" value="'+(precioFijo||"")+'" placeholder="'+cop(p.p)+'" title="Precio de venta. Vacío = automático" onchange="fijarPrecioAdmin(\''+escJs(p.id)+'\',this.value)"></div>';
+    +(esFijo?'<span style="font:700 10px Poppins;color:var(--c);background:var(--y);border-radius:999px;padding:3px 8px">fijo</span>':"")
+    +'<input type="number" min="1" step="100" value="'+(esFijo||"")+'" placeholder="'+cop(p.p)+'" title="Precio de venta. Vacío = automático" onchange="fijarPrecioAdmin(\''+escJs(p.id)+'\',this.value)"></div>';
 }
 function pintarPanelAdmin(){
   $("adminNombre").value=TIENDA.nombre;
   $("adminLogo").value=(TIENDA.logo!==TIENDA_DEFECTO.logo)?TIENDA.logo:"";
-  $("adminWa").value=String(TIENDA.whatsapp).replace(/^57/,"");
+  $("adminWaPedidos").value=String(TIENDA.whatsappPedidos||"").replace(/^57/,"");
+  $("adminWaAtencion").value=String(TIENDA.whatsappAtencion||"").replace(/^57/,"");
   $("adminEmail").value=TIENDA.email;
   $("adminRazon").value=TIENDA.razonSocial;$("adminNit").value=TIENDA.nit;$("adminDir").value=TIENDA.direccion;
-  $("adminIg").value=TIENDA.instagram;$("adminTt").value=TIENDA.tiktok;
+  $("adminIg").value=TIENDA.instagram;
+  $("adminTiktok").value=TIENDA.tiktok;
   $("adminPixel").value=TIENDA.pixelMeta;$("adminGa4").value=TIENDA.ga4;
   $("adminDestacado").value=TIENDA.destacado;
-  $("adminFavoritos").value=TIENDA.favoritos;
-  $("adminVaciar").checked=TIENDA.vaciarCarrito;
+  $("adminContraEntrega").checked=TIENDA.pagoContraEntrega!==false;
+  $("adminVaciar").checked=TIENDA.vaciarCarrito!==false;
   $("adminClaveNueva").value="";
-  $("adminResHero").innerHTML="";$("adminResPrecio").innerHTML="";$("adminBuscarHero").value="";$("adminBuscarPrecio").value="";
-  pintarFijadosAdmin();
+  /* ganancias */
+  $("adminMargen").value=Math.round(PRECIOS.margenGlobal*1000)/10;
+  $("adminMultiplicador").value=PRECIOS.multiplicadorBase;
+  $("adminRedondeo").value=String(PRECIOS.redondeo);
+  pintarCategoriasAdmin();
+  pintarFavoritosAdmin();
   pintarListaAdmin();
+  $("adminResHero").innerHTML="";$("adminResPrecio").innerHTML="";$("adminResFav").innerHTML="";
+  $("adminBuscarHero").value="";$("adminBuscarPrecio").value="";$("adminBuscarFav").value="";
+  pintarFijadosAdmin();
+  pintarPreviewAdmin();
+}
+function pintarCategoriasAdmin(){
+  const counts={};window.PRODUCTOS.forEach(function(p){counts[p.cat]=(counts[p.cat]||0)+1;});
+  let h="";
+  CATS.forEach(function(c){
+    const m=PRECIOS.margenesPorCategoria[c.id];
+    const val=(typeof m==="number")?Math.round(m*1000)/10:"";
+    h+='<div class="admin-cat-fila"><span class="admin-cat-nombre"><svg class="ic" viewBox="0 0 24 24" style="color:var(--y)"><path d="'+c.i+'"/></svg>'+esc(c.n)+' <small>('+ (counts[c.id]||0) +')</small></span>'
+      +'<input type="number" min="0" step="1" data-cat="'+c.id+'" value="'+val+'" placeholder="igual" title="Ganancia % para '+esc(c.n)+'">'
+      +'<span class="admin-cat-preview">ej: <strong>'+cop(precioEjemplo(c.id))+'</strong></span></div>';
+  });
+  $("adminCats").innerHTML=h;
+}
+function precioEjemplo(cat){
+  const barato=window.PRODUCTOS.filter(function(p){return p.cat===cat}).sort(function(a,b){return a.p-b.p})[0];
+  return barato?barato.p:0;
+}
+function pintarFavoritosAdmin(){
+  const ids=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  let h="";
+  if(!ids.length)h='<p style="font-size:12px;color:var(--mu)">Sin favoritos todavía: busca abajo para agregar.</p>';
+  else{
+    h='<p style="font:600 12px Poppins;color:var(--mu);margin:0 0 6px">FAVORITOS ACTUALES ('+ids.length+'):</p>';
+    ids.forEach(function(id){
+      const p=window.PRODUCTOS.find(function(x){return x.id===id;});
+      if(!p)return;
+      h+='<div class="admin-fila" style="background:#FFF3D6;border-color:#EADFCB"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(p.p)+'</span><button class="admin-btn quitar" type="button" onclick="quitarFavoritoAdmin(\''+escJs(id)+'\')">Quitar</button></div>';
+    });
+  }
+  $("adminFavoritosLista").innerHTML=h;
 }
 function pintarFijadosAdmin(){
-  const ids=Object.keys(PRECIOS_FIJOS.fijados);
-  $("adminFijados").innerHTML=ids.length?ids.map(function(id){
-    const p=CATALOGO_BASE_IKI.find(function(x){return x.id===id;});
-    return '<div class="admin-fila" style="background:#FFF3D6"><span class="an">'+esc(p?p.n:id)+'</span>'
-      +'<span style="font:700 12px Poppins">'+cop(PRECIOS_FIJOS.fijados[id])+'</span>'
-      +'<button class="admin-btn quitar" type="button" onclick="quitarFijadoAdmin(\''+escJs(id)+'\')">Quitar</button></div>';
-  }).join(""):"";
+  const ids=Object.keys(PRECIOS.preciosPersonalizados);
+  let h="";
+  if(ids.length){
+    h='<p style="font:600 12px Poppins;color:var(--mu);margin:0 0 6px">PRECIOS FIJOS ('+ids.length+'):</p>';
+    ids.forEach(function(id){
+      const p=window.PRODUCTOS.find(function(x){return x.id===id;});
+      h+='<div class="admin-fila" style="background:#FFF3D36"><span class="an">'+esc(p?p.n:id)+'</span><span style="font:700 12px Poppins">'+cop(PRECIOS.preciosPersonalizados[id])+'</span><button class="admin-btn quitar" type="button" onclick="quitarFijadoAdmin(\''+escJs(id)+'\')">Quitar</button></div>';
+    });
+  }
+  $("adminFijados").innerHTML=h;
 }
 function pintarListaAdmin(){
   const la=$("adminLista");
   la.hidden=false;
   const grupos={};
-  CATALOGO_BASE_IKI.forEach(function(p){(grupos[p.cat]=grupos[p.cat]||[]).push(p);});
+  window.PRODUCTOS.forEach(function(p){(grupos[p.cat]=grupos[p.cat]||[]).push(p);});
   let h="";
   Object.keys(grupos).sort().forEach(function(c){
-    h+='<div class="gr">'+esc(labelOf(c))+" ("+grupos[c].length+")</div>";
-    grupos[c].forEach(function(p){h+=filaAdmin(p,PRECIOS_FIJOS.fijados[p.id]);});
+    h+='<div class="gr">'+esc(c)+' ('+grupos[c].length+')</div>';
+    grupos[c].forEach(function(p){
+      h+=filaAdmin(p,PRECIOS.preciosPersonalizados[p.id]);
+    });
   });
   la.innerHTML=h;
 }
+function pintarPreviewAdmin(){
+  const el=$("adminPreview");
+  if(!el)return;
+  const margen=parseFloat($("adminMargen").value)||0;
+  const mult=parseFloat($("adminMultiplicador").value)||1;
+  const red=parseInt($("adminRedondeo").value,10)||0;
+  const ejemplo=Math.round(10000*mult*(1+margen/100));
+  const final=red>0?Math.max(red,Math.round(ejemplo/red)*red):Math.round(ejemplo);
+  el.innerHTML='Ejemplo: un producto de costo <strong>'+cop(10000)+'</strong> se venderá en <strong>'+cop(final)+'</strong>'
+    +' · Ganancia: <strong>'+cop(final-10000)+'</strong> ('+Math.round((final-10000)/100)+'%)'
+    +' · Margen: '+margen+'% · Multiplicador: ×'+mult+(red>0?' · Redondeado a '+cop(red):'');
+}
+
+/* --- buscadores del panel --- */
 function buscarAdminHero(){
   const q=$("adminBuscarHero").value.trim().toLowerCase();
   if(q.length<2){$("adminResHero").innerHTML="";return;}
-  const r=CATALOGO_BASE_IKI.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,6);
+  const r=window.PRODUCTOS.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,6);
   $("adminResHero").innerHTML=r.length?r.map(function(p){
     const es=(TIENDA.destacado===p.id);
-    return '<div class="admin-fila"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(PRECIOS_FIJOS.fijados[p.id]||p.p)+'</span>'
-      +'<button class="admin-btn" type="button" '+(es?"disabled style='opacity:.5'":"")+' onclick="destacarAdminHero(\''+escJs(p.id)+'\')">'+(es?"Destacado":"Destacar")+'</button></div>';
+    return '<div class="admin-fila"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(p.p)+'</span><button class="admin-btn" type="button" '+(es?"disabled style='opacity:.5'":"")+' onclick="destacarAdminHero(\''+escJs(p.id)+'\')">'+(es?"★ Destacado":"Destacar")+'</button></div>';
   }).join(""):'<div class="admin-nota">Sin resultados para "'+esc(q)+'".</div>';
 }
 function destacarAdminHero(id){
   TIENDA.destacado=id;
   $("adminDestacado").value=id;
   aplicarTienda();actualizarHero();
-  pintarFijadosAdmin();
+  pintarFijadosAdmin();pintarPreviewAdmin();
   showToast("Producto destacado actualizado");
+}
+function buscarAdminFav(){
+  const q=$("adminBuscarFav").value.trim().toLowerCase();
+  if(q.length<2){$("adminResFav").innerHTML="";return;}
+  const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  const r=window.PRODUCTOS.filter(function(p){
+    return (p.n.toLowerCase().includes(q)||String(p.id).includes(q))&&!favs.includes(p.id);
+  }).slice(0,6);
+  $("adminResFav").innerHTML=r.length?r.map(function(p){
+    return '<div class="admin-fila"><span class="an">'+esc(p.n)+'</span><span style="font:600 12px Poppins">'+cop(p.p)+'</span><button class="admin-btn" type="button" onclick="agregarFavoritoAdmin(\''+escJs(p.id)+'\')">+ Favorito</button></div>';
+  }).join(""):'<div class="admin-nota">Sin resultados o ya agregado.</div>';
+}
+function agregarFavoritoAdmin(id){
+  const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  if(!favs.includes(id)){favs.push(id);TIENDA.favoritos=favs.join(",");}
+  aplicarTienda();initCarouseles();pintarFavoritosAdmin();pintarPreviewAdmin();
+  $("adminResFav").innerHTML="";$("adminBuscarFav").value="";
+  showToast("Agregado a favoritos");
+}
+function quitarFavoritoAdmin(id){
+  const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(function(x){return x&&x!==id;});
+  TIENDA.favoritos=favs.join(",");
+  aplicarTienda();initCaruseles();pintarFavoritosAdmin();pintarPreviewAdmin();
+  showToast("Quitado de favoritos");
 }
 function buscarAdminPrecio(){
   const q=$("adminBuscarPrecio").value.trim().toLowerCase();
   if(q.length<2){$("adminResPrecio").innerHTML="";return;}
-  const r=CATALOGO_BASE_IKI.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,8);
-  $("adminResPrecio").innerHTML=r.length?r.map(function(p){return filaAdmin(p,PRECIOS_FIJOS.fijados[p.id]);}).join(""):'<div class="admin-nota">Sin resultados para "'+esc(q)+'".</div>';
+  const r=window.PRODUCTOS.filter(function(p){return p.n.toLowerCase().includes(q)||String(p.id).includes(q);}).slice(0,8);
+  $("adminResPrecio").innerHTML=r.length?r.map(function(p){return filaAdmin(p,PRECIOS.preciosPersonalizados[p.id]);}).join(""):'<div class="admin-nota">Sin resultados para "'+esc(q)+'".</div>';
 }
 function fijarPrecioAdmin(id,valor){
   const v=parseFloat(valor);
-  if(!isNaN(v)&&v>0)PRECIOS_FIJOS.fijados[id]=Math.round(v);
-  else delete PRECIOS_FIJOS.fijados[id];
+  if(!isNaN(v)&&v>0)PRECIOS.preciosPersonalizados[id]=Math.round(v);
+  else delete PRECIOS.preciosPersonalizados[id];
   recargarPrecios();
-  pintarFijadosAdmin();pintarListaAdmin();
+  pintarFijadosAdmin();pintarListaAdmin();pintarPreviewAdmin();
   showToast("Precio actualizado");
 }
 function quitarFijadoAdmin(id){
-  delete PRECIOS_FIJOS.fijados[id];
+  delete PRECIOS.preciosPersonalizados[id];
   recargarPrecios();
-  pintarFijadosAdmin();pintarListaAdmin();
+  pintarFijadosAdmin();pintarListaAdmin();pintarPreviewAdmin();
 }
+
+/* --- leer/aplicar/guardar --- */
 function leerPanelAdmin(){
   TIENDA.nombre=$("adminNombre").value.trim()||TIENDA_DEFECTO.nombre;
   TIENDA.logo=$("adminLogo").value.trim()||TIENDA_DEFECTO.logo;
-  TIENDA.whatsapp=normWa($("adminWa").value);
+  TIENDA.whatsappPedidos=normWa($("adminWaPedidos").value)||TIENDA_DEFECTO.whatsappPedidos;
+  TIENDA.whatsappAtencion=normWa($("adminWaAtencion").value);
   TIENDA.email=$("adminEmail").value.trim();
   TIENDA.razonSocial=$("adminRazon").value.trim();TIENDA.nit=$("adminNit").value.trim();TIENDA.direccion=$("adminDir").value.trim();
-  TIENDA.instagram=$("adminIg").value.trim().replace(/^@/,"");TIENDA.tiktok=$("adminTt").value.trim().replace(/^@/,"");
+  TIENDA.instagram=$("adminIg").value.trim().replace(/^@/,"");TIENDA.tiktok=$("adminTiktok").value.trim().replace(/^@/,"");
   TIENDA.pixelMeta=$("adminPixel").value.trim();TIENDA.ga4=$("adminGa4").value.trim();
   TIENDA.destacado=$("adminDestacado").value.trim()||TIENDA_DEFECTO.destacado;
-  TIENDA.favoritos=$("adminFavoritos").value.trim()||TIENDA_DEFECTO.favoritos;
+  TIENDA.pagoContraEntrega=$("adminContraEntrega").checked;
   TIENDA.vaciarCarrito=$("adminVaciar").checked;
   const nc=$("adminClaveNueva").value.trim();
   if(nc)TIENDA.claveAdmin=nc;
+  /* ganancias */
+  const mg=parseFloat($("adminMargen").value);
+  PRECIOS.margenGlobal=isNaN(mg)?0:Math.max(0,mg)/100;
+  const mult=parseFloat($("adminMultiplicador").value);
+  PRECIOS.multiplicadorBase=(isNaN(mult)||mult<=0)?1:mult;
+  const red=parseInt($("adminRedondeo").value,10);
+  PRECIOS.redondeo=isNaN(red)?0:Math.max(0,red);
+  const margenes={};
+  document.querySelectorAll("#adminCats input[data-cat]").forEach(function(inp){
+    const v=parseFloat(inp.value);
+    if(!isNaN(v))margenes[inp.dataset.cat]=Math.max(0,v)/100;
+  });
+  PRECIOS.margenesPorCategoria=margenes;
 }
 function persistirPanel(){
-  try{localStorage.setItem(TIENDA_KEY,JSON.stringify(TIENDA));localStorage.setItem(PRECIOS_KEY,JSON.stringify(PRECIOS_FIJOS));}catch(e){}
+  try{localStorage.setItem(TIENDA_KEY,JSON.stringify(TIENDA));localStorage.setItem(PRECIOS_KEY,JSON.stringify(PRECIOS));}catch(e){}
 }
 function aplicarPanelAdmin(){
   leerPanelAdmin();persistirPanel();
-  aplicarTienda();aplicarIdentidad();aplicarAnalitica();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();
   recargarPrecios();
   pintarPanelAdmin();
   showToast("Cambios aplicados en toda la tienda");
 }
 function guardarPanelAdmin(){
   leerPanelAdmin();persistirPanel();
-  aplicarTienda();aplicarIdentidad();aplicarAnalitica();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();
   recargarPrecios();pintarPanelAdmin();
-  showToast("Guardado en este computador (solo tú lo ves)");
+  showToast("Guardado en este computador");
 }
 function restaurarPanelAdmin(){
   try{localStorage.removeItem(TIENDA_KEY);localStorage.removeItem(PRECIOS_KEY);}catch(e){}
-  TIENDA=cargarTienda();PRECIOS_FIJOS=cargarPrecios();
-  aplicarTienda();aplicarIdentidad();
+  TIENDA=cargarTienda();PRECIOS=cargarPrecios();
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();
   recargarPrecios();pintarPanelAdmin();
   showToast("Valores del archivo restaurados");
 }
@@ -2162,23 +2371,33 @@ function codigoConfigAdmin(){
   L.push("const TIENDA_DEFECTO={");
   L.push(" nombre:"+JSON.stringify(TIENDA.nombre)+",");
   L.push(" logo:"+JSON.stringify(TIENDA.logo)+",");
-  L.push(" whatsapp:"+JSON.stringify(TIENDA.whatsapp)+",");
+  L.push(" whatsappPedidos:"+JSON.stringify(TIENDA.whatsappPedidos)+",");
+  L.push(" whatsappAtencion:"+JSON.stringify(TIENDA.whatsappAtencion)+",");
   L.push(" razonSocial:"+JSON.stringify(TIENDA.razonSocial)+",nit:"+JSON.stringify(TIENDA.nit)+",direccion:"+JSON.stringify(TIENDA.direccion)+",email:"+JSON.stringify(TIENDA.email)+",");
   L.push(" instagram:"+JSON.stringify(TIENDA.instagram)+",tiktok:"+JSON.stringify(TIENDA.tiktok)+",");
   L.push(" pixelMeta:"+JSON.stringify(TIENDA.pixelMeta)+",ga4:"+JSON.stringify(TIENDA.ga4)+",");
   L.push(" destacado:"+JSON.stringify(TIENDA.destacado)+",");
   L.push(" favoritos:"+JSON.stringify(TIENDA.favoritos)+",");
+  L.push(" pagoContraEntrega:"+TIENDA.pagoContraEntrega+",");
   L.push(" vaciarCarrito:"+TIENDA.vaciarCarrito+",");
   L.push(" claveAdmin:"+JSON.stringify(TIENDA.claveAdmin));
   L.push("};");
-  L.push("const PRECIOS_DEFECTO={fijados:"+JSON.stringify(PRECIOS_FIJOS.fijados)+"};");
+  L.push("const PRECIOS_DEFECTO={");
+  L.push(" margenGlobal:"+PRECIOS.margenGlobal+",");
+  L.push(" multiplicadorBase:"+PRECIOS.multiplicadorBase+",");
+  L.push(" redondeo:"+PRECIOS.redondeo+",");
+  L.push(" margenesPorCategoria:"+JSON.stringify(PRECIOS.margenesPorCategoria)+",");
+  L.push(" temporadaIds:"+JSON.stringify(PRECIOS.temporadaIds)+",");
+  L.push(" margenTemporada:"+PRECIOS.margenTemporada+",");
+  L.push(" preciosPersonalizados:"+JSON.stringify(PRECIOS.preciosPersonalizados));
+  L.push("};");
   return L.join("\n");
 }
 function copiarConfigAdmin(){
   const codigo=codigoConfigAdmin();
   persistirPanel();
-  aplicarTienda();aplicarIdentidad();aplicarAnalitica();recargarPrecios();pintarPanelAdmin();
-  const listo=function(){showToast("Copiado: reemplaza TIENDA_DEFECTO y PRECIOS_DEFECTO en index.html y publica");};
+  aplicarTienda();aplicarIdentidad();aplicarContraEntrega();recargarPrecios();pintarPanelAdmin();
+  const listo=function(){showToast("Copiado: pega TIENDA_DEFECTO y PRECIOS_DEFECTO en index.html");};
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(codigo).then(listo).catch(function(){window.prompt("Copia este bloque:",codigo);});
   }else window.prompt("Copia este bloque:",codigo);
