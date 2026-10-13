@@ -585,7 +585,7 @@ footer a:hover{color:var(--cr)}
 <section class="hero">
 <div class="hero-gal" id="heroGal"></div>
 <div class="hero-tag">
-  <span>IKI</span>
+  <img src="logo_512.png" alt="IKI" style="height:clamp(60px,8vw,110px);display:block;margin:0 auto;filter:drop-shadow(0 4px 24px rgba(0,0,0,.55))" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none;font:700 clamp(48px,7vw,84px) Montserrat,sans-serif;letter-spacing:-.03em;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.45)">IKI</span>
   <b>Esmeraldas de laboratorio</b>
   <small>El mismo brillo, hechas de forma responsable</small>
 </div>
@@ -603,7 +603,7 @@ footer a:hover{color:var(--cr)}
   <h2 class="sect-t rv">Descubre los favoritos de la tienda</h2>
   <p class="sect-s rv">Joyas y pijamas primero: desliza y toca un producto para verlo en el catálogo.</p>
   <div class="crow" id="favoritos" style="display:none">
-    <div class="chead"><span class="clab" id="favRowLabel">Los favoritos de IKI</span><span class="cmeta" id="favRowMeta"></span></div>
+    <div class="chead"><span class="clab" id="favRowLabel">Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()"></span><span class="cmeta" id="favRowMeta"></span></div>
     <div class="ctrack" id="carFav" tabindex="0" role="region" aria-label="Carrusel de los favoritos de IKI"></div>
     <div class="cnav" id="dotsFav"></div>
     <button class="carr L" type="button" onclick="scrollCarousel(-1,'carFav')" aria-label="Producto anterior"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -683,7 +683,7 @@ footer a:hover{color:var(--cr)}
 <!-- ============ Pie ============ -->
 <footer><div class="wrap">
   <div>
-    <b style="font:700 28px var(--ff);letter-spacing:-.02em;text-transform:none;color:var(--cr)">IKI</b><br>
+    <img src="logo_512.png" alt="IKI" style="height:44px;display:block;margin-bottom:10px;mix-blend-mode:screen" onerror="this.style.display='none'"><br>
     Joyas, moda y regalos<br>con cariño colombiano.<br>
     <a id="waFoot" href="#" target="_blank" rel="noopener">WhatsApp 315 637 1501</a>
   </div>
@@ -963,7 +963,7 @@ const CONFIG={
   porPagina:12,                      // productos por carga en el catálogo
   vaciarCarritoTrasPedido:true,      // evita enviar el mismo pedido dos veces
   destacado:"j27",                   // producto de la tarjeta del héroe
-  favoritosIds:["j27","j21","m04","t13","t14","r02"], // fila "Los favoritos de IKI"
+  favoritosIds:["j27","j21","m04","t13","t14","r02"], // fila "Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()">"
   analytics:{pixelMeta:"",ga4:""}    // IDs de Pixel de Meta y GA4 (vacío = apagadas)
 };
 /* Categorías: id, nombre, tono suave de tarjeta e icono de línea */
@@ -1114,7 +1114,7 @@ function renderChips(){
 function renderMobileMenu(){
   let h='<li><button onclick="toggleMenu();scrollToSection(\'tienda\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Todos los productos</button></li>';
   CATS.forEach(c=>h+='<li><button onclick="toggleMenu();filterProducts(\''+escJs(c.id)+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>'+esc(c.n)+'</button></li>');
-  h+='<li><button onclick="toggleMenu();scrollToSection(\'favoritos\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg>Los favoritos de IKI</button></li>';
+  h+='<li><button onclick="toggleMenu();scrollToSection(\'favoritos\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg>Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()"></button></li>';
   h+='<li><button onclick="toggleMenu();scrollToSection(\'faq\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2A2.6 2.6 0 0 1 12 7.4c1.4 0 2.5 1 2.5 2.2 0 2.2-2.5 2-2.5 4M12 17h.01"/></svg>Preguntas frecuentes</button></li>';
   $("mobileMenuList").innerHTML=h;
 }
@@ -1546,7 +1546,7 @@ async function crearHojaPedido(){
     cx.textAlign="left";
     cx.fillStyle="#242424";
     cx.font="700 64px Montserrat, Arial, sans-serif";
-    cx.fillText("Pedido — IKI",240,120);
+    try{const logoP=new Image();logoP.src="logo_512.png";await logoP.decode();cx.drawImage(logoP,240,52,120,120);cx.fillText("Pedido",380,120);}catch(e){cx.fillText("Pedido — IKI",240,120);}
     cx.fillStyle="#6B645A";
     cx.font="500 34px Poppins, Arial, sans-serif";
     cx.fillText(new Date().toLocaleDateString("es-CO"),240,168);
@@ -1976,7 +1976,7 @@ function aplicarIdentidad(){
   const ld=$("legalData");
   if(ld)ld.innerHTML=datos.map(function(d){return '<span class="ld-chip"><svg class="ic" viewBox="0 0 24 24"><path d="'+d.i+'"/></svg>'+esc(d.t)+'</span>';}).join("");
   const fl=$("footLegal");
-  if(fl)fl.textContent="© "+new Date().getFullYear()+" "+(TIENDA.razonSocial||nombre)+(TIENDA.nit?(" · NIT "+TIENDA.nit):"")+" · Hecho con cariño en Colombia.";
+  if(fl)fl.innerHTML="© "+new Date().getFullYear()+" "+(TIENDA.razonSocial||nombre)+(TIENDA.nit?(" · NIT "+TIENDA.nit):"")+' · Hecho con <img src="logo_120.png" alt="" style="height:12px;vertical-align:-1px" onerror="this.remove()"> en Colombia.';
 }
 function fmtWa(n){const d=String(n||"").replace(/\D/g,"").replace(/^57/,"");return d.replace(/(\d{3})(\d{3})(\d{4})/,"$1 $2 $3");}
 function normWa(v){const d=String(v||"").replace(/\D/g,"");if(!d)return TIENDA_DEFECTO.whatsapp;if(d.length===10)return "57"+d;return d;}
