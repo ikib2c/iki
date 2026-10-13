@@ -89,8 +89,6 @@ h1,h2,h3{font-family:var(--ff);letter-spacing:-.02em;line-height:1.15}
 .mm-wa{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--y);color:var(--c);border-radius:999px;padding:13px;font:600 14px var(--fb)}
 /* ============ Marcos de foto (compartidos: card, carrusel, héroe, lightbox) ============ */
 .ph{position:relative;background:var(--soft,#fff);display:grid;place-items:center;overflow:hidden}
-.ph::before{content:"";position:absolute;inset:-12%;background-image:var(--img);background-size:cover;background-position:center;filter:blur(26px) saturate(1.25) brightness(.96);transform:scale(1.06);z-index:0;display:none}
-.ph.has-img::before{display:block}
 .ph.has-img .mono{display:none}
 .ph img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;transition:transform .5s}
 .ph .mono{font:700 46px var(--ff);color:#24242412;letter-spacing:-.04em;user-select:none;position:relative;z-index:1}
@@ -246,21 +244,6 @@ h1,h2,h3{font-family:var(--ff);letter-spacing:-.02em;line-height:1.15}
 .ti .tic .ic{width:21px;height:21px}
 .ti b{font:600 15px var(--ff);display:block;margin-bottom:5px}
 .ti span{font-size:12.5px;color:var(--mu);line-height:1.5}
-/* ============ Regalos por ocasión ============ */
-#regalos{padding-top:64px}
-.gift{background:#fff;border-radius:30px;padding:42px;box-shadow:var(--sh);display:flex;justify-content:space-between;align-items:center;gap:28px;flex-wrap:wrap}
-.gift h2{font-size:clamp(22px,2.6vw,30px);margin-top:8px}
-.gift>div:last-child{display:flex;gap:9px;flex-wrap:wrap;max-width:560px}
-.gift .chip{font-size:13.5px;padding:9px 18px}
-/* ============ Nuestra esencia ============ */
-#esencia{padding-top:72px}
-.ess{display:grid;grid-template-columns:1fr 1.35fr;gap:52px;align-items:start}
-.ess p{color:var(--mu);max-width:400px;margin-top:14px;font-size:15.5px}
-.ess ul{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.ess li{background:#fff;border-radius:22px;padding:24px;box-shadow:var(--sh)}
-.ess li .ic{width:28px;height:28px;margin-bottom:12px}
-.ess li b{display:block;font:600 16px var(--ff);margin-bottom:4px}
-.ess li span{font-size:13px;color:var(--mu)}
 /* ============ Preguntas frecuentes ============ */
 #faq{padding-top:72px}
 #faq .wrap{max-width:860px}
@@ -472,12 +455,9 @@ footer a:hover{color:var(--cr)}
   .hero-g{grid-template-columns:1fr;gap:38px;padding:36px 0 28px}
   .hero-card::before{inset:14px -14px -14px 14px}
   .trust .wrap{grid-template-columns:1fr 1fr;gap:22px;padding-top:24px;padding-bottom:24px}
-  .ess{grid-template-columns:1fr;gap:28px}
-  .ess ul{grid-template-columns:1fr}
   footer .wrap{grid-template-columns:1fr 1fr}
   .dark .wrap{grid-template-columns:1fr;gap:36px}
   .dark{padding:52px 0}
-  .gift{padding:28px}
   .cwrap{padding:0 12px}
 }
 @media(max-width:768px){
@@ -502,7 +482,6 @@ footer a:hover{color:var(--cr)}
   .fabs{right:12px;bottom:12px;gap:10px}
   .fab{width:48px;height:48px}
   .fab.sh{display:none}
-  .gift{padding:22px}
   .trust .wrap{grid-template-columns:1fr}
 }
 /* ============ Accesibilidad: menos movimiento ============ */
@@ -515,25 +494,6 @@ footer a:hover{color:var(--cr)}
 .ph{background:#fff}
 .lbmain{background:#fff}
 .th,.srt{background:#fff}
-/* ============ Regalos por ocasión ============ */
-.gift-budgets{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:26px}
-.gift-budgets .chip{background:#fff;box-shadow:var(--sh);font-size:13.5px;padding:10px 20px}
-.occ-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
-.occ{background:#fff;border-radius:22px;padding:22px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;transition:transform .25s,box-shadow .25s}
-.occ:hover{transform:translateY(-4px);box-shadow:var(--shh)}
-.occ-ic{width:46px;height:46px;border-radius:50%;background:#F5AE2322;display:grid;place-items:center;margin-bottom:2px}
-.occ-ic .ic{width:21px;height:21px}
-.occ b{font:600 15px var(--ff)}
-.occ span{font-size:12px;color:var(--mu);line-height:1.45}
-.occ-cta{font:600 12px var(--fb);color:var(--c);margin-top:6px}
-.occ:hover .occ-cta{text-decoration:underline}
-/* ============ Sección legal ============ */
-#legal{padding-top:76px}
-#legal .wrap{max-width:920px}
-.legal-data{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 26px}
-.ld-chip{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--bd);border-radius:999px;padding:8px 14px;font:500 12.5px var(--fb)}
-.ld-chip .ic{width:14px;height:14px;color:var(--y)}
-#legal summary{font-size:15px}
 /* ============ Panel de administración (patrón Juguetería Taiwan) ============ */
 .admin-login{max-width:420px}
 .admin-label{display:flex;flex-direction:column;gap:6px;font:500 12.5px var(--fb);margin-bottom:14px}
@@ -571,8 +531,7 @@ footer a:hover{color:var(--cr)}
   .admin-botones .btn{flex:1 1 calc(50% - 5px);font-size:12px;padding:0 10px}
 }
 </style>
-</head>
-<body>
+</head><body>
 <a class="skip" href="#tienda">Ir a los productos</a>
 <div class="top">Envíos a todo el país · Paga contra entrega o por Nequi</div>
 
@@ -629,7 +588,7 @@ footer a:hover{color:var(--cr)}
     </div>
     <div class="hero-cta">
       <button class="btn y" onclick="scrollToSection('tienda')">Explorar tienda</button>
-      <button class="btn o" onclick="scrollToSection('regalos')">Ver regalos</button>
+      <button class="btn o" onclick="filterProducts('regalos')">Ver regalos</button>
     </div>
   </div>
   <div class="hero-card" id="heroCard" style="visibility:hidden">
@@ -731,32 +690,6 @@ footer a:hover{color:var(--cr)}
   <div class="ti rv"><div class="tic"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></div><b>Atención por WhatsApp</b><span>Pedidos y dudas con respuesta rápida.</span></div>
 </div></section>
 
-<!-- ============ Regalos por ocasión ============ -->
-<section id="regalos"><div class="wrap">
-  <div class="rv" style="text-align:center;margin-bottom:32px">
-    <div class="eyebrow">Regalos</div>
-    <h2 style="font-size:clamp(26px,3.4vw,36px);margin-top:8px">Un detalle para cada ocasión</h2>
-    <p style="color:var(--mu);max-width:540px;margin:10px auto 0">Cuéntanos para quién y para qué momento: te ayudamos a escoger el regalo perfecto y lo dejamos listo para sorprender.</p>
-  </div>
-  <div class="gift-budgets rv" id="giftBudgets"></div>
-  <div class="occ-grid" id="occGrid"></div>
-</div></section>
-
-<!-- ============ Nuestra esencia ============ -->
-<section id="esencia"><div class="wrap"><div class="ess rv">
-  <div>
-    <div class="eyebrow">Nuestra esencia</div>
-    <h2 style="font-size:clamp(26px,3.4vw,36px);margin-top:8px">Calidad, variedad y alegría para ti.</h2>
-    <p>IKI reúne cosas bonitas, útiles y especiales para regalar o regalarte, con una experiencia cercana, clara y fácil de explorar.</p>
-  </div>
-  <ul>
-    <li><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg><b>Para cada momento</b><span>Productos que acompañan rutinas, etapas y celebraciones.</span></li>
-    <li><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg><b>Descubrimientos diarios</b><span>Una selección variada que invita a encontrar algo nuevo.</span></li>
-    <li><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6zM9 12l2 2 4-4"/></svg><b>Compra confiable</b><span>Información clara y acompañamiento antes y después de tu pedido.</span></li>
-    <li><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"/></svg><b>Regalos con sentido</b><span>Detalles pensados para sorprender y crear recuerdos.</span></li>
-  </ul>
-</div></div></section>
-
 <!-- ============ Preguntas frecuentes ============ -->
 <section id="faq"><div class="wrap">
   <div class="rv"><div class="eyebrow">Ayuda</div><h2>Preguntas frecuentes</h2></div>
@@ -767,20 +700,6 @@ footer a:hover{color:var(--cr)}
   <details><summary>¿Puedo enviar mi compra como regalo?</summary><p>Sí: escríbelo en el paso de notas del pedido y lo tenemos en cuenta al preparar tu envío.</p></details>
 </div></section>
 </main>
-
-<!-- ============ Sección legal (requisitos de e-commerce en Colombia y de Meta) ============ -->
-<section id="legal"><div class="wrap">
-  <div class="rv"><div class="eyebrow">Legal</div><h2 style="font-size:clamp(26px,3.4vw,36px);margin-top:8px">Información legal y políticas</h2></div>
-  <div class="legal-data rv" id="legalData"></div>
-  <details><summary>Términos y condiciones</summary><p>IKI opera como tienda en línea de productos de estilo de vida, regalos y accesorios en Colombia. Las compras se gestionan por WhatsApp: al enviar tu pedido confirmas que los datos suministrados son veraces y aceptas estas condiciones. Los precios se publican en pesos colombianos (COP) e incluyen impuestos aplicables; el costo del envío se cotiza por separado según la ciudad de destino y se informa antes de confirmar el pedido. La disponibilidad de los productos puede variar; si una referencia se agota después de tu pedido, te lo informaremos de inmediato para ofrecerte alternativas o la devolución de lo pagado.</p></details>
-  <details><summary>Tratamiento de datos personales (Ley 1581 de 2012)</summary><p>El responsable del tratamiento es <b id="legRazon">IKI</b>. Recolectamos nombre, número de WhatsApp, correo electrónico (opcional) y dirección de entrega con la única finalidad de gestionar tu pedido, coordinar la entrega y dar respuesta a tus solicitudes. No vendemos ni cedemos tus datos a terceros. Conforme a la Ley 1581 de 2012 puedes ejercer en cualquier momento tus derechos de conocimiento, actualización, rectificación y supresión escribiendo a nuestro canal de atención. Al enviar tu pedido autorizas el uso de tus datos para los fines aquí descritos.</p></details>
-  <details><summary>Política de cookies y almacenamiento local</summary><p>Esta tienda no utiliza cookies publicitarias propias. El carrito y tu lista de favoritos se guardan en el almacenamiento local de tu propio navegador para que no pierdas tu selección; puedes borrarlos limpiando los datos del sitio en tu navegador. Si nuestra analítica está activa (Pixel de Meta o Google Analytics), estas herramientas pueden instalar cookies para medir el uso del sitio; puedes rechazarlas desde la configuración de privacidad de tu navegador.</p></details>
-  <details><summary>Derecho de retracto (Art. 47, Ley 1480 de 2011)</summary><p>En compras no presenciales tienes derecho a retractarte dentro de los <b>5 días hábiles</b> siguientes a la recepción del producto. Para ejercerlo, el producto debe estar sin uso, con su empaque original y accesorios completos. Escríbenos por WhatsApp o correo indicando tu pedido; una vez verificado el estado del producto, el reintegro del dinero se realizará en un plazo máximo de 30 días. Quedan exceptuados del retracto los productos personalizados o hechos a medida y los de uso íntimo, conforme a la ley.</p></details>
-  <details><summary>Envíos y entregas</summary><p>Despachamos a toda Colombia a través de transportadoras aliadas. Los tiempos orientativos son de 2 a 5 días hábiles en ciudades principales y de 3 a 8 en el resto del país; te compartimos la guía de envío para que hagas seguimiento. Al recibir tu pedido, revísalo frente al transportador: cualquier novedad repórtala de inmediato por WhatsApp.</p></details>
-  <details><summary>Medios de pago y seguridad</summary><p>Aceptamos pago contra entrega (pagas cuando recibes tu pedido) y transferencia por Nequi al 315 637 1501. Nunca solicitamos datos de tus tarjetas ni contraseñas bancarias: cualquier mensaje que los pida en nuestro nombre es fraudulento. La confirmación de cada pago y de cada pedido se realiza únicamente por nuestros canales oficiales de WhatsApp.</p></details>
-  <details><summary>Garantías, cambios y devoluciones (Ley 1480 de 2011)</summary><p>Todos los productos cuentan con la garantía legal de calidad e idoneidad del Estatuto del Consumidor. Si tu producto llega con fallas de fábrica o no corresponde a lo solicitado, escríbenos dentro de los <b>5 días hábiles</b> siguientes a la entrega con fotos del producto y coordinamos el cambio o la devolución según el caso. Los gastos de envío derivados de fallas imputables a la tienda son cubiertos por nosotros.</p></details>
-  <details><summary>Atención al consumidor y resolución de quejas</summary><p>Nuestro canal principal de atención es WhatsApp y respondemos en horario hábil. Si consideras que no se ha dado solución a tu solicitud, puedes acudir a la Superintendencia de Industria y Comercio (www.sic.gov.co), entidad encargada de la protección al consumidor en Colombia.</p></details>
-</div></section>
 
 <!-- ============ Banda de contacto ============ -->
 <div class="news"><div class="wrap">
@@ -804,13 +723,13 @@ footer a:hover{color:var(--cr)}
   </div>
   <div><b class="h">Ayuda</b>
     <a href="#faq">Preguntas frecuentes</a><br>
-    <a href="#legal">Envíos y garantías</a><br>
+    <a href="legal.html#envios">Envíos y garantías</a><br>
     <a href="#" onclick="intentarAbrirAdmin();return false;">Administración</a>
   </div>
   <div><b class="h">Legal</b>
-    <a href="#legal">Términos y condiciones</a><br>
-    <a href="#legal">Tratamiento de datos</a><br>
-    <a href="#legal">Derecho de retracto</a>
+    <a href="legal.html#terminos">Términos y condiciones</a><br>
+    <a href="legal.html#datos">Tratamiento de datos</a><br>
+    <a href="legal.html#retracto">Derecho de retracto</a>
   </div>
   <div class="legal" id="footLegal">© IKI · Hecho con cariño en Colombia.</div>
 </div></footer>
@@ -1085,16 +1004,6 @@ const CATS=[
 /* Fotos provisionales por categoría (banners del proyecto) */
 const IMG={joyas:"IKI_banner_joyas_1600x600.png",moda:"IKI_banner_pijamas_1600x600.png",juguetes:"",escolar:"",regalos:"IKI_banner_regalos_1600x600.png"};
 /* Chips de Regalos por ocasión */
-const GIFTS={
-  presupuestos:["Hasta $30.000","Hasta $60.000","Hasta $100.000","Más de $100.000"],
-  ocasiones:[
-    {n:"Cumpleaños",d:"Para sorprender en su día",i:"M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"},
-    {n:"Aniversario",d:"Celebra lo que son juntos",i:"M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"},
-    {n:"Baby shower",d:"Para recibir al nuevo miembro",i:"M9 2h6v4l2 3v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9l2-3zM7 13h10"},
-    {n:"Gracias",d:"Un detalle que lo dice todo",i:"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"},
-    {n:"Amistad",d:"Los amigos también se celebran",i:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8.5 10v.1M15.5 10v.1M8.5 14.5a4.5 4.5 0 0 0 7 0"},
-    {n:"Solo porque",d:"El mejor motivo es ninguno",i:"M12 3l1.9 5.9 6.1.3-4.9 3.8 1.7 5.9-4.8-3.4-4.8 3.4 1.7-5.9-4.9-3.8 6.1-.3z"}
-  ]};
 /* Productos de la tienda: generados por scripts/sync_catalogos.py en catalogo.js
    (descarga Gava, Sublimados Majestic, Jugueteria Taiwan y Solobabys; cura la
    seleccion y agrega galerias y variantes de talla/color). El cron de GitHub
@@ -1204,7 +1113,7 @@ function cartResumen(){let count=0,total=0;cart.forEach(it=>{const p=prod(it.id)
 function renderSubnav(){
   let h='<button type="button" class="snl" data-c="todo" onclick="filterProducts(\'todo\')">Todo</button>';
   CATS.forEach(c=>h+='<button type="button" class="snl" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+'</button>');
-  h+='<span class="sn-sep"></span><button type="button" class="snl" onclick="scrollToSection(\'regalos\')">Regalos</button><button type="button" class="snl" onclick="scrollToSection(\'faq\')">Ayuda</button>';
+  h+='<span class="sn-sep"></span><button type="button" class="snl" onclick="scrollToSection(\'faq\')">Ayuda</button>';
   $("subnavTrack").innerHTML=h;
   ajustarSubnav();
 }
@@ -1229,20 +1138,9 @@ function renderChips(){
   CATS.forEach(c=>h+='<button type="button" class="chip" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+' <small>'+(counts[c.id]||0)+'</small></button>');
   $("chips").innerHTML=h;
 }
-function renderGifts(){
-  $("giftBudgets").innerHTML=GIFTS.presupuestos.map(function(p){
-    return '<a class="chip" target="_blank" rel="noopener" href="'+waLink("Hola IKI, necesito un regalo "+p.toLowerCase())+'">'+esc(p)+'</a>';
-  }).join("");
-  $("occGrid").innerHTML=GIFTS.ocasiones.map(function(o){
-    return '<a class="occ rv" target="_blank" rel="noopener" href="'+waLink("Hola IKI, busco un regalo para: "+o.n)+""+'">'
-      +'<span class="occ-ic"><svg class="ic" viewBox="0 0 24 24"><path d="'+o.i+'"/></svg></span>'
-      +'<b>'+esc(o.n)+'</b><span>'+esc(o.d)+'</span><span class="occ-cta">Pedir asesoría</span></a>';
-  }).join("");
-}
 function renderMobileMenu(){
   let h='<li><button onclick="toggleMenu();scrollToSection(\'tienda\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Todos los productos</button></li>';
   CATS.forEach(c=>h+='<li><button onclick="toggleMenu();filterProducts(\''+escJs(c.id)+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>'+esc(c.n)+'</button></li>');
-  h+='<li><button onclick="toggleMenu();scrollToSection(\'regalos\')"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"/></svg>Regalos por ocasión</button></li>';
   h+='<li><button onclick="toggleMenu();scrollToSection(\'favoritos\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg>Los favoritos de IKI</button></li>';
   h+='<li><button onclick="toggleMenu();scrollToSection(\'faq\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2A2.6 2.6 0 0 1 12 7.4c1.4 0 2.5 1 2.5 2.2 0 2.2-2.5 2-2.5 4M12 17h.01"/></svg>Preguntas frecuentes</button></li>';
   $("mobileMenuList").innerHTML=h;
@@ -2127,7 +2025,7 @@ document.addEventListener("DOMContentLoaded",function(){
   aplicarTienda();
   aplicarIdentidad();
   aplicarAnalitica();
-  renderSubnav();renderBubbles();renderChips();renderGifts();renderGrid();
+  renderSubnav();renderBubbles();renderChips();renderGrid();
   initCarouseles();iniciarDeriva();actualizarHero();renderMobileMenu();
   renderCart();
   measureHeader();
