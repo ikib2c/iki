@@ -324,9 +324,10 @@ def curar_moda_majestic(items):
             u = str(u).split("|")[0].strip()
             if u.startswith("http") and u != p["imagen_url"] and u not in gal:
                 gal.append(u)
+        ref = str(p.get("referencia") or "").strip()
         return {"nombre": titulo(nombre), "precio": int(float(p.get("precio") or 0)),
                 "imgs": [p["imagen_url"]] + gal[:3],
-                "var": (var if var else None)}
+                "var": (var if var else None), "sku": (ref if ref else None)}
 
     # TODOS los validos (sin tope por categoria)
     por_cat = {}
@@ -359,7 +360,8 @@ def curar_taiwan(base, categorias, lo, hi, n):
         nombre = re.sub(r"\s+", " ", p.get("name") or "").strip()
         if not nombre or not p.get("image"):
             continue
-        por_cat[p["category"]].append({"nombre": titulo(nombre), "precio": precio, "imgs": [p["image"]]})
+        por_cat[p["category"]].append({"nombre": titulo(nombre), "precio": precio, "imgs": [p["image"]],
+                                        "sku": (str(p.get("sku") or "").strip() or None)})
     sel, vistos, v4 = [], set(), set()
     while len(sel) < n:
         added = False
@@ -451,6 +453,8 @@ def escribir_catalogo_js(secciones):
             if p.get("var"):
                 var = p["var"]
                 partes.append("var:{%s}" % ",".join("%s:[%s]" % (js_str(g), ",".join(js_str(v) for v in vals)) for g, vals in var.items()))
+            if p.get("sku"):
+                partes.append("sku:%s" % js_str(p["sku"]))
             if p.get("antes") and p["antes"] > p["precio"]:
                 partes.append("antes:%d" % p["antes"])
             lineas.append(",".join(partes) + "},")

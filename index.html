@@ -1470,16 +1470,24 @@ function sendOrder(){
   const pago=(document.querySelector('input[name="paymentMethod"]:checked')||{value:"contra-entrega"}).value;
   const labels={"contra-entrega":"Contra entrega (paga al recibir)","transferencia":"Transferencia Nequi al 315 637 1501 (se confirma por WhatsApp)"};
   const s=cartResumen();
-  let m="Hola IKI, quiero hacer este pedido.\n\n";
-  m+="Cliente: "+nombre+"\nWhatsApp: +57 "+tel+"\n";
-  if(email)m+="Email: "+email+"\n";
-  m+="\nEntrega: A domicilio\nDepartamento: "+dep+"\nCiudad: "+ciudad+"\n";
+  /* WhatsApp formatea *texto* como negrita: da jerarquia al pedido */
+  let m="*PEDIDO — IKI*\n\n";
+  m+="*Cliente:* "+nombre+"\n*WhatsApp:* +57 "+tel+"\n";
+  if(email)m+="*Email:* "+email+"\n";
+  m+="\n*Entrega:* A domicilio\nDepartamento: "+dep+"\nCiudad: "+ciudad+"\n";
   if(barrio)m+="Barrio: "+barrio+"\n";
   m+="Dirección: "+dir+"\n";
-  m+="\nPago: "+(labels[pago]||pago)+"\n\nProductos:\n";
-  cart.forEach(it=>{const p=prod(it.id);if(p)m+="\u2022 "+it.qty+" x "+p.n+(it.var?varTxt(it.var):"")+" — "+cop(p.p*it.qty)+" ("+cop(p.p)+" c/u)\n";});
-  m+="\nSubtotal: "+cop(s.total)+"\nEnvío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
-  if(notas)m+="\n\nNotas: "+notas;
+  m+="\n*Pago:* "+(labels[pago]||pago)+"\n\n*Productos:*\n";
+  cart.forEach(function(it){
+    const p=prod(it.id);
+    if(!p)return;
+    m+="\u2022 *"+it.qty+" x "+p.n+"*"+(it.var?varTxt(it.var):"")+"\n";
+    if(p.sku)m+="   Ref: "+p.sku+"\n";
+    m+="   "+cop(p.p*it.qty)+(it.qty>1?" ("+cop(p.p)+" c/u)":"")+"\n";
+  });
+  m+="\n*TOTAL PRODUCTOS: "+cop(s.total)+"*\n";
+  m+="Envío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
+  if(notas)m+="\n\n*Notas:* "+notas;
   track("Lead",{value:s.total,currency:"COP",num_items:s.count,content_name:"Pedido WhatsApp"});
   if(navigator.share&&navigator.canShare&&cart.length){
     enviarPedidoConImagen(m);
@@ -1499,23 +1507,117 @@ function sendOrder(){
   }
 }
 
-/* Envia el pedido por WhatsApp con la FOTO del primer articulo: al viajar
-   como archivo (no como URL), el cliente ve la imagen y el origen del
-   proveedor queda oculto. Si el navegador no lo permite, va solo el texto. */
+/* Envia el pedido por WhatsApp con una HOJA-RESUMEN: una sola imagen con la
+   miniatura, nombre, cantidad y precio de TODOS los articulos del pedido.
+   Asi cada producto se identifica con su foto (los que no tienen referencia)
+   y la hoja llega como UNA imagen con el texto del pedido como caption. */
 async function enviarPedidoConImagen(msg){
   try{
-    const primero=cart[0]?prod(cart[0].id):null;
-    if(primero&&primero.img){
-      const r=await fetch(primero.img,{mode:"cors"});
-      const b=await r.blob();
-      const file=new File([b],"pedido-iki.jpg",{type:(b.type||"image/jpeg")});
-      if(navigator.canShare({files:[file]})){
-        await navigator.share({text:msg,files:[file]});
-        return;
-      }
+    const hoja=await crearHojaPedido();
+    if(hoja&&navigator.canShare({files:[hoja]})){
+      await navigator.share({text:msg,files:[hoja]});
+      return;
     }
   }catch(e){}
   window.open(waLink(msg),"_blank");
+}
+
+/* Carga una imagen del catalogo para dibujarla en canvas (con CORS del CDN).
+   Si falla devuelve null y se dibuja el marcador de la categoria. */
+function cargarImagenPedido(src){
+  return new Promise(function(res){
+    const im=new Image();
+    im.crossOrigin="anonymous";
+    im.onload=function(){res(im);};
+    im.onerror=function(){res(null);};
+    im.src=src;
+  });
+}
+
+/* Hoja de pedido 1080 de ancho, alto segun articulos: encabezado con logo,
+   una fila por producto (miniatura 150x150 + nombre + Ref + cantidad/precio)
+   y pie con el total en grande. Todo en una imagen. */
+async function crearHojaPedido(){
+  try{
+    const alto=300+cart.length*190+180;
+    const cv=document.createElement("canvas");
+    cv.width=1080;cv.height=alto;
+    const cx=cv.getContext("2d");
+    cx.fillStyle="#FFF8E9";cx.fillRect(0,0,1080,alto);
+    const logo=new Image();
+    logo.src="logo_512.png";
+    try{await logo.decode();}catch(e){}
+    if(logo.width)cx.drawImage(logo,60,52,150,150);
+    cx.textAlign="left";
+    cx.fillStyle="#242424";
+    cx.font="700 64px Montserrat, Arial, sans-serif";
+    cx.fillText("Pedido — IKI",240,120);
+    cx.fillStyle="#6B645A";
+    cx.font="500 34px Poppins, Arial, sans-serif";
+    cx.fillText(new Date().toLocaleDateString("es-CO"),240,168);
+    cx.fillStyle="#F5AE23";cx.fillRect(60,232,960,6);
+    let y=290;
+    for(let i=0;i<cart.length;i++){
+      const it=cart[i];
+      const p=prod(it.id);
+      if(!p)continue;
+      const im=await cargarImagenPedido(p.img||"");
+      if(im){
+        const s=150/Math.max(im.width,im.height);
+        const w=im.width*s,h=im.height*s;
+        cx.fillStyle="#FFFFFF";
+        cx.fillRect(60,y,150,150);
+        cx.drawImage(im,60+(150-w)/2,y+(150-h)/2,w,h);
+      }else{
+        cx.fillStyle=softOf(p.cat);
+        cx.fillRect(60,y,150,150);
+        cx.fillStyle="#2424242e";
+        cx.font="700 52px Montserrat, Arial, sans-serif";
+        cx.textAlign="center";
+        cx.fillText("IKI",135,y+95);
+        cx.textAlign="left";
+      }
+      cx.fillStyle="#242424";
+      cx.font="600 38px Poppins, Arial, sans-serif";
+      cx.fillText(p.n.length>34?p.n.slice(0,33)+"…":p.n,248,y+52);
+      let linea2=y+96;
+      if(p.sku){
+        cx.fillStyle="#6B645A";
+        cx.font="500 30px Poppins, Arial, sans-serif";
+        cx.fillText("Ref: "+p.sku,248,linea2);
+        linea2+=40;
+      }
+      if(it.var){
+        cx.fillStyle="#6B645A";
+        cx.font="500 28px Poppins, Arial, sans-serif";
+        cx.fillText(Object.keys(it.var).map(function(g){return g+": "+it.var[g];}).join(" · "),248,linea2);
+      }
+      cx.textAlign="right";
+      cx.fillStyle="#242424";
+      cx.font="700 42px Montserrat, Arial, sans-serif";
+      cx.fillText(it.qty+" × "+cop(p.p*it.qty),1020,y+62);
+      if(it.qty>1){
+        cx.fillStyle="#6B645A";
+        cx.font="500 30px Poppins, Arial, sans-serif";
+        cx.fillText(cop(p.p)+" c/u",1020,y+106);
+      }
+      cx.textAlign="left";
+      cx.fillStyle="#EADFCB";
+      cx.fillRect(60,y+170,960,2);
+      y+=190;
+    }
+    cx.fillStyle="#242424";
+    cx.font="700 56px Montserrat, Arial, sans-serif";
+    cx.fillText("TOTAL PRODUCTOS",60,y+40);
+    cx.textAlign="right";
+    cx.fillText(cop(cartResumen().total),1020,y+40);
+    cx.textAlign="left";
+    cx.fillStyle="#6B645A";
+    cx.font="500 30px Poppins, Arial, sans-serif";
+    cx.fillText("Envío pagado: se cotiza según la ciudad · Confirmado por WhatsApp",60,y+90);
+    const blob=await new Promise(function(res){cv.toBlob(res,"image/png");});
+    return new File([blob],"pedido-iki.png",{type:"image/png"});
+  }catch(e){return null;}
 }
 
 /* ===== Lightbox ===== */
