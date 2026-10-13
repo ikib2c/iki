@@ -1475,17 +1475,42 @@ function toggleCart(force){
   lock(abrir);
   if(abrir){const m=$("mobileMenu");if(m.classList.contains("open"))toggleMenu();}
 }
+/* Complementos por categoria: con que combina cada compra */
+const COMPLEMENTOS={
+  joyas:["moda","urbana","regalos"],
+  moda:["joyas","urbana"],
+  urbana:["joyas","moda"],
+  juguetes:["escolar","regalos","bebe"],
+  escolar:["juguetes","regalos"],
+  bebe:["regalos","juguetes"],
+  regalos:["bebe","joyas","juguetes"]
+};
+/* Sugeridos del minicarrito RELACIONADOS con lo que ya llevan:
+   hasta 2 de la MISMA categoria (combinar la compra: otro diseno, otra talla)
+   y hasta 2 COMPLEMENTOS segun la regla de negocio. Solo productos visibles
+   y con foto, precio accesible primero. Si agregan ropa urbana, veran mas
+   ropa urbana para combinar + joyas/moda como complemento, y asi. */
 function sugeridosPorTicket(enCarrito){
-  const disp=PRODUCTOS.filter(p=>!enCarrito.has(p.id)&&productImgs(p).length>0);
-  if(!disp.length)return[];
-  const porPrecio=disp.slice().sort((a,b)=>a.p-b.p);
-  const medioIdx=porPrecio.length>2?Math.floor((porPrecio.length-1)/2):0;
-  const cand=[{p:porPrecio[0],tier:"bajo"},{p:porPrecio[medioIdx],tier:"medio"},{p:porPrecio[porPrecio.length-1],tier:"alto"}];
-  const vistos=new Set(),out=[];
-  cand.forEach(c=>{if(c.p&&!vistos.has(c.p.id)){vistos.add(c.p.id);out.push(c);}});
+  const disp=PRODUCTOS.filter(p=>!enCarrito.has(p.id)&&productImgs(p).length>0&&!prodOculto(p.id)&&!provOculto(p.prov)&&!catOculta(p.cat));
+  if(!disp.length||!cart.length)return[];
+  const catsCarrito=new Set();
+  cart.forEach(it=>{const p=prod(it.id);if(p)catsCarrito.add(p.cat);});
+  const compCats=new Set();
+  catsCarrito.forEach(c=>(COMPLEMENTOS[c]||[]).forEach(x=>{if(!catsCarrito.has(x))compCats.add(x);}));
+  const mismos=disp.filter(p=>catsCarrito.has(p.cat)).sort((a,b)=>a.p-b.p);
+  const combos=disp.filter(p=>compCats.has(p.cat)).sort((a,b)=>a.p-b.p);
+  const out=[],vistos=new Set();
+  mismos.slice(0,2).forEach(p=>{vistos.add(p.id);out.push({p:p,tier:"mismo"});});
+  combos.slice(0,2).forEach(p=>{if(!vistos.has(p.id)){vistos.add(p.id);out.push({p:p,tier:"combo"});}});
+  if(out.length<4){
+    mismos.concat(combos).forEach(p=>{
+      if(out.length>=4)return;
+      if(!vistos.has(p.id)){vistos.add(p.id);out.push({p:p,tier:catsCarrito.has(p.cat)?"mismo":"combo"});}
+    });
+  }
   return out;
 }
-const TIER={bajo:["Detallito","b"],medio:["Equilibrado","m"],alto:["Especial","a"]};
+const TIER={mismo:["Combina","b"],combo:["Complemento","m"]};
 function miniThumb(p){
   const imgs=productImgs(p),soft=softOf(p.cat);
   return '<span class="th"'+(imgs.length?' style="background-image:url(\''+esc(imgs[0])+'\')"':"")+'>'+(imgs.length?"":"<b>IKI</b>")+'</span>';
@@ -2292,7 +2317,7 @@ function aplicarIdentidad(){
   const ld=$("legalData");
   if(ld)ld.innerHTML=datos.map(function(d){return '<span class="ld-chip"><svg class="ic" viewBox="0 0 24 24"><path d="'+d.i+'"/></svg>'+esc(d.t)+'</span>';}).join("");
   const fl=$("footLegal");
-  if(fl)fl.innerHTML="© "+new Date().getFullYear()+" "+(TIENDA.razonSocial||nombre)+(TIENDA.nit?(" · NIT "+TIENDA.nit):"")+' · Hecho con <img src="logo_120.png" alt="" style="height:12px;vertical-align:-1px" onerror="this.remove()"> en Colombia.';
+  if(fl)fl.innerHTML="© "+new Date().getFullYear()+" "+(TIENDA.razonSocial||nombre)+(TIENDA.nit?(" · NIT "+TIENDA.nit):"")+' · Hecho con <img src="logo_120_light.png" alt="IKI" style="height:14px;vertical-align:-2px" onerror="this.remove()"> en Colombia.';
 }
 function fmtWa(n){const d=String(n||"").replace(/\D/g,"").replace(/^57/,"");return d.replace(/(\d{3})(\d{3})(\d{4})/,"$1 $2 $3");}
 function normWa(v){const d=String(v||"").replace(/\D/g,"");if(!d)return"";if(d.length===10)return "57"+d;return d;}
