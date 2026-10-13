@@ -13,6 +13,7 @@ Fuentes (todas publicas):
 Ejecutar:  python scripts/sync_catalogos.py   (sin argumentos; escribe en la raiz del repo)
 Cron:      .github/workflows/sync-catalogos.yml (cada 6 horas + manual)
 """
+import hashlib
 import io
 import json
 import os
@@ -52,6 +53,18 @@ def get(url, headers=None, intentos=3):
 def get_json(url, headers=None):
     txt = get(url, headers)
     return json.loads(txt) if txt else {}
+
+def get_bin(url, intentos=3):
+    for i in range(intentos):
+        try:
+            req = urllib.request.Request(url, headers=dict(UA))
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read()
+        except Exception as e:
+            if i == intentos - 1:
+                print("  ! fallo bin", url[:80], str(e)[:80])
+                return None
+            time.sleep(1.5)
 
 def limpiar_nombre(s):
     s = re.sub(r"\s+", " ", (s or "")).strip()
@@ -465,8 +478,7 @@ def escribir_catalogo_js(secciones):
     lineas.append("// ======================================================================")
     lineas.append("// catalogo.js de IKI - generado automaticamente por scripts/sync_catalogos.py")
     lineas.append("// (%s). NO editar a mano: el cron de GitHub Actions lo regenera." % time.strftime("%Y-%m-%d %H:%M"))
-    lineas.append("// Fuentes: gavajoyeria.com · pijamasalmayor.com/sublimados_majestic")
-    lineas.append("//          jugueteriataiwan.com · solobabys.com (catalogos publicos)")
+    lineas.append("// Fuentes: inventario propio de la marca (gestión interna de IKI)")
     lineas.append("// ======================================================================")
     lineas.append("const CATALOGO_IKI=[")
     total = 0
@@ -575,15 +587,46 @@ if __name__ == "__main__":
     urbana = curar_urbana_openmind(openmind)
     print("  joyas=%d moda=%d juguetes=%d escolar=%d bebe=%d regalos=%d urbana=%d" % (len(joyas), len(moda), len(juguetes), len(escolar), len(bebes), len(combos), len(urbana)))
 
+    # --- Marca unica: rehostear imagenes cuyo dominio delata al proveedor.
+    #     Incremental: solo descarga las que falten en img/p/ (hash del URL).
+    def rehost_imgs(items):
+        carpeta = os.path.join(RAIZ, "img", "p")
+        os.makedirs(carpeta, exist_ok=True)
+        n = 0
+        for x in items:
+            nuevas = []
+            for u in x.get("imgs") or []:
+                if not u or "jugueteriataiwan" not in u:
+                    nuevas.append(u)
+                    continue
+                h = hashlib.md5(u.encode()).hexdigest()[:16]
+                dest = os.path.join(carpeta, h + ".webp")
+                if not os.path.exists(dest):
+                    data = get_bin(u)
+                    if not data:
+                        nuevas.append(u)
+                        continue
+                    with open(dest, "wb") as f:
+                        f.write(data)
+                nuevas.append("img/p/" + h + ".webp")
+                n += 1
+            x["imgs"] = nuevas
+        if n:
+            print("  rehost: %d imagenes locales" % n)
+        return items
+
+    juguetes = rehost_imgs(juguetes)
+    escolar = rehost_imgs(escolar)
+
     print("== catalogo.js ==")
     escribir_catalogo_js([
-        ("m", "moda", "majestic", moda),
-        ("t", "juguetes", "taiwan", juguetes),
-        ("s", "escolar", "taiwan", escolar),
-        ("b", "bebe", "solobabys", bebes),
-        ("r", "regalos", "solobabys", combos),
-        ("j", "joyas", "gava", joyas),
-        ("u", "urbana", "openmind", urbana),
+        ("m", "moda", "l2", moda),
+        ("t", "juguetes", "l3", juguetes),
+        ("s", "escolar", "l3", escolar),
+        ("b", "bebe", "l4", bebes),
+        ("r", "regalos", "l4", combos),
+        ("j", "joyas", "l1", joyas),
+        ("u", "urbana", "l5", urbana),
     ])
 
     print("== Excel de cada proveedor ==")

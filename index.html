@@ -151,6 +151,10 @@ section[id]{scroll-margin-top:88px}
 .ctrack::-webkit-scrollbar{display:none}
 @media(min-width:700px){.ctrack{--cols:3.2}}
 @media(min-width:1020px){.ctrack{--cols:4.4;--gap:18px}}
+/* Favoritos: fila protagonista — tarjetas ligeramente más grandes y DOS filas */
+#carFav{grid-template-rows:repeat(2,auto);--cols:2.05}
+@media(min-width:700px){#carFav{--cols:2.9}}
+@media(min-width:1020px){#carFav{--cols:3.9}}
 .cari{scroll-snap-align:start;cursor:pointer;border:0;background:none;padding:0;text-align:left;position:relative;transition:transform .3s}
 .cari:hover{transform:translateY(-4px)}
 .cfr{aspect-ratio:4/5;border-radius:18px;overflow:hidden;box-shadow:var(--sh)}
@@ -483,7 +487,6 @@ footer a:hover{color:var(--cr)}
   .fg input,.fg select,.fg textarea{font-size:16px}
   .fabs{right:12px;bottom:12px;gap:10px}
   .fab{width:48px;height:48px}
-  .fab.sh{display:none}
   .trust .wrap{grid-template-columns:1fr}
 }
 /* ============ Accesibilidad: menos movimiento ============ */
@@ -514,7 +517,7 @@ footer a:hover{color:var(--cr)}
 .ph{background:#fff}
 .lbmain{background:#fff}
 .th,.srt{background-color:#fff}
-/* ============ Panel de administración (patrón Juguetería Taiwan) ============ */
+/* ============ Panel de administración (patrón interno de la marca) ============ */
 .admin-login{max-width:420px}
 .admin-label{display:flex;flex-direction:column;gap:6px;font:500 12.5px var(--fb);margin-bottom:14px}
 .admin-label input{padding:12px;border:1.5px solid var(--bd);border-radius:12px;font:400 14px var(--fb);background:#fff}
@@ -656,7 +659,7 @@ footer a:hover{color:var(--cr)}
   <p class="sect-s rv">Un carrusel por catálogo con lo mejor de cada proveedor: desliza y toca un producto.</p>
   <div class="crow" id="favoritos" style="display:none">
     <div class="chead"><span class="clab" id="favRowLabel">Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()"></span><span class="cmeta" id="favRowMeta"></span></div>
-    <div class="ctrack" id="carFav" tabindex="0" role="region" aria-label="Carrusel de los favoritos de IKI"></div>
+    <div class="ctrack" id="carFav" tabindex="0" role="region" data-rows="2" aria-label="Carrusel de los favoritos de IKI"></div>
     <div class="cnav" id="dotsFav"></div>
     <button class="carr L" type="button" onclick="scrollCarousel(-1,'carFav')" aria-label="Producto anterior"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
     <button class="carr R" type="button" onclick="scrollCarousel(1,'carFav')" aria-label="Producto siguiente"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -762,8 +765,10 @@ footer a:hover{color:var(--cr)}
   </div>
   <div><b class="h">Tienda</b>
     <button class="flink" onclick="filterProducts('joyas')">Joyas y accesorios</button>
-    <button class="flink" onclick="filterProducts('moda')">Moda y pijamas</button>
     <button class="flink" onclick="filterProducts('juguetes')">Juguetes</button>
+    <button class="flink" onclick="filterProducts('urbana')">Ropa urbana</button>
+    <button class="flink" onclick="filterProducts('moda')">Moda y pijamas</button>
+    <button class="flink" onclick="filterProducts('bebe')">Bebé</button>
     <button class="flink" onclick="filterProducts('escolar')">Escolar</button>
     <button class="flink" onclick="filterProducts('regalos')">Regalos</button>
   </div>
@@ -1017,11 +1022,14 @@ footer a:hover{color:var(--cr)}
       <label class="admin-check"><input type="checkbox" id="adminVerConfianza" onchange="toggleSeccion('confianza',this.checked)" checked> Mostrar franja de confianza</label>
       <label class="admin-check"><input type="checkbox" id="adminVerFaq" onchange="toggleSeccion('faq',this.checked)" checked> Mostrar preguntas frecuentes</label>
       <label class="admin-check"><input type="checkbox" id="adminVerContacto" onchange="toggleSeccion('contacto',this.checked)" checked> Mostrar banda de contacto</label>
-      <label class="admin-check"><input type="checkbox" id="adminVerCarFav" onchange="toggleCarrusel('favoritos',this.checked)" checked> Mostrar carrusel de favoritos</label>
-      <label class="admin-check"><input type="checkbox" id="adminVerCar1" onchange="toggleCarrusel('row1',this.checked)" checked> Mostrar carrusel 1</label>
-      <label class="admin-check"><input type="checkbox" id="adminVerCar2" onchange="toggleCarrusel('row2',this.checked)" checked> Mostrar carrusel 2</label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCarFav" onchange="toggleCarrusel('favoritos',this.checked)" checked> <span id="adminCarFavNombre">Carrusel de favoritos</span></label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar1" onchange="toggleCarrusel('row1',this.checked)" checked> <span id="adminCar1Nombre">Carrusel 1</span></label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar2" onchange="toggleCarrusel('row2',this.checked)" checked> <span id="adminCar2Nombre">Carrusel 2</span></label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar3" onchange="toggleCarrusel('row3',this.checked)" checked> <span id="adminCar3Nombre">Carrusel 3</span></label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar4" onchange="toggleCarrusel('row4',this.checked)" checked> <span id="adminCar4Nombre">Carrusel 4</span></label>
+      <label class="admin-check"><input type="checkbox" id="adminVerCar5" onchange="toggleCarrusel('row5',this.checked)" checked> <span id="adminCar5Nombre">Carrusel 5</span></label>
       </div>
-      <div class="admin-h">Catálogos de proveedores <small>oculta de un golpe todas las prendas de un proveedor</small></div>
+      <div class="admin-h">Catálogos de inventario <small>oculta de un golpe todas las prendas de una línea de compra</small></div>
       <div class="admin-lista" id="adminCatalogosVis"></div>
       <div class="admin-h">Categorías visibles <small>desmarca para ocultar la categoría de toda la tienda</small></div>
       <div class="admin-lista" id="adminCatsVis"></div>
@@ -1103,8 +1111,8 @@ const CATS=[
 const IMG={joyas:"IKI_banner_joyas_1600x600.png",moda:"IKI_banner_pijamas_1600x600.png",juguetes:"",escolar:"",regalos:"IKI_banner_regalos_1600x600.png"};
 /* Chips de Regalos por ocasión */
 /* Productos de la tienda: generados por scripts/sync_catalogos.py en catalogo.js
-   (descarga Gava, Sublimados Majestic, Jugueteria Taiwan y Solobabys; cura la
-   seleccion y agrega galerias y variantes de talla/color). El cron de GitHub
+   (inventario propio de la marca; el proceso interno lo cura con
+   galerias y variantes de talla/color). El cron de GitHub
    Actions lo actualiza solo: no editar a mano. */
 const CATALOGO_BASE_IKI=(typeof CATALOGO_IKI!=="undefined"&&Array.isArray(CATALOGO_IKI))?CATALOGO_IKI:[];
 
@@ -1227,7 +1235,7 @@ function aplicarTienda(){
   CONFIG.pagoContraEntrega=TIENDA.pagoContraEntrega;
   CONFIG.analytics={pixelMeta:TIENDA.pixelMeta,ga4:TIENDA.ga4};
 }
-/* ===== Motor de precios (inspirado en Jugueteria Taiwan) =====
+/* ===== Motor de precios  =====
    precioFinal = base × multiplicador × (1 + margen) → redondeado
    Prioridad: 1.precio exacto → 2.margen temporada → 3.margen categoria → 4.margen global */
 function redondearPrecio(n){
@@ -2098,7 +2106,9 @@ function visibleCount(tid){
   const t=$(tid),f=t?t.querySelector(".cari"):null;
   if(!f)return 1;
   const gap=parseFloat(getComputedStyle(t).columnGap||"14")||14;
-  return Math.max(1,Math.round(t.clientWidth/(f.getBoundingClientRect().width+gap)));
+  const cols=Math.max(1,Math.round(t.clientWidth/(f.getBoundingClientRect().width+gap)));
+  const rows=parseInt(t.getAttribute("data-rows")||"1",10)||1;
+  return cols*rows;
 }
 function buildDots(tid,did){
   const t=$(tid),d=$(did);if(!t||!d)return;
@@ -2150,6 +2160,15 @@ function scrollCarousel(d,tid){
   const paso=f?(f.getBoundingClientRect().width+gap)*visibleCount(tid):t.clientWidth*.8;
   t.scrollBy({left:paso*d,behavior:"smooth"});
 }
+/* Categorías top para los 5 carruseles: prioridad comercial + resto por
+   cantidad. La usan la tienda y el panel para NOMBRAR los carruseles. */
+function topCategorias(){
+  const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
+  const PRIORIDAD=["joyas","juguetes","urbana","moda","bebe"];
+  const prioridad=PRIORIDAD.filter(c=>counts[c]&&!catOculta(c));
+  const resto=Object.keys(counts).filter(c=>!PRIORIDAD.includes(c)&&!catOculta(c)).sort((a,b)=>counts[b]-counts[a]);
+  return prioridad.concat(resto).slice(0,5).map(function(c){return{id:c,n:counts[c]};});
+}
 function initCarouseles(){
   const sel=CONFIG.favoritosIds.map(prod).filter(Boolean);
   const fr=$("favoritos");
@@ -2162,16 +2181,13 @@ function initCarouseles(){
     buildDots("carFav","dotsFav");hookScroll("carFav","dotsFav");
   }else fr.style.display="none";
   const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  const PRIORIDAD=["joyas","juguetes","urbana","moda","bebe"];
-  const prioridad=PRIORIDAD.filter(c=>counts[c]&&!catOculta(c));
-  const resto=Object.keys(counts).filter(c=>!PRIORIDAD.includes(c)&&!catOculta(c)).sort((a,b)=>counts[b]-counts[a]);
-  const top=prioridad.concat(resto).slice(0,5);
+  const top=topCategorias();
   [["row1","car1","dots1","row1Label","row1Meta"],
    ["row2","car2","dots2","row2Label","row2Meta"],
    ["row3","car3","dots3","row3Label","row3Meta"],
    ["row4","car4","dots4","row4Label","row4Meta"],
    ["row5","car5","dots5","row5Label","row5Meta"]].forEach((cfg,i)=>{
-    const cat=top[i],row=$(cfg[0]),t=$(cfg[1]);
+    const cat=top[i]&&top[i].id,row=$(cfg[0]),t=$(cfg[1]);
     if(!cat||carruselOculto(cfg[0])){row.style.display="none";return;}
     row.style.display="";
     $(cfg[3]).textContent=labelOf(cat);
@@ -2358,7 +2374,8 @@ function prodOculto(id){return ocultasLista(TIENDA.productosOcultos).includes(id
 function seccionOculta(id){return ocultasLista(TIENDA.seccionesOcultas).includes(id);}
 function carruselOculto(id){return ocultasLista(TIENDA.carruselesOcultos).includes(id);}
 function provOculto(prv){return ocultasLista(TIENDA.catalogosOcultos).includes(prv);}
-const PROVEEDORES=[{id:"gava",n:"Gava Joyería"},{id:"majestic",n:"Sublimados Majestic"},{id:"taiwan",n:"Juguetería Taiwan"},{id:"solobabys",n:"Solobabys"},{id:"openmind",n:"Open Mind"}];
+/* Lineas de inventario (codigos internos neutrales: una sola marca ante el cliente) */
+const PROVEEDORES=[{id:"l1",n:"Línea Joyas"},{id:"l2",n:"Línea Moda"},{id:"l3",n:"Línea Juguetes y escolar"},{id:"l4",n:"Línea Bebé y regalos"},{id:"l5",n:"Línea Ropa urbana"}];
 function aplicarSeccionesVisibles(){
   const mapa={hero:".hero",marquee:".marquee",carruseles:".carsec",categorias:".catsbar",confianza:".trust",faq:"#faq",contacto:".news"};
   Object.keys(mapa).forEach(function(k){
@@ -2558,8 +2575,17 @@ function pintarVisibilidadAdmin(){
   $("adminCatalogosVis").innerHTML=hc;
   const secs={hero:"adminVerHero",marquee:"adminVerMarquee",categorias:"adminVerCategorias",carruseles:"adminVerCarruseles",confianza:"adminVerConfianza",faq:"adminVerFaq",contacto:"adminVerContacto"};
   Object.keys(secs).forEach(function(k){const el=$(secs[k]);if(el)el.checked=!seccionOculta(k);});
-  const cars={favoritos:"adminVerCarFav",row1:"adminVerCar1",row2:"adminVerCar2"};
+  const cars={favoritos:"adminVerCarFav",row1:"adminVerCar1",row2:"adminVerCar2",row3:"adminVerCar3",row4:"adminVerCar4",row5:"adminVerCar5"};
   Object.keys(cars).forEach(function(k){const el=$(cars[k]);if(el)el.checked=!carruselOculto(k);});
+  /* nombres dinámicos: cada carrusel con su categoría y conteo ACTUAL */
+  const top=topCategorias();
+  const nomFav=$("adminCarFavNombre");
+  if(nomFav)nomFav.textContent="Carrusel de favoritos ("+CONFIG.favoritosIds.length+" productos)";
+  for(let ri=0;ri<5;ri++){
+    const el=$("adminCar"+(ri+1)+"Nombre");
+    if(!el)continue;
+    el.textContent=top[ri]?("Carrusel "+(ri+1)+" · "+labelOf(top[ri].id)+" ("+top[ri].n+" productos)"):"Carrusel "+(ri+1);
+  }
   pintarOcultosAdmin();
 }
 function toggleSeccion(id,visible){

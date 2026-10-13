@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name  "ikib2c-bot"
           git config user.email "ikib2c@users.noreply.github.com"
-          git add catalogo.js *.xlsx
+          git add catalogo.js *.xlsx img
           if ! git diff --cached --quiet; then
             git commit -m "sync: actualiza catalogo de la tienda y Excel de proveedores [skip ci]"
             git push
