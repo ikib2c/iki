@@ -304,6 +304,12 @@ def curar_moda_majestic(items):
     # Typos visibles al cliente: se corrigen aqui y la preservacion de ids
     # es tolerante (norm_clave) para no romper enlaces de pedidos viejos.
     FIXES = [("CORSERT", "CORSET"), ("BODDY", "BODY")]
+    # Pijamas de FAMILIA: nombres de tienda por articulo del proveedor
+    NOMBRES_FAMILIAR = {
+        "PIJAMAS FAMILIARES": "Pijama Familiar de Personajes",
+        "PIJAMA FAMILIAR NAVIDEÑAS": "Pijama Familiar Navideña",
+        "PIJAMA NAVIDAD FAMILIAR": "Pijama Familiar Grinch",
+    }
 
     def nombre_limpio(nombre):
         n = re.sub(r"\s+", " ", (nombre or "")).strip().rstrip(".")
@@ -347,8 +353,10 @@ def curar_moda_majestic(items):
             return None
         return p
 
-    def con_datos(p):
-        nombre = nombre_limpio(p.get("nombre"))
+    def con_datos(p, nombre=None, precio=None, var_extra=None):
+        # nombre explicito (prendas de familia): ya viene formateado, NO se
+        # re-titula para no arruinar etiquetas como "2XL Unisex"
+        nombre = (titulo(nombre_limpio(p.get("nombre"))) if nombre is None else nombre)
         tallas = parse_tallas(p.get("tallas"))
         var = {}
         if tallas:
@@ -356,6 +364,8 @@ def curar_moda_majestic(items):
         est = parse_estampados(p.get("estampados"))
         if est:
             var["Estampado"] = est
+        if var_extra:
+            var.update(var_extra)
         extras = p.get("imagenes_extra")
         urls = []
         if isinstance(extras, list):
@@ -372,13 +382,73 @@ def curar_moda_majestic(items):
             if u.startswith("http") and u != p["imagen_url"] and u not in gal:
                 gal.append(u)
         ref = str(p.get("referencia") or "").strip()
-        return {"nombre": titulo(nombre), "precio": int(float(p.get("precio") or 0)),
+        return {"nombre": nombre, "precio": int(float(precio if precio is not None else (p.get("precio") or 0))),
                 "imgs": [p["imagen_url"]] + gal[:3],
                 "cat": clasificar_prenda(nombre),
                 "var": (var if var else None), "sku": (ref if ref else None)}
 
-    # TODOS los validos (sin tope por categoria)
-    elegidos = [con_datos(p) for p in (candidato(x) for x in items) if p]
+    def prendas_familiares(p):
+        """Pijamas de FAMILIA: el proveedor las publica con precio placeholder
+        ($3) pero la tarjeta trae el precio REAL POR PRENDA en precios_familia
+        (dama, dama plus, caballero, 2XL unisex y nino con tallas 2/4 a 14/16).
+        Se expande en un producto por prenda con su precio y sus tallas,
+        respetando las opciones deshabilitadas de cada tarjeta."""
+        pf = p.get("precios_familia") or {}
+        if not isinstance(pf, dict):
+            return []
+        pt = pf.get("precios_tallas") or {}
+        raw_des = str(pf.get("opciones_deshabilitadas") or "").lower()
+        tallas_nino = sorted([t for t in pt if "/" in str(t)])
+        precio_nino = 0
+        for t in tallas_nino:
+            try:
+                precio_nino = max(precio_nino, float(pt.get(t) or 0))
+            except Exception:
+                pass
+        plan = [
+            ("Dama", pf.get("dama_unica"), ["Única"]),
+            ("Dama Plus", pf.get("dama_plus"), ["Plus"]),
+            ("Caballero", pf.get("caballero_unica") if pf.get("caballero_unica") is not None else pf.get("hombre"), ["Única"]),
+            ("2XL Unisex", pf.get("unisex_2xl"), ["2XL"]),
+            ("Niño", precio_nino or None, tallas_nino),
+        ]
+        # Opciones deshabilitadas: match EXACTO por etiqueta de la tarjeta
+        # ("dama" NO puede caer dentro de "dama plus" ni "18" dentro de nada)
+        DES_HASTA = {"Dama": ["dama única"], "Dama Plus": ["dama plus"], "Caballero": ["caballero"],
+                     "2XL Unisex": ["2xl unisex", "2xl"], "Niño": []}
+        clave = nombre_limpio(p.get("nombre")).upper().strip()
+        base = NOMBRES_FAMILIAR.get(clave) or titulo(nombre_limpio(p.get("nombre")))
+        out = []
+        for miembro, precio, tallas in plan:
+            if not precio:
+                continue
+            if any(x in raw_des for x in DES_HASTA[miembro]):
+                continue
+            if miembro == "Niño" and tallas and all(t.lower() in raw_des for t in tallas):
+                continue
+            try:
+                precio = int(float(precio))
+            except Exception:
+                continue
+            if precio <= 0:
+                continue
+            var_extra = {"Talla": tallas} if tallas else {"Talla": ["Única"]}
+            d = con_datos(p, nombre="%s · %s" % (base, miembro), precio=precio, var_extra=var_extra)
+            if d:
+                out.append(d)
+        return out
+
+    # TODOS los validos (sin tope por categoria); las pijamas de familia
+    # (precio placeholder) entran expandidas por prenda con su precio real.
+    elegidos = []
+    for x in items:
+        if x.get("oculto"):
+            continue
+        c = candidato(x)
+        if c:
+            elegidos.append(con_datos(x))
+        elif x.get("es_producto_familiar") and x.get("imagen_url") and (x.get("precios_familia") or {}):
+            elegidos.extend(prendas_familiares(x))
     elegidos = [p for p in elegidos if p and len(p.get("nombre") or "") >= 6]
     elegidos.sort(key=lambda x: -x["precio"])
     return elegidos
@@ -484,10 +554,11 @@ def curar_urbana_openmind(prods):
 
 def norm_clave(nombre):
     """Clave de preservacion de ids/cids TOLERANTE a correcciones de
-    nombre: los typos corregidos (Corsert->Corset, Boddy->Body) mantienen
-    su id y su Cat permanente, asi los enlaces de pedidos viejos (?art=)
-    y la curacion del heroe/favoritos no se rompen."""
-    n = (nombre or "").lower()
+    nombre: los typos corregidos (Corsert->Corset, Boddy->Body) y el
+    punto final suelto mantienen su id y su Cat permanente, asi los
+    enlaces de pedidos viejos (?art=) y la curacion del heroe/favoritos
+    no se rompen."""
+    n = (nombre or "").lower().strip().rstrip(".")
     for a, b in (("corsert", "corset"), ("boddy", "body")):
         n = n.replace(a, b)
     return n
@@ -500,10 +571,32 @@ def escribir_catalogo_js(secciones):
     fijos del admin no se rompen cuando cambian precios, el orden o se
     corrigen typos del proveedor. Respeta la categoria POR PRODUCTO cuando
     la curacion la trae (clasificacion de Majestic)."""
+    # RESTAURACION: al corregirle el punto final del nombre, el Pantalon
+    # Bolero Tanga perdio su id m30 y su Cat IKI-0030 (la clave de nombre
+    # dejo de coincidir). Se restauran para que los favoritos, los precios
+    # fijos del admin y los enlaces de pedidos viejos (?art=IKI-0030)
+    # sigan apuntando al mismo producto. m87/IKI-0103 fueron suyos durante
+    # unas horas y quedan QUEMADOS: ningun producto nuevo puede heredar
+    # enlaces o favoritos ajenos.
+    ID_FIJOS = {("m", "pantalon bolero tanga"): 30}
+    CID_FIJOS = {("m", "pantalon bolero tanga"): 30}
+    QUEMADOS_ID = {("m", 87)}
+    QUEMADOS_CID = {103}
     previos = {}
     usados = {}
     previos_cid = {}
-    usados_cid = set()
+    usados_cid = set(QUEMADOS_CID)
+    # numeros que ID_FIJOS devuelve a su dueno original: nadie mas puede
+    # heredarlos por nombre desde el catalogo previo (el m30 vuelve al
+    # Pantalon: la prenda que lo heredo por error debe soltarlo y recibir
+    # numero fresco, pues no tiene historial propio)
+    FIJOS_NUM = set(ID_FIJOS.values())
+    FIJOS_CID_NUM = set(CID_FIJOS.values())
+    # numeros restaurados y quemados jamas se reemiten
+    for (pre, _), num in ID_FIJOS.items():
+        usados.setdefault(pre, set()).add(num)
+    for pre, num in QUEMADOS_ID:
+        usados.setdefault(pre, set()).add(num)
     try:
         with open(os.path.join(RAIZ, "catalogo.js"), encoding="utf-8") as f:
             texto_previo = f.read()
@@ -546,12 +639,18 @@ def escribir_catalogo_js(secciones):
         claves_cid = set()
         for p in items:
             clave = (prefijo, norm_clave(p["nombre"]))
-            if clave in previos and clave not in claves:
+            if clave in ID_FIJOS:
+                num = ID_FIJOS[clave]
+                usados.setdefault(prefijo, set()).add(num)
+            elif clave in previos and clave not in claves and previos[clave] not in FIJOS_NUM:
                 num = previos[clave]
             else:
                 num = num_libre(prefijo)
             claves.add(clave)
-            if clave in previos_cid and clave not in claves_cid:
+            if clave in CID_FIJOS:
+                cid_num = CID_FIJOS[clave]
+                usados_cid.add(cid_num)
+            elif clave in previos_cid and clave not in claves_cid and previos_cid[clave] not in FIJOS_CID_NUM:
                 cid_num = previos_cid[clave]
                 usados_cid.add(cid_num)
             else:
