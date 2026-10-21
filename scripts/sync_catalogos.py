@@ -615,6 +615,13 @@ if __name__ == "__main__":
 
     # --- Marca unica: rehostear imagenes cuyo dominio delata al proveedor.
     #     Incremental: solo descarga las que falten en img/p/ (hash del URL).
+    #     El catalogo de Taiwan ahora sirve miniaturas webp (~25 KB) con
+    #     rutas RELATIVAS (assets/fotos/...) que solo existen en SU
+    #     repositorio: se resuelven contra su base publica y se rehostean
+    #     igual — el hash del URL ABSOLUTO mantiene el rehost incremental
+    #     (las ya descargadas no se vuelven a bajar) y la marca sigue sin
+    #     exponer ningun dominio ajeno en las fotos.
+    TAIWAN_BASE = "https://jugueteriataiwanoficial.github.io/jugueteriataiwan/"
     def rehost_imgs(items):
         carpeta = os.path.join(RAIZ, "img", "p")
         os.makedirs(carpeta, exist_ok=True)
@@ -622,13 +629,19 @@ if __name__ == "__main__":
         for x in items:
             nuevas = []
             for u in x.get("imgs") or []:
-                if not u or "jugueteriataiwan" not in u:
+                if not u:
+                    continue
+                if u.startswith("assets/"):
+                    original = TAIWAN_BASE + u
+                elif "jugueteriataiwan" in u:
+                    original = u
+                else:
                     nuevas.append(u)
                     continue
-                h = hashlib.md5(u.encode()).hexdigest()[:16]
+                h = hashlib.md5(original.encode()).hexdigest()[:16]
                 dest = os.path.join(carpeta, h + ".webp")
                 if not os.path.exists(dest):
-                    data = get_bin(u)
+                    data = get_bin(original)
                     if not data:
                         nuevas.append(u)
                         continue

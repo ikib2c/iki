@@ -489,11 +489,25 @@ footer a:hover{color:var(--cr)}
   .fab{width:48px;height:48px}
   .trust .wrap{grid-template-columns:1fr}
 }
+/* Badge del carrito con rebote elastico (overshoot): mas jugoso que un
+   bump plano; el contador "salta" al cambiar y confirma que el producto
+   SI entro al pedido sin abrir el carrito. La regla por id cubre el
+   badge del header y el del carrito flotante. */
+@keyframes badgeBump{0%{transform:scale(1)}45%{transform:scale(1.45)}100%{transform:scale(1)}}
+#cartCount.bump,#floatingCartCount.bump{animation:badgeBump .5s cubic-bezier(0.34,1.56,0.64,1)}
+/* VUELO AL CARRITO: al agregar un producto, su foto vuela desde la
+   tarjeta hasta el icono del carrito (dopamina visual: confirma QUE
+   producto entra y DONDE queda). El clon es la propia miniatura (ya en
+   cache: no descarga nada) y vive solo ~0.5s. Marco blanco y
+   object-fit contain: el producto viaja COMPLETO, igual que en las
+   tarjetas de la marca. */
+.iki-fly{position:fixed;z-index:99999;pointer-events:none;border-radius:10px;background:#fff;object-fit:contain;box-shadow:0 8px 24px #24242459}
 /* ============ Accesibilidad: menos movimiento ============ */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none}
+  .iki-fly{display:none}
 }
 /* ============ Hero: galería de esmeraldas de laboratorio ============ */
 .hero{position:relative;overflow:hidden;padding:0;margin-top:-1px}
@@ -1351,7 +1365,25 @@ function placeholderImg(cat){
   const c=softOf(cat);
   return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><rect width="400" height="500" fill="#FFFFFF"/><text x="200" y="278" font-family="Montserrat,Arial,sans-serif" font-size="92" font-weight="700" fill="'+c+'" fill-opacity="0.55" text-anchor="middle" letter-spacing="-4">IKI</text></svg>');
 }
-function imgOnError(el,cat){if(!el)return;if(el.dataset.fbk===el.src)return;el.dataset.fbk=el.src;el.onerror=null;el.src=placeholderImg(cat);}
+/* Respaldo universal de imagenes con cadena de galeria: si la foto falla
+   (URL rota), se reintenta con la SIGUIENTE foto de la galeria del
+   producto antes de caer al placeholder de la categoria (galerias y
+   lightbox reciclan el mismo <img>: fbkFrom recuerda la ultima URL que
+   fallo, evita bucles y deja pasar el respaldo de la foto siguiente). */
+function imgOnError(el,cat,id){
+  if(!el)return;
+  if(id){
+    try{
+      const imgs=productImgs(prod(id))||[];
+      const i=imgs.indexOf(el.src);
+      const nx=(i>=0&&i<imgs.length-1)?imgs[i+1]:null;
+      if(nx&&nx!==el.src){el.dataset.fbkFrom=el.src;el.src=nx;return;}
+    }catch(e){}
+  }
+  if(el.dataset.fbkFrom===el.src)return;
+  el.dataset.fbkFrom=el.src;
+  el.src=placeholderImg(cat);
+}
 function lock(on){document.body.classList.toggle("noscroll",on);}
 
 /* ===== Analítica opcional (Pixel de Meta y GA4) ===== */
@@ -1434,7 +1466,7 @@ function tarjetaHTML(p){
   const id=String(p.id),imgs=productImgs(p),tiene=imgs.length>0,src=tiene?imgs[0]:"",f=favs.includes(p.id),soft=softOf(p.cat);
   return '<article class="card" id="product-'+esc(id)+'" data-cat="'+esc(p.cat)+'">'
   +'<div class="ph'+(tiene?' has-img':'')+'" style="--soft:'+soft+(tiene?";--img:url('"+esc(src)+"')":"")+'" role="button" tabindex="0" aria-label="Ver '+esc(p.n)+'" onclick="verProducto(\''+escJs(id)+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();verProducto(\''+escJs(id)+'\')}">'
-  +(tiene?'<img src="'+esc(src)+'" alt="'+esc(p.n)+'" loading="lazy" decoding="async" onerror="imgOnError(this,\''+escJs(p.cat)+'\')">':'<b class="mono">IKI</b>')
+  +(tiene?'<img src="'+esc(src)+'" alt="'+esc(p.n)+'" loading="lazy" decoding="async" onerror="imgOnError(this,\''+escJs(p.cat)+'\',\''+escJs(id)+'\')">':'<b class="mono">IKI</b>')
   +'<button class="fav'+(f?' on':'')+'" type="button" aria-pressed="'+f+'" aria-label="Favorito: '+esc(p.n)+'" onclick="event.stopPropagation();toggleFav(\''+escJs(id)+'\')"><svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg></button>'
   +'<button class="qadd" type="button" aria-label="Agregar una unidad de '+esc(p.n)+' al carrito" onclick="event.stopPropagation();quickAdd(\''+escJs(id)+'\')"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>'
   +'</div>'
@@ -1511,13 +1543,16 @@ function addSelected(id){
   const qv=$("qv-"+id),qs=$("qs-"+id);
   if(qv)qv.textContent=1;
   if(qs&&p)qs.textContent=cop(p.p);
-  openOrderForm();
+  /* La foto vuela al carrito: si anima, se le deja aterrizar (~0.3s)
+     para que el ojo siga el recorrido y DESPUES abre el checkout. */
+  if(volarAlCarrito(id))setTimeout(openOrderForm,300);
+  else openOrderForm();
 }
 function quickAdd(id,abrir){
   if(abrir===undefined)abrir=true;
   const v=curVar(id);
   addToCart(id,1,Object.keys(v).length?v:null);
-  if(abrir)openOrderForm();
+  if(abrir){if(volarAlCarrito(id))setTimeout(openOrderForm,300);else openOrderForm();}
   else{const p=prod(id);showToast("Agregado: "+(p?p.n:"producto"));}
 }
 function toggleFav(id){
@@ -1536,6 +1571,55 @@ function verProducto(id){
 }
 
 /* ===== Carrito ===== */
+/* VUELO AL CARRITO: la foto de la tarjeta vuela hasta el icono del
+   carrito en ~0.5s con un arco suave. Usa Web Animations (todos los
+   navegadores modernos) y reusa la miniatura en cache (cero descargas).
+   Devuelve true si animo, para que quien llame espere a que aterrice
+   antes de abrir el checkout. Se omite (false) si: el checkout ya esta
+   abierto (agregar un sugerido desde el propio pedido), el usuario
+   prefiere menos movimiento, la tarjeta no esta en pantalla o su foto
+   no cargo. */
+function volarAlCarrito(id){
+  try{
+    if($("orderModal").classList.contains("show"))return false;
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return false;
+    if(!document.body.animate)return false;
+    const card=$("product-"+id);
+    const img=card?card.querySelector(".ph img"):null;
+    if(!img||!img.complete||!img.naturalWidth)return false;
+    /* Objetivo: el carrito flotante si esta en pantalla; si no, el badge
+       del header (escritorio). */
+    let destino=$("floatingCartCount");
+    let dr=destino?destino.getBoundingClientRect():null;
+    if(!dr||!dr.width||dr.bottom<0||dr.top>window.innerHeight){
+      destino=$("cartCount");
+      dr=destino?destino.getBoundingClientRect():null;
+    }
+    if(!destino||!dr.width)return false;
+    const ir=img.getBoundingClientRect();
+    const clon=img.cloneNode(false);
+    clon.className="iki-fly";
+    clon.removeAttribute("id");
+    clon.removeAttribute("loading");
+    clon.removeAttribute("decoding");
+    clon.style.left=ir.left+"px";
+    clon.style.top=ir.top+"px";
+    clon.style.width=ir.width+"px";
+    clon.style.height=ir.height+"px";
+    document.body.appendChild(clon);
+    const dx=(dr.left+dr.width/2)-(ir.left+ir.width/2);
+    const dy=(dr.top+dr.height/2)-(ir.top+ir.height/2);
+    const anim=clon.animate([
+      {transform:"translate(0,0) scale(1)",opacity:1},
+      {transform:"translate("+(dx*0.5)+"px,"+(dy*0.5-70)+"px) scale(0.65)",opacity:1,offset:0.45},
+      {transform:"translate("+dx+"px,"+dy+"px) scale(0.12)",opacity:0.55}
+    ],{duration:520,easing:"cubic-bezier(0.5,0,0.75,0)"});
+    const limpiar=function(){if(clon.parentNode)clon.remove();};
+    anim.onfinish=limpiar;
+    anim.oncancel=limpiar;
+    return true;
+  }catch(e){return false;}
+}
 function addToCart(id,qty,vari){
   const k=varKey(vari||null);
   const it=cart.find(x=>x.id===id&&varKey(x.var)===k);
@@ -1544,6 +1628,8 @@ function addToCart(id,qty,vari){
   const p=prod(id);
   if(p)track("AddToCart",{content_name:p.n,content_type:"product",contents:[{id:id,quantity:qty}],value:p.p*qty,currency:"COP"});
   renderCart();
+  /* Dopamina fisica: vibracion corta en telefonos (no-op en escritorio) */
+  try{if("vibrate" in navigator)navigator.vibrate(30);}catch(e){}
 }
 function updateCartQty(i,d){
   const it=cart[i];if(!it)return;
@@ -2042,7 +2128,7 @@ function renderLightbox(){
   main.style.setProperty("--soft",softOf(p.cat));
   main.classList.add("has-img");
   main.style.setProperty("--img",'url("'+src+'")');
-  im.onerror=function(){imgOnError(im,p.cat);};
+  im.onerror=function(){imgOnError(im,p.cat,p.id);};
   im.src=src;im.alt=p.n;
   $("lbCaption").textContent=p.n;
   $("lbCounter").textContent=(lb.i+1)+" / "+lb.imgs.length;
@@ -2207,7 +2293,7 @@ function crearItemCarro(p){
   d.setAttribute("aria-label","Ver "+p.n);
   const imgs=productImgs(p),tiene=imgs.length>0,soft=softOf(p.cat);
   d.innerHTML='<div class="cfr ph'+(tiene?" has-img":"")+'" style="--soft:'+soft+(tiene?";--img:url('"+esc(imgs[0])+"')":"")+'">'
-  +(tiene?'<img src="'+esc(imgs[0])+'" alt="'+esc(p.n)+'" loading="lazy" decoding="async" onerror="imgOnError(this,\''+escJs(p.cat)+'\')">':'<b class="mono">IKI</b>')
+  +(tiene?'<img src="'+esc(imgs[0])+'" alt="'+esc(p.n)+'" loading="lazy" decoding="async" onerror="imgOnError(this,\''+escJs(p.cat)+'\',\''+escJs(String(p.id))+'\')">':'<b class="mono">IKI</b>')
   +'<span class="cbg">'+esc(labelOf(p.cat))+'</span>'
   +'<div class="cov"><b>'+esc(p.n)+'</b><span>'+cop(p.p)+'</span></div></div>';
   d.addEventListener("click",()=>scrollToProduct(p.id));
