@@ -1,12 +1,21 @@
 # IKI --- Brief de identidad de marca y manual para diseño
 
-**Versión:** 1.2\
+**Versión:** 1.3\
 **Fecha:** octubre de 2026\
 **Mercado:** Colombia\
 **Modelo de negocio:** comercio electrónico (venta por WhatsApp)\
 **Etapa:** tienda publicada y operativa en GitHub Pages\
 **Documento para:** diseñador/a de branding, diseñador/a web, empaque,
 fotografía y contenido
+
+> **Cambios de la versión 1.3:** el panel publica la configuración para
+> todos vía API de GitHub (`data/configuracion.js`, con versión creciente
+> y sin la clave); el catálogo de Sublimados Majestic se organizó en 8
+> categorías de tienda clasificadas por nombre (la del proveedor venía
+> sucia) y sus pijamas de familia entraron con el precio real por prenda
+> de la tarjeta; se añaden los tonos suaves de las categorías nuevas a
+> la sección 7 y el estado vigente (solo la línea de moda visible) a la
+> sección 20; el documento operativo completo pasó a `README.md`.
 
 > **Cambios de la versión 1.2:** la sección 19 (index v1) pasa a ser
 > referencia histórica; la nueva sección 21 documenta el sistema real
@@ -366,14 +375,26 @@ y miniaturas. El texto que va encima es siempre carbón `#242424`.
 
   Moda y pijamas         `#FAD0D4`      11,1 : 1
 
-  Juguetes               `#C6EEE9`      12,4 : 1
+  Juguetes / Shorts      `#C6EEE9`      12,4 : 1
 
-  Escolar                `#BDE8C7`      11,5 : 1
+  Escolar / Niños        `#BDE8C7`      11,5 : 1
 
-  Regalos                `#E3DAFD`      11,6 : 1
+  Regalos / Pantalones   `#E3DAFD`      11,6 : 1
 
-  Bebé                   `#C9E4F7`      —
+  Bebé / Enterizos       `#C9E4F7` / `#D7E3FC`  —
+
+  Urbana                 `#D7E3FC`      —
+
+  **Ropa interior**      `#F9D9E8`      —
+  (nueva, línea de moda)
+
+  **Navidad y Halloween** `#D6F5E3`     —
+  (nueva, línea de moda)
   ------------------------------------------------------------------------
+
+Las categorías de la línea de moda (pijamas de pareja, conjuntos,
+pantalones, shorts, interior, enterizos, niños y navidad) reutilizan los
+tonos de la paleta y añaden `#F9D9E8` (interior) y `#D6F5E3` (navidad).
 
 Los **marcos de fotografía** (tarjetas de producto, carruseles, miniaturas
 del carrito y lightbox) usan **fondo blanco puro `#FFFFFF`** de borde a
@@ -1080,11 +1101,15 @@ Esta sección documenta **lo que está publicado hoy** en
 | Archivo / carpeta            | Rol |
 |------------------------------|-----|
 | `index.html`                 | Tienda completa en un archivo (HTML + CSS + JS sin dependencias salvo Google Fonts) |
-| `catalogo.js`                | Catálogo activo (80 productos curados con galerías y variantes); lo genera el cron y no se edita a mano |
-| `legal.html`                 | Página legal propia: 8 políticas con anclas, índice y datos del negocio desde el panel |
-| `scripts/sync_catalogos.py`  | Descarga los 4 proveedores, normaliza, cura la selección, escribe `catalogo.js` y los 4 Excel |
-| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, commitea y publica los cambios |
-| `*_Catalogo.xlsx` (4)        | Excel completos por proveedor: Gava (897), Sublimados Majestic (87), Juguetería Taiwan (1.626), Solobabys (135) |
+| `catalogo.js`                | Catálogo activo (2.089 productos); lo genera el cron y no se edita a mano |
+| `data/configuracion.js`      | Configuración publicada desde el panel ("Publicar para TODOS"); la mantiene el propio panel vía API de GitHub |
+| `legal.html`                 | Página legal propia: 8 políticas con anclas, índice y datos del negocio desde la configuración publicada |
+| `scripts/sync_catalogos.py`  | Descarga los 5 proveedores, normaliza, cura, clasifica y escribe `catalogo.js` y los 5 Excel |
+| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, absorbe lo publicado con `pull --rebase`, commitea y publica |
+| `*_Catalogo.xlsx` (5)        | Excel completos por proveedor: Gava, Sublimados Majestic, Juguetería Taiwan, Solobabys y Open Mind |
+| `img/p/`                     | Miniaturas rehospedadas de la tienda (webp, hash del URL): ningún dominio ajeno en las fotos |
+| `generar_enlace_config.py`   | Local (en `.gitignore`): enlace de configuración de un solo toque para cargar el token del panel |
+| `README.md`                  | Documento operativo del sistema (pipeline del catálogo, panel, precios y operación diaria) |
 | `logo_120.png` / `logo_512.png` | Logo transparente en tamaños web (derivados del icono 2048) |
 | `IKI_icono_*`, banners, favicons | Activos de marca y favicon del sitio |
 
@@ -1096,8 +1121,11 @@ Esta sección documenta **lo que está publicado hoy** en
 - **Funcionales:** texto secundario `#6B645A`, divisores `#EADFCB`,
   favoritos coral `#F36B76`, error `#B42318`, éxito `#237A57`.
 - **Tonos suaves por categoría** (burbujas y etiquetas):
-  Joyas `#FBE3AE` · Moda `#FAD0D4` · Juguetes `#C6EEE9` ·
-  Escolar `#BDE8C7` · Regalos `#E3DAFD` · **Bebé `#C9E4F7`**.
+  Joyas `#FBE3AE` · Moda `#FAD0D4` · Juguetes/Shorts `#C6EEE9` ·
+  Escolar/Niños `#BDE8C7` · Regalos/Pantalones `#E3DAFD` ·
+  **Bebé `#C9E4F7`** · Urbana/Enterizos `#D7E3FC` ·
+  **Interior `#F9D9E8`** · **Navidad `#D6F5E3`** (las dos últimas nuevas
+  de la línea de moda).
 - **Fotografía:** marcos con **fondo blanco puro** y `object-fit: contain`
   (producto completo, sin recortes ni desenfoque); miniaturas del carrito,
   buscador y resumen del pedido también en `contain`.
@@ -1113,26 +1141,52 @@ Esta sección documenta **lo que está publicado hoy** en
 
 ### 20.4 Catálogo y categorías
 
-- **6 categorías:** Joyas y accesorios (28) · Moda y pijamas (14) ·
-  Juguetes (14) · Escolar (8) · Bebé (12) · Regalos (4 combos).
-- **4 proveedores sincronizados:**
-  - Joyas — Gava Joyería (gavajoyeria.com, Shopify)
-  - Moda — Sublimados Majestic (pijamasalmayor.com, Supabase)
-  - Juguetes y Escolar — Juguetería Taiwan (catalogo.js público)
-  - Bebé y Regalos — Solobabys (solobabys.com, Shopify)
-- **Variantes por producto:** tallas (pijamas) y colores (Solobabys) como
-  chips preseleccionados en la ficha; viajan en el mensaje de WhatsApp.
-- **Galerías:** fotos adicionales por producto (lightbox con miniaturas).
-- **Sincronización:** GitHub Actions cada 6 horas regenera `catalogo.js`
-  y los 4 Excel; GitHub Pages publica el resultado solo.
+- **Categorías de tienda actuales (línea de moda, clasificadas por nombre
+  en el sync — la "categoría" del proveedor venía sucia):** Pijamas de
+  pareja (7) · Conjuntos y blusas (16) · Pantalones y capris (16) · Shorts
+  y bermudas (15) · Ropa interior y juanitas (13) · Enterizos y batolas
+  (7) · Niños y niñas (8) · Navidad y Halloween (17). **99 productos
+  visibles.**
+- **Pijamas de familia:** el proveedor las publica a $3 (placeholder) pero
+  la tarjeta trae el precio real por prenda; el sync las expande en un
+  producto por prenda (dama, dama plus, caballero, 2XL y niño con tallas
+  2/4–14/16), con estampados de familia como chips (Grinch, Simpsons,
+  Stitch, Avengers, Mickey…) y respetando las opciones deshabilitadas de
+  cada tarjeta.
+- **Categorías históricas** (vuelven a aparecer solas al reactivar sus
+  líneas): joyas, juguetes, escolar, bebé, regalos, ropa urbana y moda.
+- **5 líneas de inventario sincronizadas** (códigos internos `l1`–`l5`,
+  una sola marca ante el cliente):
+  - `l1` Joyas — Gava Joyería (gavajoyeria.com, Shopify)
+  - `l2` Moda — Sublimados Majestic (pijamasalmayor.com, Supabase)
+  - `l3` Juguetes y escolar — Juguetería Taiwan (catalogo.js público)
+  - `l4` Bebé y regalos — Solobabys (solobabys.com, Shopify)
+  - `l5` Ropa urbana — Open Mind (tiendasopenmind.com, Shopify)
+- **Estado vigente (octubre de 2026):** solo la línea `l2` está visible;
+  `l1`, `l3`, `l4` y `l5` ocultas desde el panel. Ocultar una línea
+  arrastra TODO lo suyo (categorías, burbujas, chips, carruseles, héroe,
+  buscador y footer) con la misma lógica de visibilidad.
+- **Variantes por producto:** tallas y colores/estampados como chips
+  preseleccionados en la ficha; viajan en el mensaje de WhatsApp.
+- **Galerías:** fotos adicionales por producto (lightbox con miniaturas y
+  cadena de respaldo foto→galería→placeholder de categoría).
+- **IDs y Códigos permanentes:** cada producto conserva su `id` interno y
+  su Cat `IKI-XXXX` entre sincronizaciones (clave de nombre tolerante a
+  correcciones de typos); los enlaces `?art=IKI-XXXX` de pedidos viejos
+  nunca se rompen y los números retirados quedan quemados.
+- **Sincronización:** GitHub Actions cada 6 horas regenera `catalogo.js`,
+  los Excel y las miniaturas rehospedadas en `img/p/`; GitHub Pages
+  publica el resultado solo.
 
 ### 20.5 Páginas y estructura del index
 
 1. Barra superior (envíos y medios de pago) · encabezado fijo con logo
    transparente, buscador con sugerencias, favoritos, carrito y menú
    móvil · subnavegación por categorías.
-2. Héroe: eslogan, chips de beneficios y tarjeta del producto destacado
-   (configurable desde el panel).
+2. Héroe de temporada (solo escritorio, hasta 6 productos): "Halloween y
+   Navidad ya llegaron — pijamas y outfits para toda la familia", con 2
+   artículos de Halloween y 4 de Navidad; se cura desde el panel
+   (heroIds) y se publica con la configuración.
 3. Burbujas de categoría con foto y precio "desde".
 4. Carruseles: "Los favoritos de IKI" + fila por categoría (autoplay que
    respeta `prefers-reduced-motion`).
@@ -1154,25 +1208,51 @@ Esta sección documenta **lo que está publicado hoy** en
   4) pago: contra entrega o Nequi 315 637 1501 · 5) notas.
 - Validación en vivo por campo, botón que guía el siguiente paso y mensaje
   de WhatsApp con productos, variantes, subtotal y datos del cliente.
+- **Dopamina de la compra**: al agregar, la foto de la tarjeta vuela al
+  carrito (Web Animations, miniatura en caché, respeta
+  `prefers-reduced-motion` y no vuela con el checkout abierto), el badge
+  rebota con easing elástico y el teléfono vibra; el checkout espera
+  ~0,3 s a que la foto aterrice.
+- **Hoja de pedido PNG** (logo, consecutivo `PED-YYYYMMDD-NNN`, una fila
+  por producto): en celular viaja **junto con el texto del pedido** por
+  Web Share (wa.me no admite adjuntos); en escritorio se descarga para
+  adjuntarla.
+- **Enlaces de alistamiento**: cada artículo del pedido lleva un enlace
+  clicable a su ficha (`?art=IKI-XXXX`), con Códigos permanentes que
+  nunca se reutilizan.
 - Barrio opcional y vaciado automático del carrito tras enviar.
 
 ### 20.7 Panel de administración
 
 - Acceso con clave (default configurable `IKI123*`): enlace "Administración"
-  del pie, `?admin=1` o Ctrl+Shift+A.
+  del pie, `?admin` o Ctrl+Shift+A.
 - Editable sin tocar código: nombre, logo, WhatsApp, email, redes,
   **datos legales** (razón social, NIT, dirección), analítica (Pixel de
-  Meta y GA4), producto destacado, favoritos del carrusel, comportamiento
-  y **precio exacto por producto** (buscador + lista completa).
-- "Guardar en MI computador" (localStorage, instantáneo) y
-  "Guardar para TODOS" (copia los bloques `TIENDA_DEFECTO` y
-  `PRECIOS_DEFECTO` para publicarlos en el archivo).
+  Meta y GA4), héroe, favoritos del carrusel, visibilidad de secciones y
+  carruseles, **catálogos de inventario por línea** (ocultar una línea
+  arrastra todo lo suyo), categorías visibles, ocultar productos, precio
+  exacto por producto y márgenes por categoría.
+- **Publicar para TODOS**: sube la configuración vigente a
+  `data/configuracion.js` vía la API de GitHub, con **versión siempre
+  creciente** y **sin la clave del panel**; todos los visitantes la ven
+  en ~1 minuto. Precedencias: lo publicado manda sobre la fábrica del
+  archivo y sobre los previews guardados en cada navegador ("Guardar en MI
+  computador" solo previsualiza hasta que exista algo publicado más
+  nuevo).
+- **Token de GitHub** (fine-grained, Contents Read and write, solo este
+  repositorio): vive únicamente en el navegador del administrador y se
+  puede cargar con el **enlace de configuración** de un solo toque que
+  arma el script local `generar_enlace_config.py` (viaja en el `#fragmento`
+  de la URL, nunca llega al servidor y se autolimpia del historial).
+- **Copiar configuración (respaldo)**: el flujo antiguo por portapapeles
+  queda como respaldo sin conexión.
 
 ### 20.8 Accesibilidad y comportamiento
 
 - Enlace para saltar al contenido, foco visible, cierre con Escape,
   `aria-` en botones y paneles, áreas táctiles ≥ 44 px.
-- `prefers-reduced-motion`: sin autoplay ni deriva de categorías.
+- `prefers-reduced-motion`: sin autoplay, sin deriva de categorías ni
+  vuelo de la foto al carrito.
 - Responsive desde 380 px: checkout a pantalla completa en móvil,
   grid de 2 columnas, barra de filtros estática en pantallas pequeñas.
 - QA/E2E automatizados (jsdom): 78 verificaciones del flujo completo.
@@ -1181,7 +1261,9 @@ Esta sección documenta **lo que está publicado hoy** en
 
 - Dominio propio y URL absoluta de `og:image` / datos estructurados.
 - Razón social y NIT reales (editables desde el panel).
-- Alojar fotos propias de producto (hoy en CDN de los proveedores).
+- Alojar fotos propias de las demás líneas: las de juguetes y escolar ya
+  viven rehospedadas en `img/p/`; joyas, moda, bebé y urbana siguen en
+  CDNs neutrales (Shopify/Supabase).
 - Políticas de envío con costos y plazos definitivos por ciudad.
 - Verificar la disponibilidad del nombre en la SIC.
 
