@@ -550,6 +550,9 @@ footer a:hover{color:var(--cr)}
 .admin-botones{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .admin-botones .btn{min-height:44px;padding:0 18px;font-size:13px}
 .admin-nota{margin-top:14px;font-size:12px;color:var(--mu);background:#FFFDF6;border:1px dashed var(--bd);border-radius:10px;padding:10px 12px;line-height:1.5}
+.admin-sync-ayuda{margin:4px 0 2px;font-size:12px;color:var(--mu)}
+.admin-sync-ayuda summary{cursor:pointer;font:600 12.5px var(--fb);color:var(--c);padding:6px 0}
+.admin-sync-ayuda[open] summary{margin-bottom:2px}
 @media(min-width:901px){
   /* Escritorio: galeria a la izquierda; nombre, boton y sugerencias a la derecha.
      Todo visible sin scroll en una pantalla normal. */
@@ -1052,14 +1055,26 @@ footer a:hover{color:var(--cr)}
       <div class="admin-h">Lista completa de productos</div>
       <div class="admin-lista" id="adminLista" hidden></div>
 
+      <div class="admin-h">Publicar para TODOS <small>sube esta configuración al proyecto de GitHub: todos los visitantes la ven en ~1 minuto, sin editar archivos</small></div>
+      <div class="admin-grid">
+        <label class="admin-label" style="grid-column:1/-1">Token de GitHub con permiso Contents (Read and write), solo este repositorio
+          <input id="adminToken" type="password" autocomplete="off" onchange="guardarTokenGitHub()" placeholder="github_pat_… (se pide una sola vez; se guarda SOLO en este navegador)">
+        </label>
+      </div>
+      <details class="admin-sync-ayuda">
+        <summary>¿Cómo consigo ese token?</summary>
+        <p class="admin-nota">En github.com entra a <b>Settings → Developer settings → Fine-grained tokens → Generate new token</b>: en Repository access marca <b>solo el repositorio de la tienda</b> (ikib2c/iki) y en Repository permissions elige <b>Contents → Read and write</b>. Genera el token (empieza por <em>github_pat_</em>), cópialo y pégalo arriba: queda guardado únicamente en este navegador. <em>Es un permiso quirúrgico: con ese token solo se pueden cambiar archivos del repositorio — nada más. Igual que la clave del panel, nunca viaja en la configuración publicada.</em></p>
+      </details>
+
       <div class="admin-botones">
         <button class="btn y" type="button" onclick="aplicarPanelAdmin()"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg> Ver cambios ahora</button>
+        <button class="btn y" type="button" id="adminPublicarBtn" onclick="publicarConfigAdmin()">Publicar para TODOS</button>
         <button class="btn o" type="button" onclick="guardarPanelAdmin()">Guardar en MI computador</button>
-        <button class="btn o" type="button" onclick="copiarConfigAdmin()">Guardar para TODOS</button>
+        <button class="btn o" type="button" onclick="copiarConfigAdmin()">Copiar configuración (respaldo)</button>
         <button class="btn o" type="button" onclick="restaurarPanelAdmin()">Restaurar</button>
         <button class="btn o" type="button" onclick="cerrarSesionAdmin()">Salir</button>
       </div>
-      <p class="admin-nota"><b>Guardar en MI computador:</b> solo lo ves tú. <b>Guardar para TODOS:</b> copia los bloques <b>TIENDA_DEFECTO</b> y <b>PRECIOS_DEFECTO</b> para pegarlos en el archivo y publicarlos. La clave es una barrera de conveniencia, no seguridad real.</p>
+      <p class="admin-nota"><b>Publicar para TODOS:</b> sube esta configuración al proyecto de GitHub (<b>data/configuracion.js</b>) y <b>todos los visitantes la verán en ~1 minuto</b> — funciona solo, sin pedirle a nadie que edite el archivo; usa el token de GitHub de arriba. <b>Guardar en MI computador:</b> solo previsualiza en este navegador (hasta que publiques). <b>Copiar configuración</b> queda como respaldo sin conexión. La clave del panel nunca se publica. La clave es una barrera de conveniencia, no seguridad real.</p>
       <div class="admin-preview" id="adminPreview"></div>
     </div>
   </div>
@@ -1085,6 +1100,13 @@ footer a:hover{color:var(--cr)}
     <div class="lbup" id="lbUpsell"><h4>También te puede interesar</h4><div class="lbupt" id="lbUpsellTrack"></div></div>
   </div>
 </div>
+<!-- Configuración publicada desde el panel ("Publicar para TODOS"): la
+     que ven TODOS los visitantes. La mantiene el propio panel vía la
+     API de GitHub — nadie edita este archivo a mano. Se carga
+     SINCRONA (script clásico) para que la configuración ya esté
+     disponible antes de inicializar la tienda; si aún no se ha
+     publicado nada, la tienda arranca con los valores de fábrica. -->
+<script src="data/configuracion.js"></script>
 <script src="catalogo.js"></script>
 <script>
 /* ============================================================
@@ -1152,23 +1174,52 @@ const PRECIOS_DEFECTO={
   preciosPersonalizados:{}
 };
 const TIENDA_KEY="iki-tienda-v1",PRECIOS_KEY="iki-precios-v1";
+/* ===== Configuración publicada desde el panel ("Publicar para TODOS") =====
+   data/configuracion.js lo escribe el PANEL vía la API de GitHub: nadie
+   lo edita a mano y TODOS los visitantes la ven sin tocar el archivo de
+   la página. Reglas de precedencia:
+   - Lo publicado manda sobre los valores de fábrica de este archivo.
+   - Lo guardado en ESTE navegador ("Guardar en MI computador") es un
+     PREVIEW: se respeta solo mientras no exista algo publicado más
+     nuevo. Si lo publicado trae una versión mayor a la que este
+     navegador ya absorbió, manda lo publicado y lo guardado aquí se
+     descarta (ya vino incluido o quedó viejo). */
+const BASE_CONFIG_KEY="iki-config-base";
+const CONFIG_PUBLICA=(typeof window.CONFIG_PUBLICADA!=="undefined"&&window.CONFIG_PUBLICADA)?window.CONFIG_PUBLICADA:null;
+(function absorberConfigPublica(){
+  if(!CONFIG_PUBLICA||!CONFIG_PUBLICA.version)return;
+  let baseLocal=null;
+  try{baseLocal=parseInt(localStorage.getItem(BASE_CONFIG_KEY),10)||null;}catch(e){}
+  if(baseLocal!==null&&baseLocal>=CONFIG_PUBLICA.version)return;
+  /* Lo publicado es nuevo para este navegador: manda él y se limpia lo
+     guardado aquí (las claves de localStorage que definen TIENDA_KEY y
+     PRECIOS_KEY, las mismas que llenan cargarTienda/cargarPrecios). */
+  try{
+    localStorage.removeItem(TIENDA_KEY);
+    localStorage.removeItem(PRECIOS_KEY);
+    localStorage.setItem(BASE_CONFIG_KEY,String(CONFIG_PUBLICA.version));
+  }catch(e){}
+})();
+/* Valores efectivos de fábrica: los del archivo + lo publicado */
+const TIENDA_FABRICA=Object.assign({},TIENDA_DEFECTO,(CONFIG_PUBLICA&&CONFIG_PUBLICA.tienda)||{});
+const PRECIOS_FABRICA=Object.assign({},PRECIOS_DEFECTO,(CONFIG_PUBLICA&&CONFIG_PUBLICA.precios)||{});
 function cargarTienda(){
   let g={};try{g=JSON.parse(localStorage.getItem(TIENDA_KEY))||{};}catch(e){}
-  const t=String(g.nombre||TIENDA_DEFECTO.nombre);
+  const t=String(g.nombre||TIENDA_FABRICA.nombre);
   const str=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
   const si=(v,d)=>(typeof v==="boolean")?v:d;
   const T={
-    nombre:t,logo:str(g.logo,TIENDA_DEFECTO.logo),
-    whatsappPedidos:str(g.whatsappPedidos,TIENDA_DEFECTO.whatsappPedidos),
-    whatsappAtencion:str(g.whatsappAtencion,TIENDA_DEFECTO.whatsappAtencion),
+    nombre:t,logo:str(g.logo,TIENDA_FABRICA.logo),
+    whatsappPedidos:str(g.whatsappPedidos,TIENDA_FABRICA.whatsappPedidos),
+    whatsappAtencion:str(g.whatsappAtencion,TIENDA_FABRICA.whatsappAtencion),
     razonSocial:str(g.razonSocial,""),nit:str(g.nit,""),direccion:str(g.direccion,""),email:str(g.email,""),
     instagram:str(g.instagram,""),tiktok:str(g.tiktok,""),
     pixelMeta:str(g.pixelMeta,""),ga4:str(g.ga4,""),
-    heroIds:str(g.heroIds||g.destacado,TIENDA_DEFECTO.heroIds),
-    favoritos:str(g.favoritos,TIENDA_DEFECTO.favoritos),
-    pagoContraEntrega:si(g.pagoContraEntrega,TIENDA_DEFECTO.pagoContraEntrega),
-    vaciarCarrito:si(g.vaciarCarrito,TIENDA_DEFECTO.vaciarCarrito),
-    claveAdmin:str(g.claveAdmin,TIENDA_DEFECTO.claveAdmin),
+    heroIds:str(g.heroIds||g.destacado,TIENDA_FABRICA.heroIds),
+    favoritos:str(g.favoritos,TIENDA_FABRICA.favoritos),
+    pagoContraEntrega:si(g.pagoContraEntrega,TIENDA_FABRICA.pagoContraEntrega),
+    vaciarCarrito:si(g.vaciarCarrito,TIENDA_FABRICA.vaciarCarrito),
+    claveAdmin:str(g.claveAdmin,TIENDA_FABRICA.claveAdmin),
     categoriasOcultas:str(g.categoriasOcultas,""),
     productosOcultos:str(g.productosOcultos,""),
     seccionesOcultas:str(g.seccionesOcultas,""),
@@ -1177,22 +1228,23 @@ function cargarTienda(){
   };
   /* Migracion v2: el catalogo cambio de ids al crecer; respetar la curacion
      nueva del heroe y los favoritos UNA sola vez, y de ahi en adelante
-     respetar lo que el admin guarde. */
+     respetar lo que el admin guarde. Con configuracion publicada, la
+     curacion nueva es LA PUBLICADA (TIENDA_FABRICA). */
   if((parseInt(g.heroeV)||0)<2){
-    T.heroIds=TIENDA_DEFECTO.heroIds;
-    T.favoritos=TIENDA_DEFECTO.favoritos;
+    T.heroIds=TIENDA_FABRICA.heroIds;
+    T.favoritos=TIENDA_FABRICA.favoritos;
     T.heroeV=2;
   }
   /* Migracion favoritos v2: la curacion oficial pasa a 14 items (Lego Pokemon) */
   if((parseInt(g.favoritosV)||0)<2){
-    T.favoritos=TIENDA_DEFECTO.favoritos;
+    T.favoritos=TIENDA_FABRICA.favoritos;
     T.favoritosV=2;
   }
   return T;
 }function cargarPrecios(){
   let g={};try{g=JSON.parse(localStorage.getItem(PRECIOS_KEY))||{};}catch(e){}
   const num=(v,d)=>(typeof v==="number"&&isFinite(v)&&v>=0)?v:d;
-  const mg={};Object.assign(mg,PRECIOS_DEFECTO.margenesPorCategoria);
+  const mg={};Object.assign(mg,PRECIOS_FABRICA.margenesPorCategoria);
   Object.keys(g.margenesPorCategoria||{}).forEach(function(c){
     const m=g.margenesPorCategoria[c];
     if(typeof m==="number"&&isFinite(m)&&m>=0)mg[c]=m;
@@ -1201,31 +1253,33 @@ function cargarTienda(){
     const p=(g.preciosPersonalizados||g.fijados)[id];
     if(typeof p==="number"&&isFinite(p)&&p>0)fij[id]=p;
   });
-  const temp=Array.isArray(g.temporadaIds)?g.temporadaIds.filter(function(id){return typeof id==="string"&&id}):(PRECIOS_DEFECTO.temporadaIds||[]).slice();
+  const temp=Array.isArray(g.temporadaIds)?g.temporadaIds.filter(function(id){return typeof id==="string"&&id}):(PRECIOS_FABRICA.temporadaIds||[]).slice();
   const txt=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
   /* Migracion v2: aplica UNA vez la estrategia de margenes investigada
      (global, por categoria y redondeo); los precios FIJOS del admin se
-     respetan. Despues de la migracion el admin manda como siempre. */
-  let margenGlobal=num(g.margenGlobal,PRECIOS_DEFECTO.margenGlobal),
-      redondeo=num(g.redondeo,PRECIOS_DEFECTO.redondeo),
+     respetan. Despues de la migracion el admin manda como siempre. Con
+     configuracion publicada, la estrategia que se adopta es LA PUBLICADA
+     (PRECIOS_FABRICA), no la del archivo. */
+  let margenGlobal=num(g.margenGlobal,PRECIOS_FABRICA.margenGlobal),
+      redondeo=num(g.redondeo,PRECIOS_FABRICA.redondeo),
       preciosV=(typeof g.preciosV==="number"&&g.preciosV>=2)?g.preciosV:1;
   if(preciosV<2){
     Object.keys(mg).forEach(function(c){delete mg[c];});
-    Object.assign(mg,PRECIOS_DEFECTO.margenesPorCategoria);
-    margenGlobal=PRECIOS_DEFECTO.margenGlobal;
-    redondeo=PRECIOS_DEFECTO.redondeo;
+    Object.assign(mg,PRECIOS_FABRICA.margenesPorCategoria);
+    margenGlobal=PRECIOS_FABRICA.margenGlobal;
+    redondeo=PRECIOS_FABRICA.redondeo;
     preciosV=2;
   }
   return {
     margenGlobal:margenGlobal,
-    multiplicadorBase:Math.max(0.01,num(g.multiplicadorBase,PRECIOS_DEFECTO.multiplicadorBase)),
+    multiplicadorBase:Math.max(0.01,num(g.multiplicadorBase,PRECIOS_FABRICA.multiplicadorBase)),
     redondeo:redondeo,
     margenesPorCategoria:mg,
     temporadaIds:temp,
-    temporadaCats:txt(g.temporadaCats,PRECIOS_DEFECTO.temporadaCats),
-    temporadaInicio:txt(g.temporadaInicio,PRECIOS_DEFECTO.temporadaInicio),
-    temporadaFin:txt(g.temporadaFin,PRECIOS_DEFECTO.temporadaFin),
-    margenTemporada:num(g.margenTemporada,PRECIOS_DEFECTO.margenTemporada),
+    temporadaCats:txt(g.temporadaCats,PRECIOS_FABRICA.temporadaCats),
+    temporadaInicio:txt(g.temporadaInicio,PRECIOS_FABRICA.temporadaInicio),
+    temporadaFin:txt(g.temporadaFin,PRECIOS_FABRICA.temporadaFin),
+    margenTemporada:num(g.margenTemporada,PRECIOS_FABRICA.margenTemporada),
     preciosV:preciosV,
     preciosPersonalizados:fij
   };
@@ -1829,7 +1883,10 @@ function envolverLineas(cx,txt,maxW,maxLines){
    en 2 lineas y todo se corta al ancho de su columna. */
 async function crearHojaPedido(consec){
   try{
-    const nFilas=cart.length;
+    /* Copia instantanea del carrito: el pedido puede vaciarse mientras
+       las miniaturas cargan y la hoja debe conservar TODOS los items. */
+    const items=cart.slice();
+    const nFilas=items.length;
     const alto=340+nFilas*200+340;
     const cv=document.createElement("canvas");
     cv.width=1080;cv.height=alto;
@@ -1856,8 +1913,8 @@ async function crearHojaPedido(consec){
     cx.fillStyle="#F5AE23";cx.fillRect(60,330,960,6);
     /* ===== Filas de productos ===== */
     let y=380;
-    for(let i=0;i<cart.length;i++){
-      const it=cart[i];
+    for(let i=0;i<items.length;i++){
+      const it=items[i];
       const p=prod(it.id);
       if(!p)continue;
       const im=await cargarImagenPedido(p.img||"");
@@ -1899,12 +1956,13 @@ async function crearHojaPedido(consec){
       y+=200;
     }
     /* ===== Pie ===== */
-    const s=cartResumen();
+    let fTotal=0,fCount=0;
+    items.forEach(function(it){const p=prod(it.id);if(p){fTotal+=p.p*it.qty;fCount+=it.qty;}});
     cx.fillStyle="#242424";cx.font="700 50px Montserrat, Arial, sans-serif";
     cx.fillText("TOTAL PRODUCTOS",60,y+58);
-    cx.textAlign="right";cx.fillText(cop(s.total),1020,y+58);cx.textAlign="left";
+    cx.textAlign="right";cx.fillText(cop(fTotal),1020,y+58);cx.textAlign="left";
     cx.fillStyle="#6B645A";cx.font="500 28px Poppins, Arial, sans-serif";
-    cx.fillText(cortarTexto(cx,s.count+" unidad"+(s.count===1?"":"es")+" · Envío pagado: se cotiza según la ciudad",920),60,y+108);
+    cx.fillText(cortarTexto(cx,fCount+" unidad"+(fCount===1?"":"es")+" · Envío pagado: se cotiza según la ciudad",920),60,y+108);
     cx.fillText("Pago: contra entrega · Nequi 315 637 1501",60,y+148);
     cx.fillStyle="#F5AE23";cx.fillRect(60,y+186,960,4);
     cx.fillStyle="#242424";cx.font="700 36px Montserrat, Arial, sans-serif";
@@ -1917,25 +1975,53 @@ async function crearHojaPedido(consec){
   }catch(e){return null;}
 }
 
-/* Envia el pedido DIRECTO por WhatsApp: wa.me abre el chat del vendedor
-   LISTO (contacto correcto, sin selector de apps ni busqueda de contactos:
-   cero friccion, cero ventas abandonadas). La hoja-resumen con la
-   miniatura de cada producto se DESCARGA al dispositivo para adjuntarla
-   en el mismo chat: es la guia visual de alistamiento para proveedores
-   que no usan SKU ni referencias. */
-function enviarPedido(msg,consec){
-  window.open(waLink(msg),"_blank");
-  crearHojaPedido(consec).then(function(hoja){
-    if(!hoja||!hoja.size)return;
-    try{
-      const url=URL.createObjectURL(hoja);
-      const a=document.createElement("a");
-      a.href=url;a.download="pedido-iki.png";
-      document.body.appendChild(a);a.click();a.remove();
-      setTimeout(function(){URL.revokeObjectURL(url);},5000);
-      showToast("Hoja del pedido descargada: adjúntala en el chat para un alistamiento más rápido");
-    }catch(e){}
-  });
+/* Envia el pedido por WhatsApp CON la hoja-resumen incluida.
+   - MOVIL: wa.me no admite imagenes adjuntas, por eso la hoja viaja por
+     la Web Share API (el mismo mecanismo de la tarjeta de compartir):
+     el telefono abre el menu nativo con la IMAGEN y el TEXTO del pedido
+     JUNTOS; al elegir WhatsApp llegan al chat en un solo envio, ya no
+     queda una descarga suelta en el dispositivo que nadie adjunta.
+   - Si el navegador no soporta compartir archivos (o se cancela), cae
+     al flujo directo wa.me + descarga: el pedido nunca se pierde.
+   - DESKTOP: wa.me abre el chat del vendedor LISTO (contacto correcto,
+     sin selector de apps, cero friccion) y la hoja se DESCARGA para
+     adjuntarla en el mismo chat: guia visual de alistamiento para
+     proveedores que no usan SKU ni referencias. */
+function esMovil(){
+  try{if(matchMedia("(pointer:coarse)").matches)return true;}catch(e){}
+  return /Android|iPhone|iPad|iPod|Mobi/i.test((navigator&&navigator.userAgent)||"");
+}
+function abrirWhatsAppDirecto(msg){
+  const w=window.open(waLink(msg),"_blank");
+  if(!w){try{location.href=waLink(msg);}catch(e){}} /* popup bloqueado: navega directo */
+}
+function descargarHoja(hoja){
+  if(!hoja||!hoja.size)return;
+  try{
+    const url=URL.createObjectURL(hoja);
+    const a=document.createElement("a");
+    a.href=url;a.download="pedido-iki.png";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},5000);
+    showToast("Hoja del pedido descargada: adjúntala en el chat para un alistamiento más rápido");
+  }catch(e){}
+}
+async function enviarPedido(msg,consec){
+  if(esMovil()&&navigator.share&&navigator.canShare){
+    const hoja=await crearHojaPedido(consec);
+    if(hoja&&hoja.size&&navigator.canShare({files:[hoja]})){
+      try{
+        await navigator.share({text:msg,files:[hoja]});
+        showToast("Compartido: en WhatsApp llegan la hoja y el pedido juntos");
+        return;
+      }catch(e){/* cancelado o gesto vencido: flujo directo */}
+    }
+    abrirWhatsAppDirecto(msg);
+    descargarHoja(hoja);
+    return;
+  }
+  abrirWhatsAppDirecto(msg);
+  crearHojaPedido(consec).then(descargarHoja);
 }
 
 /* ===== Lightbox ===== */
@@ -2467,7 +2553,7 @@ function filaAdmin(p,esFijo){
 }
 function pintarPanelAdmin(){
   $("adminNombre").value=TIENDA.nombre;
-  $("adminLogo").value=(TIENDA.logo!==TIENDA_DEFECTO.logo)?TIENDA.logo:"";
+  $("adminLogo").value=(TIENDA.logo!==TIENDA_FABRICA.logo)?TIENDA.logo:"";
   $("adminWaPedidos").value=String(TIENDA.whatsappPedidos||"").replace(/^57/,"");
   $("adminWaAtencion").value=String(TIENDA.whatsappAtencion||"").replace(/^57/,"");
   $("adminEmail").value=TIENDA.email;
@@ -2478,6 +2564,7 @@ function pintarPanelAdmin(){
   $("adminContraEntrega").checked=TIENDA.pagoContraEntrega!==false;
   $("adminVaciar").checked=TIENDA.vaciarCarrito!==false;
   $("adminClaveNueva").value="";
+  const tk=$("adminToken");if(tk)tk.value=leerTokenGitHub();
   $("adminMargen").value=Math.round(PRECIOS.margenGlobal*1000)/10;
   $("adminMultiplicador").value=PRECIOS.multiplicadorBase;
   $("adminRedondeo").value=String(PRECIOS.redondeo);
@@ -2769,9 +2856,9 @@ function quitarFijadoAdmin(id){
 
 /* --- leer/aplicar/guardar --- */
 function leerPanelAdmin(){
-  TIENDA.nombre=$("adminNombre").value.trim()||TIENDA_DEFECTO.nombre;
-  TIENDA.logo=$("adminLogo").value.trim()||TIENDA_DEFECTO.logo;
-  TIENDA.whatsappPedidos=normWa($("adminWaPedidos").value)||TIENDA_DEFECTO.whatsappPedidos;
+  TIENDA.nombre=$("adminNombre").value.trim()||TIENDA_FABRICA.nombre;
+  TIENDA.logo=$("adminLogo").value.trim()||TIENDA_FABRICA.logo;
+  TIENDA.whatsappPedidos=normWa($("adminWaPedidos").value)||TIENDA_FABRICA.whatsappPedidos;
   TIENDA.whatsappAtencion=normWa($("adminWaAtencion").value);
   TIENDA.email=$("adminEmail").value.trim();
   TIENDA.razonSocial=$("adminRazon").value.trim();TIENDA.nit=$("adminNit").value.trim();TIENDA.direccion=$("adminDir").value.trim();
@@ -2860,10 +2947,103 @@ function copiarConfigAdmin(){
   const codigo=codigoConfigAdmin();
   persistirPanel();
   aplicarTienda();aplicarIdentidad();aplicarContraEntrega();aplicarVisibilidad();recargarPrecios();pintarPanelAdmin();
-  const listo=function(){showToast("Copiado: pega TIENDA_DEFECTO y PRECIOS_DEFECTO en index.html");};
+  const listo=function(){showToast("Copiado (respaldo sin conexión): pega TIENDA_DEFECTO y PRECIOS_DEFECTO en index.html");};
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(codigo).then(listo).catch(function(){window.prompt("Copia este bloque:",codigo);});
   }else window.prompt("Copia este bloque:",codigo);
+}
+
+/* --- Publicar para TODOS (autónomo, vía API de GitHub) ---
+   Sube la configuración vigente del panel al archivo data/configuracion.js
+   del repositorio con la API de Contents — el token de arriba, que solo
+   puede tocar archivos de ESTE repo — y GitHub Pages la sirve a todos los
+   visitantes en ~1 minuto. Escribiendo ese archivo ya no hace falta
+   pedirle a nadie que edite la página. La clave del panel NUNCA se
+   publica (queda de fábrica en el archivo o guardada en cada navegador). */
+const GITHUB_TOKEN_KEY="iki-github-token";
+const REPO_API="https://api.github.com/repos/ikib2c/iki";
+function leerTokenGitHub(){
+  try{return localStorage.getItem(GITHUB_TOKEN_KEY)||"";}catch(e){return "";}
+}
+function guardarTokenGitHub(){
+  const inp=$("adminToken");if(!inp)return;
+  try{localStorage.setItem(GITHUB_TOKEN_KEY,inp.value.trim());}catch(e){}
+  showToast(inp.value.trim()?"Token guardado en este navegador":"Token borrado");
+}
+function ab64(buffer){
+  const bytes=new Uint8Array(buffer);let bin="";const trozo=0x8000;
+  for(let i=0;i<bytes.length;i+=trozo)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+trozo));
+  return btoa(bin);
+}
+function abrirGuiaToken(){
+  const g=document.querySelector(".admin-sync-ayuda");if(g)g.open=true;
+}
+async function publicarConfigAdmin(){
+  const token=leerTokenGitHub();
+  if(!token){
+    showToast("Falta el token de GitHub — mira la guía de abajo","err");
+    abrirGuiaToken();
+    return;
+  }
+  const btn=$("adminPublicarBtn");
+  const etiquetaOriginal=btn?btn.innerHTML:"";
+  if(btn){btn.disabled=true;btn.textContent="Publicando…";}
+  try{
+    /* Se publica EXACTAMENTE lo que el panel está mostrando */
+    leerPanelAdmin();
+    const {claveAdmin,heroeV,favoritosV,...tiendaSinClave}=TIENDA;
+    /* Versión siempre creciente: gana a relojes atrasados */
+    const version=Math.max(Date.now(),(CONFIG_PUBLICA?CONFIG_PUBLICA.version:0)+1);
+    const cuerpo={version:version,tienda:tiendaSinClave,precios:PRECIOS};
+    const contenido='// Configuración de la tienda publicada desde el panel de administración\n'
+      +'// (botón "Publicar para TODOS"). Se aplica a TODOS los visitantes de\n'
+      +'// https://ikib2c.github.io/iki/ — nadie necesita editar este archivo a mano.\n'
+      +'window.CONFIG_PUBLICADA = '+JSON.stringify(cuerpo,null,2)+';\n';
+    const b64=ab64(new TextEncoder().encode(contenido));
+    const encabezados={Authorization:"Bearer "+token,Accept:"application/vnd.github+json"};
+    const ruta=REPO_API+"/contents/data/configuracion.js";
+    /* SHA del archivo actual (null = crear por primera vez) */
+    let sha=null;
+    const r1=await fetch(ruta,{headers:encabezados});
+    if(r1.ok)sha=(await r1.json()).sha;
+    else if(r1.status!==404){
+      showToast("GitHub respondió "+r1.status+" al leer la configuración — intenta de nuevo","err");
+      if(btn){btn.disabled=false;btn.innerHTML=etiquetaOriginal;}
+      return;
+    }
+    const enviar=function(){return fetch(ruta,{
+      method:"PUT",
+      headers:Object.assign({},encabezados,{"Content-Type":"application/json"}),
+      body:JSON.stringify({
+        message:"config: publicada desde el panel ("+new Date().toLocaleString("es-CO")+")",
+        content:b64,
+        sha:sha||undefined
+      })
+    });};
+    let r=await enviar();
+    if(r.status===409||r.status===422){
+      /* Alguien publicó mientras tanto: se toma su sha y se reintenta */
+      const r2=await fetch(ruta,{headers:encabezados});
+      if(r2.ok){sha=(await r2.json()).sha;r=await enviar();}
+    }
+    if(r.status===200||r.status===201){
+      /* Este navegador queda sincronizado con lo publicado */
+      try{
+        localStorage.setItem(PRECIOS_KEY,JSON.stringify(PRECIOS));
+        localStorage.setItem(TIENDA_KEY,JSON.stringify(TIENDA));
+        localStorage.setItem(BASE_CONFIG_KEY,String(version));
+      }catch(e){}
+      showToast("Publicada: todos los visitantes la verán en ~1 minuto");
+    }else if(r.status===401||r.status===403){
+      showToast("El token no tiene permiso de Contents — créalo de nuevo con la guía","err");
+      abrirGuiaToken();
+    }else{
+      showToast("GitHub respondió "+r.status+" — intenta de nuevo en un momento","err");
+    }
+  }catch(e){
+    showToast("No pudimos hablar con GitHub — revisa la conexión","err");
+  }
+  if(btn){btn.disabled=false;btn.innerHTML=etiquetaOriginal;}
 }
 
 /* ===== Inicio ===== */

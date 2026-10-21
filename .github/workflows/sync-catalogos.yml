@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historial completo: el panel publica data/configuracion.js
+                           # por API mientras el cron corre; el push seguro lo absorbe
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -37,6 +40,14 @@ jobs:
           git add catalogo.js *.xlsx img
           if ! git diff --cached --quiet; then
             git commit -m "sync: actualiza catalogo de la tienda y Excel de proveedores [skip ci]"
+            # Si el panel publico la configuracion mientras este cron corria,
+            # el repositorio quedo adelante: se absorbe con rebase (el panel
+            # solo toca data/configuracion.js, nunca catalogo.js ni los Excel,
+            # asi que no hay conflicto posible) y se reintenta el push.
+            if ! git pull --rebase origin main; then
+              echo "No se pudo absorber lo publicado por el panel; el catalogo se regenera en la proxima corrida."
+              exit 1
+            fi
             git push
           else
             echo "Sin cambios: los catalogos ya estaban al dia."

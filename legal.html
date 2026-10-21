@@ -124,24 +124,45 @@ a{color:inherit;text-decoration:none}
   <a href="index.html">Volver a la tienda</a>
 </div></footer>
 
+<script src="data/configuracion.js"></script>
 <script>
-/* Mismos ajustes del panel de administración (localStorage) que usa la tienda:
-   razón social, NIT, dirección y contacto se pintan aquí también. */
+/* Mismos ajustes del panel de administración que usa la tienda: la
+   configuración PUBLICADA desde el panel (data/configuracion.js) manda
+   sobre estos valores de fábrica; lo guardado en este navegador
+   (localStorage, "Guardar en MI computador") solo previsualiza y se
+   descarta cuando lo publicado es más nuevo. Aquí se pintan razón
+   social, NIT, dirección y contacto, igual que en la tienda. */
 const TIENDA_DEFECTO={
   nombre:"IKI",logo:"logo_120.png",whatsapp:"573156371501",
   razonSocial:"",nit:"",direccion:"",email:"",
   instagram:"",tiktok:"",pixelMeta:"",ga4:"",
   destacado:"j27",favoritos:"j27,j21,m04,t13,t14,r02",vaciarCarrito:true,claveAdmin:"IKI123*"
 };
-const TIENDA_KEY="iki-tienda-v1";
+const TIENDA_KEY="iki-tienda-v1",PRECIOS_KEY="iki-precios-v1",BASE_CONFIG_KEY="iki-config-base";
+const CONFIG_PUBLICA=(typeof window.CONFIG_PUBLICADA!=="undefined"&&window.CONFIG_PUBLICADA)?window.CONFIG_PUBLICADA:null;
+(function absorberConfigPublica(){
+  if(!CONFIG_PUBLICA||!CONFIG_PUBLICA.version)return;
+  let baseLocal=null;
+  try{baseLocal=parseInt(localStorage.getItem(BASE_CONFIG_KEY),10)||null;}catch(e){}
+  if(baseLocal!==null&&baseLocal>=CONFIG_PUBLICA.version)return;
+  /* Lo publicado es nuevo para este navegador: manda él y se limpia lo
+     guardado aquí (mismas claves y reglas que la tienda). */
+  try{
+    localStorage.removeItem(TIENDA_KEY);
+    localStorage.removeItem(PRECIOS_KEY);
+    localStorage.setItem(BASE_CONFIG_KEY,String(CONFIG_PUBLICA.version));
+  }catch(e){}
+})();
+/* Valores efectivos de fábrica: los del archivo + lo publicado */
+const TIENDA_FABRICA=Object.assign({},TIENDA_DEFECTO,(CONFIG_PUBLICA&&CONFIG_PUBLICA.tienda)||{});
 function cargarTienda(){
   let g={};try{g=JSON.parse(localStorage.getItem(TIENDA_KEY))||{};}catch(e){}
   const str=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
   return {
-    nombre:str(g.nombre,TIENDA_DEFECTO.nombre),
-    whatsapp:str(g.whatsapp,TIENDA_DEFECTO.whatsapp),
-    razonSocial:str(g.razonSocial,""),nit:str(g.nit,""),
-    direccion:str(g.direccion,""),email:str(g.email,"")
+    nombre:str(g.nombre,TIENDA_FABRICA.nombre),
+    whatsapp:str(g.whatsappPedidos||g.whatsapp,TIENDA_FABRICA.whatsappPedidos||TIENDA_FABRICA.whatsapp),
+    razonSocial:str(g.razonSocial,TIENDA_FABRICA.razonSocial||""),nit:str(g.nit,TIENDA_FABRICA.nit||""),
+    direccion:str(g.direccion,TIENDA_FABRICA.direccion||""),email:str(g.email,TIENDA_FABRICA.email||"")
   };
 }
 const TIENDA=cargarTienda();

@@ -2,3 +2,8 @@
 GitHub.txt
 iki_token.txt
 _taiwan_tmp.js
+.firecrawl/goldbox-token.txt
+dropi-analytics/node_modules/
+dropi-analytics/auth/
+dropi-analytics/data/snapshot-*.log
+dropi-analytics/config/credenciales.json
