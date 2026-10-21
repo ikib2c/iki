@@ -1223,23 +1223,27 @@ function cargarTienda(){
   const t=String(g.nombre||TIENDA_FABRICA.nombre);
   const str=(v,d)=>(typeof v==="string"&&v.trim())?v.trim():d;
   const si=(v,d)=>(typeof v==="boolean")?v:d;
+  /* TODOS los campos caen a la fabrica efectiva (archivo + publicado):
+     lo que el panel publica aplica completo, incluidos los "ocultos"
+     (catalogos, categorias, productos, secciones y carruseles) que antes
+     defaulted a "" y la configuracion publicada nunca los alcanzaba. */
   const T={
     nombre:t,logo:str(g.logo,TIENDA_FABRICA.logo),
     whatsappPedidos:str(g.whatsappPedidos,TIENDA_FABRICA.whatsappPedidos),
     whatsappAtencion:str(g.whatsappAtencion,TIENDA_FABRICA.whatsappAtencion),
-    razonSocial:str(g.razonSocial,""),nit:str(g.nit,""),direccion:str(g.direccion,""),email:str(g.email,""),
-    instagram:str(g.instagram,""),tiktok:str(g.tiktok,""),
-    pixelMeta:str(g.pixelMeta,""),ga4:str(g.ga4,""),
+    razonSocial:str(g.razonSocial,TIENDA_FABRICA.razonSocial),nit:str(g.nit,TIENDA_FABRICA.nit),direccion:str(g.direccion,TIENDA_FABRICA.direccion),email:str(g.email,TIENDA_FABRICA.email),
+    instagram:str(g.instagram,TIENDA_FABRICA.instagram),tiktok:str(g.tiktok,TIENDA_FABRICA.tiktok),
+    pixelMeta:str(g.pixelMeta,TIENDA_FABRICA.pixelMeta),ga4:str(g.ga4,TIENDA_FABRICA.ga4),
     heroIds:str(g.heroIds||g.destacado,TIENDA_FABRICA.heroIds),
     favoritos:str(g.favoritos,TIENDA_FABRICA.favoritos),
     pagoContraEntrega:si(g.pagoContraEntrega,TIENDA_FABRICA.pagoContraEntrega),
     vaciarCarrito:si(g.vaciarCarrito,TIENDA_FABRICA.vaciarCarrito),
     claveAdmin:str(g.claveAdmin,TIENDA_FABRICA.claveAdmin),
-    categoriasOcultas:str(g.categoriasOcultas,""),
-    productosOcultos:str(g.productosOcultos,""),
-    seccionesOcultas:str(g.seccionesOcultas,""),
-    carruselesOcultos:str(g.carruselesOcultos,""),
-    catalogosOcultos:str(g.catalogosOcultos,"")
+    categoriasOcultas:str(g.categoriasOcultas,TIENDA_FABRICA.categoriasOcultas),
+    productosOcultos:str(g.productosOcultos,TIENDA_FABRICA.productosOcultos),
+    seccionesOcultas:str(g.seccionesOcultas,TIENDA_FABRICA.seccionesOcultas),
+    carruselesOcultos:str(g.carruselesOcultos,TIENDA_FABRICA.carruselesOcultos),
+    catalogosOcultos:str(g.catalogosOcultos,TIENDA_FABRICA.catalogosOcultos)
   };
   /* Migracion v2: el catalogo cambio de ids al crecer; respetar la curacion
      nueva del heroe y los favoritos UNA sola vez, y de ahi en adelante
