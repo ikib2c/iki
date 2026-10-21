@@ -1057,10 +1057,11 @@ footer a:hover{color:var(--cr)}
 
       <div class="admin-h">Publicar para TODOS <small>sube esta configuración al proyecto de GitHub: todos los visitantes la ven en ~1 minuto, sin editar archivos</small></div>
       <div class="admin-grid">
-        <label class="admin-label" style="grid-column:1/-1">Token de GitHub con permiso Contents (Read and write), solo este repositorio
+        <label class="admin-label" style="grid-column:1/-1">Token de GitHub con permiso Contents (Read and write), solo este repositorio <small>(se pide una sola vez — o llega solo al abrir el enlace de configuración)</small>
           <input id="adminToken" type="password" autocomplete="off" onchange="guardarTokenGitHub()" placeholder="github_pat_… (se pide una sola vez; se guarda SOLO en este navegador)">
         </label>
       </div>
+      <p class="admin-nota">💡 ¿Token vacío? Pide a tu persona de confianza el <b>enlace de configuración</b> (lo genera el script local <em>generar_enlace_config.py</em> del proyecto): al abrirlo una sola vez, el token queda cargado para siempre en este navegador y el campo nace lleno. El token nunca va escrito dentro del archivo de la página: el repositorio es público y cualquiera podría leerlo.</p>
       <details class="admin-sync-ayuda">
         <summary>¿Cómo consigo ese token?</summary>
         <p class="admin-nota">En github.com entra a <b>Settings → Developer settings → Fine-grained tokens → Generate new token</b>: en Repository access marca <b>solo el repositorio de la tienda</b> (ikib2c/iki) y en Repository permissions elige <b>Contents → Read and write</b>. Genera el token (empieza por <em>github_pat_</em>), cópialo y pégalo arriba: queda guardado únicamente en este navegador. <em>Es un permiso quirúrgico: con ese token solo se pueden cambiar archivos del repositorio — nada más. Igual que la clave del panel, nunca viaja en la configuración publicada.</em></p>
@@ -1074,7 +1075,7 @@ footer a:hover{color:var(--cr)}
         <button class="btn o" type="button" onclick="restaurarPanelAdmin()">Restaurar</button>
         <button class="btn o" type="button" onclick="cerrarSesionAdmin()">Salir</button>
       </div>
-      <p class="admin-nota"><b>Publicar para TODOS:</b> sube esta configuración al proyecto de GitHub (<b>data/configuracion.js</b>) y <b>todos los visitantes la verán en ~1 minuto</b> — funciona solo, sin pedirle a nadie que edite el archivo; usa el token de GitHub de arriba. <b>Guardar en MI computador:</b> solo previsualiza en este navegador (hasta que publiques). <b>Copiar configuración</b> queda como respaldo sin conexión. La clave del panel nunca se publica. La clave es una barrera de conveniencia, no seguridad real.</p>
+      <p class="admin-nota"><b>Publicar para TODOS:</b> sube esta configuración al proyecto de GitHub (<b>data/configuracion.js</b>) y <b>todos los visitantes la verán en ~1 minuto</b> — funciona solo, sin pedirle a nadie que edite el archivo; usa el token de GitHub que llega con el enlace de configuración. <b>Guardar en MI computador:</b> solo previsualiza en este navegador (hasta que publiques). <b>Copiar configuración</b> queda como respaldo sin conexión. La clave del panel nunca se publica. La clave es una barrera de conveniencia, no seguridad real.</p>
       <div class="admin-preview" id="adminPreview"></div>
     </div>
   </div>
@@ -2970,6 +2971,28 @@ function guardarTokenGitHub(){
   try{localStorage.setItem(GITHUB_TOKEN_KEY,inp.value.trim());}catch(e){}
   showToast(inp.value.trim()?"Token guardado en este navegador":"Token borrado");
 }
+/* --- Enlace de configuración (token de un solo toque) ---
+   El token de GitHub JAMÁS se escribe en este archivo (el repo es
+   público: cualquiera que leyera la página podría publicar
+   configuración por nosotros). En su lugar, el script local
+   generar_enlace_config.py arma un enlace que lo trae en el
+   #fragmento de la URL — el fragmento NUNCA viaja al servidor — y
+   con abrirlo UNA VEZ queda guardado para siempre en este navegador
+   (el campo del panel nace lleno). El enlace se borra de la barra de
+   direcciones y del historial al instante: no se comparte por
+   accidente al reenviar la página. */
+function absorberEnlaceConfig(){
+  const m=/[#&]config=([^&]+)/.exec(window.location.hash||"");
+  if(!m)return false;
+  try{
+    const datos=JSON.parse(atob(decodeURIComponent(m[1])));
+    if(datos.githubToken||datos.token)try{localStorage.setItem(GITHUB_TOKEN_KEY,String(datos.githubToken||datos.token));}catch(e){}
+  }catch(e){/* enlace corrupto: se ignora y se limpia igual */}
+  try{history.replaceState(null,"",window.location.pathname+window.location.search);}
+  catch(e){try{window.location.hash="";}catch(e2){}}
+  return true;
+}
+window.__configAbsorbida=absorberEnlaceConfig();
 function ab64(buffer){
   const bytes=new Uint8Array(buffer);let bin="";const trozo=0x8000;
   for(let i=0;i<bytes.length;i+=trozo)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+trozo));
@@ -2981,7 +3004,7 @@ function abrirGuiaToken(){
 async function publicarConfigAdmin(){
   const token=leerTokenGitHub();
   if(!token){
-    showToast("Falta el token de GitHub — mira la guía de abajo","err");
+    showToast("Falta el token de GitHub — pide el enlace de configuración (un toque y queda cargado) o mira la guía de abajo","err");
     abrirGuiaToken();
     return;
   }
@@ -3051,6 +3074,9 @@ document.addEventListener("DOMContentLoaded",function(){
   aplicarTienda();
   aplicarIdentidad();
   aplicarAnalitica();
+  /* Si llegó por el enlace de configuración, el token ya quedó guardado:
+     se le confirma con un aviso amable. */
+  if(window.__configAbsorbida)showToast("Token de GitHub quedó cargado en este navegador");
   renderSubnav();renderBubbles();renderChips();renderGrid();
   initCarouseles();iniciarDeriva();actualizarHero();renderMobileMenu();
   renderCart();
