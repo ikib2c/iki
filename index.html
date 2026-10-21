@@ -58,7 +58,7 @@ section[id]{scroll-margin-top:88px}
 .hd{display:grid;grid-template-columns:auto minmax(240px,480px) auto;align-items:center;gap:16px;max-width:1180px;margin:0 auto;padding:11px 26px}
 .brand{justify-self:start;display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:0;padding:0}
 .brand img{height:44px;display:block}
-.brand .bt{font:700 26px var(--ff);letter-spacing:-.02em;color:var(--c)}
+.brand .bt{font:600 12.5px/1.35 var(--fb);letter-spacing:0;color:var(--c);max-width:172px;text-align:left;padding-top:1px}
 .sbox{position:relative;display:flex}
 .sbox input{flex:1;min-width:0;border:1.5px solid var(--bd);border-right:0;background:#fff;border-radius:999px 0 0 999px;padding:11px 18px;font:400 14px var(--fb);color:var(--c)}
 .sbox input:focus{outline:none;border-color:var(--c)}
@@ -137,7 +137,7 @@ section[id]{scroll-margin-top:88px}
 .bub .bp .ic{width:30px;height:30px}
 .bub:hover .bp{transform:translateY(-3px);box-shadow:var(--sh)}
 .bub.on .bp{border-color:var(--y);box-shadow:0 0 0 3px #F5AE2336}
-.bub .bl{font:600 12.5px/1.2 var(--fb);max-width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bub .bl{font:600 12.5px/1.25 var(--fb);max-width:100%;text-align:center;white-space:normal;height:33px;overflow:hidden}
 .bub .bq{font:600 11px var(--fb);color:var(--mu)}
 .cwrap .carr{top:44%}
 /* ============ Carrusel ============ */
@@ -442,6 +442,8 @@ footer a:hover{color:var(--cr)}
 .lbi .pp{font:700 12px var(--ff)}
 /* ============ Responsive ============ */
 @media(max-width:900px){
+  /* En movil el logo basta (el eslogan no cabe junto al buscador) */
+  .brand .bt{display:none}
   .hero{display:none}
   /* Barra de categorias: se pliega con transform (GPU) en vez de max-height
      (layout). El transform no dispara reflow del resto de la pagina, es
@@ -452,7 +454,6 @@ footer a:hover{color:var(--cr)}
   .hd{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;position:relative}
   .brand{flex:1}
   .brand img{height:38px}
-  .brand .bt{font-size:22px}
   .sbox{order:3;flex:1 1 100%}
   .hicons{flex:none}
   .ib.wa-hdr{display:none}
@@ -621,7 +622,7 @@ footer a:hover{color:var(--cr)}
   <div class="hd">
     <button class="brand" onclick="scrollToTop()" aria-label="IKI, volver al inicio">
       <img src="logo_120.png" alt="IKI" onerror="this.style.display='none'">
-      <span class="bt" id="brandTxt">IKI</span>
+      <span class="bt" id="brandTxt">Todo lo que te hace feliz, en un solo lugar</span>
     </button>
     <div class="sbox">
       <input id="searchInput" type="search" placeholder="Buscar productos" aria-label="Buscar productos">
@@ -2203,6 +2204,19 @@ function scrollToSection(id){
   const off=(h?h.offsetHeight:0)+10;
   const top=s.getBoundingClientRect().top+window.scrollY-off;
   window.scrollTo({top:Math.max(0,top),behavior:"smooth"});
+  /* El grid pagina al hacer scroll (99 productos en cargas de 12): el
+     objetivo SE MUEVE mientras el contenido nuevo empuja la pagina y el
+     scroll aterrizaba donde la seccion 'estaba'. Se re-ancla hasta que
+     la seccion queda fija bajo el header. */
+  let intentos=0;
+  const anclar=function(){
+    intentos++;
+    const actual=s.getBoundingClientRect().top;
+    if(intentos>6||Math.abs(actual-off)<=4)return;
+    window.scrollTo({top:Math.max(0,actual+window.scrollY-off),behavior:"smooth"});
+    setTimeout(anclar,650);
+  };
+  setTimeout(anclar,850);
 }
 /* Enlace de alistamiento (?art=IKI-XXXX): resuelve por Cat permanente
    (o por id interno) y lleva directo a la tarjeta del producto. */
@@ -2559,7 +2573,10 @@ function compactarHeader(){
 /* ===== Identidad en vivo (nombre, logo, legal, enlaces) ===== */
 function aplicarIdentidad(){
   const nombre=TIENDA.nombre||"IKI";
-  $("brandTxt").textContent=nombre;
+  /* El texto junto al logo es el ESLOGAN (el logo ya dice IKI: repetirlo
+     era redundante); el nombre configurable sigue en el titulo, el footer
+     y los saludos de WhatsApp. */
+  $("brandTxt").textContent="Todo lo que te hace feliz, en un solo lugar";
   const limg=document.querySelector(".brand img");
   if(limg){limg.src=TIENDA.logo||TIENDA_DEFECTO.logo;limg.onerror=function(){limg.style.display="none";};limg.style.display="";}
   document.title=nombre+" — Todo lo que te hace feliz, en un solo lugar";
