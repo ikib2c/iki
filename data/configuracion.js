@@ -2,7 +2,7 @@
 // (botón "Publicar para TODOS"). Se aplica a TODOS los visitantes de
 // https://ikib2c.github.io/iki/ — nadie necesita editar este archivo a mano.
 window.CONFIG_PUBLICADA = {
-  "version": 1792560963624,
+  "version": 1792569199561,
   "tienda": {
     "nombre": "IKI",
     "logo": "logo_120.png",
@@ -16,15 +16,15 @@ window.CONFIG_PUBLICADA = {
     "tiktok": "",
     "pixelMeta": "",
     "ga4": "",
-    "heroIds": "j180,j182,j213,j225,j247,j283",
-    "favoritos": "j180,j182,j213,j225,j247,j283,u01,u04,u17,b120,b119,r01,r04,t409",
+    "heroIds": "m01,m04,m05,m09,m59,m16",
+    "favoritos": "m03,m06,m08,m11,m15,m16,m18,m21,m23,m29,m44,m47,m61,m66",
     "pagoContraEntrega": true,
     "vaciarCarrito": true,
     "categoriasOcultas": "",
     "productosOcultos": "",
     "seccionesOcultas": "",
     "carruselesOcultos": "",
-    "catalogosOcultos": ""
+    "catalogosOcultos": "l1,l3,l4,l5"
   },
   "precios": {
     "margenGlobal": 0.25,
