@@ -2194,16 +2194,34 @@ function toggleMenu(){
   lock(abre);
   $("menuBtn").setAttribute("aria-expanded",abre);
 }
+/* Normalizacion de busqueda: la gente escribe rapido, sin tildes y sin
+   enes ("navidena", "nino") y en palabras sueltas ("grinch dama") — se
+   dobla la ene, se quitan tildes, el separador · cuenta como espacio y
+   TODAS las palabras deben aparecer en el nombre, la categoria, el
+   Codigo permanente (IKI-XXXX) o el SKU del proveedor. */
+function normBusq(s){
+  return String(s||"").toLowerCase()
+    .replace(/[áàäâã]/g,"a").replace(/[éèëê]/g,"e").replace(/[íìïî]/g,"i")
+    .replace(/[óòöôõ]/g,"o").replace(/[úùüû]/g,"u")
+    .replace(/ñ/g,"n").replace(/·/g," ");
+}
 function searchProducts(){
-  const q=$("searchInput").value.trim().toLowerCase(),box=$("searchResults");
+  const box=$("searchResults");
+  const q=normBusq($("searchInput").value.trim());
   if(q.length<2){box.style.display="none";return;}
   clearTimeout(window.__sq);
-  window.__sq=setTimeout(()=>track("Search",{search_string:q}),900);
-  const r=PRODUCTOS.filter(p=>prodVisible(p)&&(p.n.toLowerCase().includes(q)||labelOf(p.cat).toLowerCase().includes(q))).slice(0,8);
+  window.__sq=setTimeout(()=>track("Search",{search_string:$("searchInput").value.trim()}),900);
+  const terms=q.split(/\s+/).filter(Boolean);
+  const todos=PRODUCTOS.filter(p=>{
+    if(!prodVisible(p))return false;
+    const hay=normBusq(p.n+" "+labelOf(p.cat)+" "+(p.cid||"")+" "+(p.sku||""));
+    return terms.every(t=>hay.includes(t));
+  });
+  const r=todos.slice(0,8);
   box.innerHTML=r.length?r.map(p=>{
     const imgs=productImgs(p);
     return '<button type="button" class="sri" onclick="scrollToProduct(\''+escJs(p.id)+'\')"><span class="srt"'+(imgs.length?' style="background-image:url(\''+esc(imgs[0])+'\')"':"")+'>'+(imgs.length?"":"IKI")+'</span><span><b>'+esc(p.n)+'</b><i>'+cop(p.p)+' · '+esc(labelOf(p.cat))+'</i></span></button>';
-  }).join(""):'<div class="sri"><span class="srt" style="background-color:var(--cr)">IKI</span><span><b>Sin resultados</b><i>Prueba con otra palabra</i></span></div>';
+  }).join("")+(todos.length>8?'<div class="sri" style="cursor:default;opacity:.75"><span class="srt" style="background:var(--cr)">+'+(todos.length-8)+'</span><span><b>'+(todos.length-8)+' resultados más</b><i>Sigue escribiendo para afinar la búsqueda</i></span></div>':""):'<div class="sri"><span class="srt" style="background-color:var(--cr)">IKI</span><span><b>Sin resultados</b><i>Prueba con otra palabra</i></span></div>';
   box.style.display="block";
 }
 function hideSearch(){$("searchResults").style.display="none";}
@@ -2522,13 +2540,18 @@ function iniciarDeriva(){
 function actualizarHero(){
   const gal=$("heroGal");
   if(!gal)return;
+  /* En pantallas pequenas el heroe esta OCULTO (display:none) pero sus
+     imagenes eager se descargaban igual: datos regalados. Con lazy en
+     movil no se descarga ninguna; en escritorio siguen eager (el heroe
+     es el elemento principal del render). */
+  const hamb=window.matchMedia&&window.matchMedia("(max-width:900px)").matches;
   const ids=(TIENDA.heroIds||"").split(",").map(function(s){return s.trim();}).filter(Boolean);
   let h="";
   ids.forEach(function(pid){
     const p=window.PRODUCTOS.find(function(x){return x.id===pid;});
     if(!p||!p.img||!prodVisible(p))return;
     h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+p.n+'">'
-      +'<img src="'+p.img+'" alt="'+p.n+'" decoding="async" loading="eager">'
+      +'<img src="'+p.img+'" alt="'+p.n+'" decoding="async" loading="'+(hamb?"lazy":"eager")+'">'
       +'<div class="hg-info"><b>'+p.n+'</b><span>'+cop(p.p)+'</span></div>'
       +'</div>';
   });
