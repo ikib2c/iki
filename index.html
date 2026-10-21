@@ -1135,12 +1135,24 @@ const CONFIG={
   favoritosIds:["j27","j21","m04","t13","t14","r02"], // fila "Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()">"
   analytics:{pixelMeta:"",ga4:""}    // IDs de Pixel de Meta y GA4 (vacío = apagadas)
 };
-/* Categorías: id, nombre, tono suave de tarjeta e icono de línea */
+/* Categorías: id, nombre, tono suave de tarjeta e icono de línea.
+   Las 8 categorias de Sublimados Majestic (clasificadas por nombre en el
+   sync) sustituyen a la antiguamente plana "moda": pijamas de pareja,
+   conjuntos, pantalones, shorts, ropa interior, enterizos, niños y
+   temporada navideña. */
 const CATS=[
  {id:"joyas",n:"Joyas y accesorios",c:"#FBE3AE",i:"M6 3h12l4 6-10 12L2 9zM2 9h20"},
  {id:"juguetes",n:"Juguetes",c:"#C6EEE9",i:"M12 20a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM6 6a2.5 2.5 0 1 0 0 .1M18 6a2.5 2.5 0 1 0 0 .1M10 12v.1M14 12v.1"},
  {id:"urbana",n:"Ropa urbana",c:"#D7E3FC",i:"M4 4l5 2 3 2 3-2 5-2 2 5-3 2v11H5v-9L2 9z"},
  {id:"moda",n:"Moda y pijamas",c:"#FAD0D4",i:"M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z"},
+ {id:"pijamas",n:"Pijamas de pareja",c:"#FAD0D4",i:"M20 12.5A8.5 8.5 0 1 1 11.5 4a6.5 6.5 0 0 0 8.5 8.5zM17 5v3M15.5 6.5h3"},
+ {id:"conjuntos",n:"Conjuntos y blusas",c:"#FBE3AE",i:"M8 3l4 2 4-2 5 3-2 4-2-1v13H7V9L5 10 3 6z"},
+ {id:"pantalones",n:"Pantalones y capris",c:"#E3DAFD",i:"M7 3h10l1 18h-5l-2-10-2 10H6z"},
+ {id:"shorts",n:"Shorts y bermudas",c:"#C6EEE9",i:"M6 3h12l1 13h-5l-2-6-2 6H5z"},
+ {id:"interior",n:"Ropa interior y juanitas",c:"#F9D9E8",i:"M12 20s-6-4-6-9a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 5-6 9-6 9z"},
+ {id:"enterizos",n:"Enterizos y batolas",c:"#D7E3FC",i:"M9 3l3 4 3-4 1 4-4 3 4 11H4l4-11-4-3z"},
+ {id:"ninos",n:"Niños y niñas",c:"#BDE8C7",i:"M12 3l2 5 5 1-4 4 1 5-4-3-4 3 1-5-4-4 5-1z"},
+ {id:"navidad",n:"Navidad y Halloween",c:"#D6F5E3",i:"M12 3l3 5h-2l3 5h-2l3 6H7l3-6H8l3-5H9zM11 19h2"},
  {id:"bebe",n:"Bebé",c:"#C9E4F7",i:"M9 2h6v4l2 3v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9l2-3zM7 13h10"},
  {id:"escolar",n:"Escolar",c:"#BDE8C7",i:"M4 20l1-4L17 4l3 3L8 19zM14 7l3 3"},
  {id:"regalos",n:"Regalos",c:"#E3DAFD",i:"M3 9h18v12H3zM2 6h20v3H2zM12 6v15M12 6C9 1 6 3 8 6M12 6c3-5 6-3 4 0"}];
@@ -1179,9 +1191,9 @@ const PRECIOS_DEFECTO={
   margenGlobal:0.25,
   multiplicadorBase:1,
   redondeo:100,
-  margenesPorCategoria:{joyas:0.70,moda:0.60,juguetes:0.50,escolar:0.50,bebe:0.25,regalos:0.30,urbana:0.20},
+  margenesPorCategoria:{joyas:0.70,moda:0.60,pijamas:0.60,conjuntos:0.60,pantalones:0.60,shorts:0.60,interior:0.60,enterizos:0.60,ninos:0.60,navidad:0.60,juguetes:0.50,escolar:0.50,bebe:0.25,regalos:0.30,urbana:0.20},
   temporadaIds:[],
-  temporadaCats:"juguetes,regalos,joyas",
+  temporadaCats:"juguetes,regalos,joyas,navidad",
   temporadaInicio:"11-15",
   temporadaFin:"01-06",
   margenTemporada:0.10,
@@ -1473,7 +1485,7 @@ function listado(){
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
-  else{const PRIO={joyas:0,juguetes:1,urbana:2,moda:3};l=l.slice().sort((a,b)=>(PRIO[a.cat]!==undefined?PRIO[a.cat]:4)-(PRIO[b.cat]!==undefined?PRIO[b.cat]:4)||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
+  else{const PRIO={joyas:0,juguetes:1,urbana:2,moda:3,pijamas:4,conjuntos:5,pantalones:6,shorts:7,interior:8,navidad:9,enterizos:10,ninos:11};l=l.slice().sort((a,b)=>(PRIO[a.cat]!==undefined?PRIO[a.cat]:20)-(PRIO[b.cat]!==undefined?PRIO[b.cat]:20)||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
   return l;
 }
 function tarjetaHTML(p){
@@ -2378,7 +2390,7 @@ function scrollCarousel(d,tid){
    vacias con conteos inflados. */
 function topCategorias(){
   const counts={};PRODUCTOS.forEach(p=>{if(prodVisible(p))counts[p.cat]=(counts[p.cat]||0)+1;});
-  const PRIORIDAD=["joyas","juguetes","urbana","moda","bebe"];
+  const PRIORIDAD=["joyas","juguetes","urbana","moda","pijamas","conjuntos","pantalones","shorts","interior","navidad","enterizos","ninos","bebe"];
   const prioridad=PRIORIDAD.filter(c=>counts[c]);
   const resto=Object.keys(counts).filter(c=>!PRIORIDAD.includes(c)).sort((a,b)=>counts[b]-counts[a]);
   return prioridad.concat(resto).slice(0,5).map(function(c){return{id:c,n:counts[c]};});

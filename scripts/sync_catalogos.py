@@ -296,8 +296,45 @@ def curar_joyas_gava(prods, h2c):
 
 
 def curar_moda_majestic(items):
-    """14 prendas: 2 por categoria del proveedor, precios 18k-110k, con tallas."""
+    """Curacion de Sublimados Majestic: precios 18k-110k, con tallas y
+    estampados, y CLASIFICACION por nombre en categorias de tienda (la
+    'categoria' del proveedor viene muy sucia: 'shortiras', 'familiar',
+    'shorts' vs 'Short Dama', 'Sin categoria'...)."""
     GENERICOS = {"conjunto", "body", "shorts", "pijama pink", "pijama"}
+    # Typos visibles al cliente: se corrigen aqui y la preservacion de ids
+    # es tolerante (norm_clave) para no romper enlaces de pedidos viejos.
+    FIXES = [("CORSERT", "CORSET"), ("BODDY", "BODY")]
+
+    def nombre_limpio(nombre):
+        n = re.sub(r"\s+", " ", (nombre or "")).strip().rstrip(".")
+        for a, b in FIXES:
+            n = n.replace(a, b)
+        return n
+
+    def clasificar_prenda(nombre):
+        """Organiza el catalogo en 8 categorias de tienda a partir del
+        nombre. Orden: temporada > ninos > pijamas/pareja > enterizos >
+        conjuntos > interior > pantalones/trios > shorts > juanitas."""
+        n = (nombre or "").upper()
+        if re.search(r"NAVIDAD|NAVIDE|HALLOWEEN|GRINCH|SANTA\b", n):
+            return "navidad"
+        if re.search(r"NIÑO|NIÑA|NIÑOS|NIÑAS", n):
+            return "ninos"
+        if "PIJAMA" in n or "PAREJA" in n:
+            return "pijamas"
+        if "ENTERIZO" in n or "BATOLA" in n:
+            return "enterizos"
+        if re.search(r"CONJUNTO|CORSET|BODY|BLUSON|VESTIDO|CHAQUETA|EVILLA", n):
+            return "conjuntos"
+        if re.search(r"\bSET\b|LEVANTADORA", n):
+            return "interior"
+        if "PANTALON" in n or "CAPRI" in n or "TRIO" in n:
+            return "pantalones"
+        if "SHORT" in n or "BERMUDA" in n:
+            return "shorts"
+        if "JUANITA" in n:
+            return "interior"
+        return "moda"
 
     def candidato(p):
         if p.get("oculto"):
@@ -305,13 +342,13 @@ def curar_moda_majestic(items):
         precio = float(p.get("precio") or 0)
         if not (18000 <= precio <= 110000) or not p.get("imagen_url"):
             return None
-        nombre = re.sub(r"\s+", " ", p.get("nombre") or "").strip()
+        nombre = nombre_limpio(p.get("nombre"))
         if "(Copia)" in nombre or not nombre or limpiar_nombre(nombre).lower() in GENERICOS:
             return None
         return p
 
     def con_datos(p):
-        nombre = re.sub(r"\s+", " ", p.get("nombre") or "").strip()
+        nombre = nombre_limpio(p.get("nombre"))
         tallas = parse_tallas(p.get("tallas"))
         var = {}
         if tallas:
@@ -337,18 +374,12 @@ def curar_moda_majestic(items):
         ref = str(p.get("referencia") or "").strip()
         return {"nombre": titulo(nombre), "precio": int(float(p.get("precio") or 0)),
                 "imgs": [p["imagen_url"]] + gal[:3],
+                "cat": clasificar_prenda(nombre),
                 "var": (var if var else None), "sku": (ref if ref else None)}
 
     # TODOS los validos (sin tope por categoria)
-    por_cat = {}
-    for p in sorted((c for c in (candidato(x) for x in items) if c),
-                    key=lambda x: -float(x.get("precio") or 0)):
-        por_cat.setdefault(p.get("categoria") or "Sin categoría", []).append(p)
-    elegidos = []
-    for cat, lst in por_cat.items():
-        for p in lst:
-            elegidos.append(p)
-    elegidos = [con_datos(p) for p in elegidos if len(p.get("nombre") or "") >= 6]
+    elegidos = [con_datos(p) for p in (candidato(x) for x in items) if p]
+    elegidos = [p for p in elegidos if p and len(p.get("nombre") or "") >= 6]
     elegidos.sort(key=lambda x: -x["precio"])
     return elegidos
 
@@ -451,11 +482,24 @@ def curar_urbana_openmind(prods):
 # 3. ESCRITURA: catalogo.js y Excel
 # ============================================================================
 
+def norm_clave(nombre):
+    """Clave de preservacion de ids/cids TOLERANTE a correcciones de
+    nombre: los typos corregidos (Corsert->Corset, Boddy->Body) mantienen
+    su id y su Cat permanente, asi los enlaces de pedidos viejos (?art=)
+    y la curacion del heroe/favoritos no se rompen."""
+    n = (nombre or "").lower()
+    for a, b in (("corsert", "corset"), ("boddy", "body")):
+        n = n.replace(a, b)
+    return n
+
+
 def escribir_catalogo_js(secciones):
     """secciones: [(prefijo, categoria, proveedor, [productos])] -> catalogo.js con ids ESTABLES.
-    Los ids se reutilizan del catalogo.js anterior (clave: prefijo + nombre en minusculas),
-    asi el heroe, los favoritos y los precios fijos del admin no se rompen cuando
-    cambian precios u orden de ordenamiento en el proveedor."""
+    Los ids se reutilizan del catalogo.js anterior (clave: prefijo + nombre
+    normalizado en minusculas), asi el heroe, los favoritos y los precios
+    fijos del admin no se rompen cuando cambian precios, el orden o se
+    corrigen typos del proveedor. Respeta la categoria POR PRODUCTO cuando
+    la curacion la trae (clasificacion de Majestic)."""
     previos = {}
     usados = {}
     previos_cid = {}
@@ -464,12 +508,12 @@ def escribir_catalogo_js(secciones):
         with open(os.path.join(RAIZ, "catalogo.js"), encoding="utf-8") as f:
             texto_previo = f.read()
             for mm in re.finditer(r'\{id:"([a-z]+)(\d+)",n:"((?:[^"\\]|\\.)*)"', texto_previo):
-                previos[(mm.group(1), mm.group(3).lower())] = int(mm.group(2))
+                previos[(mm.group(1), norm_clave(mm.group(3)))] = int(mm.group(2))
                 usados.setdefault(mm.group(1), set()).add(int(mm.group(2)))
             for mm in re.finditer(r'cid:"IKI-(\d+)"', texto_previo):
                 usados_cid.add(int(mm.group(1)))
             for mm in re.finditer(r'\{id:"([a-z]+)\d+",n:"((?:[^"\\]|\\.)*)"[^}]*?cid:"IKI-(\d+)"', texto_previo):
-                previos_cid[(mm.group(1), mm.group(2).lower())] = int(mm.group(3))
+                previos_cid[(mm.group(1), norm_clave(mm.group(2)))] = int(mm.group(3))
     except Exception:
         pass
 
@@ -501,7 +545,7 @@ def escribir_catalogo_js(secciones):
         claves = set()
         claves_cid = set()
         for p in items:
-            clave = (prefijo, p["nombre"].lower())
+            clave = (prefijo, norm_clave(p["nombre"]))
             if clave in previos and clave not in claves:
                 num = previos[clave]
             else:
@@ -513,7 +557,7 @@ def escribir_catalogo_js(secciones):
             else:
                 cid_num = cid_libre()
             claves_cid.add(clave)
-            partes = ['{id:"%s%02d"' % (prefijo, num), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % cat, 'prov:"%s"' % prov, 'cid:"IKI-%04d"' % cid_num]
+            partes = ['{id:"%s%02d"' % (prefijo, num), "n:%s" % js_str(p["nombre"]), "p:%d" % p["precio"], 'cat:"%s"' % (p.get("cat") or cat), 'prov:"%s"' % prov, 'cid:"IKI-%04d"' % cid_num]
             imgs = p.get("imgs") or []
             if imgs:
                 partes.append("img:%s" % js_str(imgs[0]))
