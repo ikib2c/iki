@@ -2,7 +2,7 @@
 // (botón "Publicar para TODOS"). Se aplica a TODOS los visitantes de
 // https://ikib2c.github.io/iki/ — nadie necesita editar este archivo a mano.
 window.CONFIG_PUBLICADA = {
-  "version": 1792569199561,
+  "version": 1792571549594,
   "tienda": {
     "nombre": "IKI",
     "logo": "logo_120.png",
@@ -33,6 +33,14 @@ window.CONFIG_PUBLICADA = {
     "margenesPorCategoria": {
       "joyas": 0.7,
       "moda": 0.6,
+      "pijamas": 0.6,
+      "conjuntos": 0.6,
+      "pantalones": 0.6,
+      "shorts": 0.6,
+      "interior": 0.6,
+      "enterizos": 0.6,
+      "ninos": 0.6,
+      "navidad": 0.6,
       "juguetes": 0.5,
       "escolar": 0.5,
       "bebe": 0.25,
@@ -40,7 +48,7 @@ window.CONFIG_PUBLICADA = {
       "urbana": 0.2
     },
     "temporadaIds": [],
-    "temporadaCats": "juguetes,regalos,joyas",
+    "temporadaCats": "juguetes,regalos,joyas,navidad",
     "temporadaInicio": "11-15",
     "temporadaFin": "01-06",
     "margenTemporada": 0.1,
