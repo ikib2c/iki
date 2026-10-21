@@ -2200,23 +2200,27 @@ function searchProducts(){
 function hideSearch(){$("searchResults").style.display="none";}
 function scrollToSection(id){
   const s=$(id);if(!s)return;
+  /* El grid pagina al hacer scroll (99 productos en cargas de 12) y el
+     destino SE MOVIA mientras cargaba: el FAQ se corria ~1.500px y el
+     scroll aterrizaba donde la seccion 'estaba'. Al navegar por secciones
+     se carga TODO el catalogo de una vez: el objetivo queda fijo. Las
+     fotos siguen siendo lazy (solo se piden las que entran al viewport). */
+  try{
+    if(typeof listadoActual!=="undefined"&&listadoActual.length){
+      let vueltas=0;
+      while(pagina*CONFIG.porPagina<listadoActual.length&&vueltas++<40)cargarMas();
+    }
+  }catch(e){}
   const h=$("hdr");
   const off=(h?h.offsetHeight:0)+10;
   const top=s.getBoundingClientRect().top+window.scrollY-off;
   window.scrollTo({top:Math.max(0,top),behavior:"smooth"});
-  /* El grid pagina al hacer scroll (99 productos en cargas de 12): el
-     objetivo SE MUEVE mientras el contenido nuevo empuja la pagina y el
-     scroll aterrizaba donde la seccion 'estaba'. Se re-ancla hasta que
-     la seccion queda fija bajo el header. */
-  let intentos=0;
-  const anclar=function(){
-    intentos++;
+  /* Respaldo: si algo mas mueve el layout (fuentes, fotos del heroe), un
+     unico re-anclaje instantaneo cuando termina el scroll suave. */
+  setTimeout(function(){
     const actual=s.getBoundingClientRect().top;
-    if(intentos>6||Math.abs(actual-off)<=4)return;
-    window.scrollTo({top:Math.max(0,actual+window.scrollY-off),behavior:"smooth"});
-    setTimeout(anclar,650);
-  };
-  setTimeout(anclar,850);
+    if(Math.abs(actual-off)>4)window.scrollTo({top:Math.max(0,actual+window.scrollY-off),behavior:"auto"});
+  },900);
 }
 /* Enlace de alistamiento (?art=IKI-XXXX): resuelve por Cat permanente
    (o por id interno) y lleva directo a la tarjeta del producto. */
