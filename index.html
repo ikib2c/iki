@@ -2256,7 +2256,10 @@ function scrollToProduct(id){
     const np=Math.floor(idx/CONFIG.porPagina)+1;
     if(np>pagina){pagina=np;renderGrid();}
   }
-  scrollToSection("tienda");
+  /* DIRECTO a la tarjeta: no se pasa por el scroll de la seccion, cuyo
+     re-anclaje a los 900ms devolvia la pagina al tope del catalogo
+     ('baja y se devuelve') y dejaba la tarjeta abajo sin verse. La
+     paginacion solo ANADE tarjetas debajo: el destino no se mueve. */
   setTimeout(()=>{
     const card=$("product-"+id);if(!card)return;
     toggleQty(id,true);
