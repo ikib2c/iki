@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IKI — Todo lo que te hace feliz, en un solo lugar</title>
-<meta name="description" content="IKI: joyas, moda, pijamas, juguetes, útiles escolares y regalos seleccionados. Compra fácil y confiable con envíos a todo el país.">
+<meta name="description" content="IKI: pijamas, moda y artículos para toda la familia, con envíos a todo el país. Paga contra entrega o por Nequi.">
 <meta property="og:title" content="IKI — Todo lo que te hace feliz, en un solo lugar">
-<meta property="og:description" content="Joyas, moda, pijamas, juguetes, escolar y regalos seleccionados.">
+<meta property="og:description" content="Pijamas y moda para toda la familia. Envíos a toda Colombia, paga contra entrega o por Nequi.">
 <!-- Al publicar: reemplazar por la URL absoluta de la imagen de vista previa (mínimo 512×512) -->
 <meta property="og:image" content="https://ikib2c.github.io/iki/logo_512.png">
 <meta property="og:type" content="website">
@@ -127,7 +127,9 @@ section[id]{scroll-margin-top:88px}
 /* ============ Burbujas de categoría ============ */
 .catsbar{padding:34px 0 6px}
 .cwrap{position:relative;max-width:1180px;margin:0 auto;padding:0 44px}
-#catsTrack{display:grid;grid-auto-flow:column;grid-auto-columns:94px;gap:16px;overflow-x:auto;scroll-snap-type:x proximity;scroll-behavior:smooth;padding:6px 2px 12px;scrollbar-width:none}
+#catsTrack{display:grid;grid-auto-flow:column;grid-auto-columns:94px;gap:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scroll-behavior:smooth;padding:6px 26px 12px 2px;scrollbar-width:none}
+/* El padding final garantiza que la ULTIMA burbuja se vea completa al
+   terminar el scroll (en movil quedaba cortada al borde). */
 #catsTrack::-webkit-scrollbar{display:none}
 #catsTrack.drifting{scroll-behavior:auto;scroll-snap-type:none}
 .bub{display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:0;padding:0;cursor:pointer;scroll-snap-align:start}
@@ -777,7 +779,7 @@ footer a:hover{color:var(--cr)}
 <footer><div class="wrap">
   <div>
     <img src="logo_512_light.png" alt="IKI" style="height:44px;display:block;margin-bottom:10px" onerror="this.style.display='none'"><br>
-    Joyas, moda y regalos<br>con cariño colombiano.<br>
+    Todo lo que te hace feliz,<br>con cariño colombiano.<br>
     <a id="waFoot" href="#" target="_blank" rel="noopener">WhatsApp 315 637 1501</a>
   </div>
   <div><b class="h">Tienda</b>
@@ -1186,7 +1188,7 @@ const TIENDA_DEFECTO={
   instagram:"",tiktok:"",
   pixelMeta:"",ga4:"",
   heroIds:"j180,j182,j213,j225,j247,j283",
-  favoritos:"j180,j182,j213,j225,j247,j283,u01,u04,u17,b120,b119,r01,r04,t409",
+  favoritos:"m85,m86,m59,m80,m81,m84,m03,m06,m08,m11,m15,m16,m18,m21,m23,m29,m44,m47,m61,m66",
   pagoContraEntrega:true,
   vaciarCarrito:true,
   claveAdmin:"IKI123*",
@@ -1494,7 +1496,7 @@ function listado(){
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
-  else{const PRIO={joyas:0,juguetes:1,urbana:2,moda:3,pijamas:4,conjuntos:5,pantalones:6,shorts:7,interior:8,navidad:9,enterizos:10,ninos:11};l=l.slice().sort((a,b)=>(PRIO[a.cat]!==undefined?PRIO[a.cat]:20)-(PRIO[b.cat]!==undefined?PRIO[b.cat]:20)||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
+  else{const PRIO={joyas:0,juguetes:1,urbana:2,moda:3,pijamas:4,conjuntos:5,pantalones:6,shorts:7,interior:8,navidad:9,enterizos:10,ninos:11};l=l.slice().sort((a,b)=>(PRIO[a.cat]!==undefined?PRIO[a.cat]:20)-(PRIO[b.cat]!==undefined?PRIO[b.cat]:20)||a.p-b.p||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
   return l;
 }
 function tarjetaHTML(p){
@@ -2097,22 +2099,13 @@ async function crearHojaPedido(consec){
   }catch(e){return null;}
 }
 
-/* Envia el pedido por WhatsApp CON la hoja-resumen incluida.
-   - MOVIL: wa.me no admite imagenes adjuntas, por eso la hoja viaja por
-     la Web Share API (el mismo mecanismo de la tarjeta de compartir):
-     el telefono abre el menu nativo con la IMAGEN y el TEXTO del pedido
-     JUNTOS; al elegir WhatsApp llegan al chat en un solo envio, ya no
-     queda una descarga suelta en el dispositivo que nadie adjunta.
-   - Si el navegador no soporta compartir archivos (o se cancela), cae
-     al flujo directo wa.me + descarga: el pedido nunca se pierde.
-   - DESKTOP: wa.me abre el chat del vendedor LISTO (contacto correcto,
-     sin selector de apps, cero friccion) y la hoja se DESCARGA para
-     adjuntarla en el mismo chat: guia visual de alistamiento para
-     proveedores que no usan SKU ni referencias. */
-function esMovil(){
-  try{if(matchMedia("(pointer:coarse)").matches)return true;}catch(e){}
-  return /Android|iPhone|iPad|iPod|Mobi/i.test((navigator&&navigator.userAgent)||"");
-}
+/* Envia el pedido SIEMPRE directo por WhatsApp: wa.me abre el chat del
+   vendedor LISTO en cualquier dispositivo — sin selector de apps ni
+   busqueda de contacto ni elegir numero (el share nativo obligaba a
+   escoger app y luego el chat: friccion critica que perdia ventas).
+   La hoja-resumen con la miniatura de cada producto se DESCARGA al
+   dispositivo para adjuntarla en el mismo chat: guia visual de
+   alistamiento para proveedores que no usan SKU ni referencias. */
 function abrirWhatsAppDirecto(msg){
   const w=window.open(waLink(msg),"_blank");
   if(!w){try{location.href=waLink(msg);}catch(e){}} /* popup bloqueado: navega directo */
@@ -2129,19 +2122,6 @@ function descargarHoja(hoja){
   }catch(e){}
 }
 async function enviarPedido(msg,consec){
-  if(esMovil()&&navigator.share&&navigator.canShare){
-    const hoja=await crearHojaPedido(consec);
-    if(hoja&&hoja.size&&navigator.canShare({files:[hoja]})){
-      try{
-        await navigator.share({text:msg,files:[hoja]});
-        showToast("Compartido: en WhatsApp llegan la hoja y el pedido juntos");
-        return;
-      }catch(e){/* cancelado o gesto vencido: flujo directo */}
-    }
-    abrirWhatsAppDirecto(msg);
-    descargarHoja(hoja);
-    return;
-  }
   abrirWhatsAppDirecto(msg);
   crearHojaPedido(consec).then(descargarHoja);
 }
@@ -2259,6 +2239,16 @@ function scrollToProduct(id){
   },480);
 }
 function scrollToTop(){window.scrollTo({top:0,behavior:"smooth"});}
+/* Categorias visibles para textos de compartir: SIEMPRE coherentes con
+   la tienda real (se arman de las categorias vivas, no de una lista fija). */
+function catsVisiblesTexto(max){
+  const vivas=CATS.filter(c=>catViva(c.id));
+  const n=max||4;
+  return vivas.slice(0,n).map(c=>c.n).join(" · ")+(vivas.length>n?" y más":"");
+}
+function textoCompartirTienda(){
+  return "IKI — "+catsVisiblesTexto(4)+". Envíos a toda Colombia. Paga contra entrega o por Nequi.";
+}
 async function shareCatalog(){
   let url="";try{url=location.origin+location.pathname;}catch(e){url=location.href;}
   track("Lead",{content_name:"Compartir tienda"});
@@ -2271,14 +2261,14 @@ async function shareCatalog(){
         await navigator.share({text:url,files:[tarjeta]});
         return;
       }
-      await navigator.share({title:"IKI",text:"IKI — joyas, moda, juguetes, bebé y ropa urbana con envíos a toda Colombia. Paga contra entrega o por Nequi.",url:url});
+      await navigator.share({title:"IKI",text:textoCompartirTienda(),url:url});
       return;
     }
   }catch(e){}
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    const texto="IKI — joyas, moda, juguetes, bebé y ropa urbana con envíos a toda Colombia. Paga contra entrega o por Nequi.";
+    const texto=textoCompartirTienda();
     navigator.clipboard.writeText(texto+" "+url).then(()=>showToast("Enlace copiado. Compártelo donde quieras")).catch(()=>window.prompt("Copia este enlace:",texto+" "+url));
-  }else window.prompt("Copia este enlace:","IKI — joyas, moda y regalos "+url);
+  }else window.prompt("Copia este enlace:",textoCompartirTienda()+" "+url);
 }
 
 /* Tarjeta para compartir: 1080x1080 con logo transparente, nombre, eslogan
@@ -2304,7 +2294,7 @@ async function crearTarjetaCompartir(){
     cx.fillText("Todo lo que te hace feliz,",540,455);
     cx.fillText("en un solo lugar",540,512);
     cx.fillStyle="#6B645A";cx.font="500 29px Poppins, Arial, sans-serif";
-    cx.fillText("Joyas · Moda · Juguetes · Bebé · Ropa urbana y más",540,568);
+    cx.fillText(cortarTexto(cx,catsVisiblesTexto(4),980),540,568);
     cx.fillStyle="#F5AE23";cx.fillRect(440,600,200,5);
     /* QR sobre fondo blanco: escanea y entra a la tienda */
     cx.fillStyle="#FFFFFF";cx.fillRect(390,632,300,300);
@@ -2468,6 +2458,9 @@ function iniciarDeriva(){
   const t=$("catsTrack");
   if(!t||typeof IntersectionObserver!=="function")return;
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  /* En pantallas tactiles NO hay deriva automatica: pelea con el scroll
+   del dedo y deja la ultima burbuja inalcanzable; movil = scroll manual. */
+  if(window.matchMedia&&window.matchMedia("(pointer: coarse)").matches)return;
   let dir=1,visible=false,pausa=0,raf=null,ult=0;
   const prog=()=>{if(raf==null){ult=performance.now();raf=requestAnimationFrame(paso);}};
   function paso(ahora){
