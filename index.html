@@ -1207,7 +1207,7 @@ const TIENDA_DEFECTO={
 const PRECIOS_DEFECTO={
   margenGlobal:0.25,
   multiplicadorBase:1,
-  redondeo:100,
+  redondeo:1000,
   margenesPorCategoria:{joyas:0.70,moda:0.60,pijamas:0.60,conjuntos:0.60,pantalones:0.60,shorts:0.60,interior:0.60,enterizos:0.60,ninos:0.60,navidad:0.60,juguetes:0.50,escolar:0.50,bebe:0.25,regalos:0.30,urbana:0.20},
   temporadaIds:[],
   temporadaCats:"juguetes,regalos,joyas,navidad",
@@ -1348,7 +1348,10 @@ function aplicarTienda(){
 function redondearPrecio(n){
   const r=PRECIOS.redondeo;
   if(!r||r<=0)return Math.round(n);
-  return Math.max(r,Math.round(n/r)*r);
+  /* Redondeo COMERCIAL hacia ARRIBA: nunca quedan colas tipo $2.400 o
+     $2.600 — el precio SIEMPRE sube al multiplo limpio ($3.000). Los
+     precios ya exactos (fijados por el admin en miles) no se mueven. */
+  return Math.ceil(n/r)*r;
 }
 /* Temporada navidena automatica: entre temporadaInicio y temporadaFin
    (formato MM-DD, cruza el ano) las categorias de regalo suman
@@ -1502,7 +1505,7 @@ function listado(){
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
-  else{const PRIO={joyas:0,juguetes:1,urbana:2,moda:3,pijamas:4,conjuntos:5,pantalones:6,shorts:7,interior:8,navidad:9,enterizos:10,ninos:11};l=l.slice().sort((a,b)=>(PRIO[a.cat]!==undefined?PRIO[a.cat]:20)-(PRIO[b.cat]!==undefined?PRIO[b.cat]:20)||a.p-b.p||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
+  else{l=l.slice().sort((a,b)=>a.p-b.p||PRODUCTOS.indexOf(a)-PRODUCTOS.indexOf(b));}
   return l;
 }
 function tarjetaHTML(p){
@@ -2984,7 +2987,7 @@ function pintarPreviewAdmin(){
   const mult=parseFloat($("adminMultiplicador").value)||1;
   const red=parseInt($("adminRedondeo").value,10)||0;
   const ejemplo=Math.round(10000*mult*(1+margen/100));
-  const final=red>0?Math.max(red,Math.round(ejemplo/red)*red):Math.round(ejemplo);
+  const final=red>0?Math.max(red,Math.ceil(ejemplo/red)*red):Math.round(ejemplo);
   el.innerHTML='Ejemplo: un producto de costo <strong>'+cop(10000)+'</strong> se venderá en <strong>'+cop(final)+'</strong>'
     +' · Ganancia: <strong>'+cop(final-10000)+'</strong> ('+Math.round((final-10000)/100)+'%)';
 }
