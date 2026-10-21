@@ -1411,9 +1411,12 @@ let cart=ls("iki-cart",[]),favs=ls("iki-favs",[]),selQty={},selVar={},filter="to
 function cartResumen(){let count=0,total=0;cart.forEach(it=>{const p=prod(it.id);if(p){count+=it.qty;total+=p.p*it.qty}});return{count:count,total:total};}
 
 /* ===== Navegación y categorías ===== */
+/* Solo categorias VIVAS (con inventario visible): si un catalogo se
+   oculta, sus categorias quedan vacias y desaparecen de todos los
+   accesos de navegacion con esta misma logica. */
 function renderSubnav(){
   let h='<button type="button" class="snl" data-c="todo" onclick="filterProducts(\'todo\')">Todo</button>';
-  CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<button type="button" class="snl" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+'</button>');
+  CATS.filter(c=>catViva(c.id)).forEach(c=>h+='<button type="button" class="snl" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+'</button>');
   h+='<span class="sn-sep"></span><button type="button" class="snl" onclick="scrollToSection(\'faq\')">Ayuda</button>';
   $("subnavTrack").innerHTML=h;
   ajustarSubnav();
@@ -1421,12 +1424,15 @@ function renderSubnav(){
 function ajustarSubnav(){const t=$("subnavTrack");if(t)t.classList.toggle("is-desb",t.scrollWidth>t.clientWidth+1);}
 function scrollSubnav(d){const t=$("subnavTrack");if(t)t.scrollBy({left:d*260,behavior:"smooth"});}
 function renderBubbles(){
-  const desde={};CATS.forEach(c=>desde[c.id]=Infinity);
-  PRODUCTOS.forEach(p=>{desde[p.cat]=Math.min(desde[p.cat],p.p)});
-  const minAll=Math.min.apply(null,Object.values(desde));
-  let h='<button type="button" class="bub" data-c="todo" onclick="filterProducts(\'todo\')"><span class="bp" style="background:#fff"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span><span class="bl">Todas</span><span class="bq">desde '+cop(minAll)+'</span></button>';
-  CATS.filter(c=>!catOculta(c.id)).forEach(c=>{
-    const conImg=PRODUCTOS.find(p=>p.cat===c.id&&productImgs(p).length);
+  /* Precio "desde" y foto solo de productos VISIBLES: una linea oculta
+     no puede prestar su precio mas barato ni su foto. */
+  const desde={};CATS.forEach(c=>{if(catViva(c.id))desde[c.id]=Infinity;});
+  PRODUCTOS.forEach(p=>{if(prodVisible(p)&&desde[p.cat]!==undefined)desde[p.cat]=Math.min(desde[p.cat],p.p);});
+  const vivas=Object.keys(desde).filter(k=>isFinite(desde[k]));
+  const minAll=vivas.length?Math.min.apply(null,vivas.map(k=>desde[k])):0;
+  let h='<button type="button" class="bub" data-c="todo" onclick="filterProducts(\'todo\')"><span class="bp" style="background:#fff"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span><span class="bl">Todas</span>'+(minAll>0?'<span class="bq">desde '+cop(minAll)+'</span>':"")+'</button>';
+  CATS.filter(c=>catViva(c.id)).forEach(c=>{
+    const conImg=PRODUCTOS.find(p=>p.cat===c.id&&prodVisible(p)&&productImgs(p).length);
     const img=conImg?productImgs(conImg)[0]:(IMG[c.id]||"");
     h+='<button type="button" class="bub" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')" aria-label="Ver '+esc(c.n)+'"><span class="bp"'+(img?' style="background-color:'+c.c+';background-image:url(\''+esc(img)+'\')"':' style="background:'+c.c+'"')+'>'+(img?"":'<svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>')+'</span><span class="bl">'+esc(c.n)+'</span><span class="bq">desde '+cop(desde[c.id])+'</span></button>';
   });
@@ -1434,14 +1440,18 @@ function renderBubbles(){
 }
 function scrollCats(d){const t=$("catsTrack");if(t)t.scrollBy({left:d*300,behavior:"smooth"});}
 function renderChips(){
-  const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  let h='<button type="button" class="chip" data-c="todo" onclick="filterProducts(\'todo\')">Todo <small>'+PRODUCTOS.filter(p=>!prodOculto(p.id)&&!catOculta(p.cat)&&!provOculto(p.prov)).length+'</small></button>';
-  CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<button type="button" class="chip" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+' <small>'+(counts[c.id]||0)+'</small></button>');
+  /* Conteos honestos: solo productos visibles. La categoria vacia por
+     catalogo oculto no aparece y el resto muestra lo que de verdad se
+     puede comprar. */
+  const counts={};let total=0;
+  PRODUCTOS.forEach(p=>{if(prodVisible(p)){counts[p.cat]=(counts[p.cat]||0)+1;total++;}});
+  let h='<button type="button" class="chip" data-c="todo" onclick="filterProducts(\'todo\')">Todo <small>'+total+'</small></button>';
+  CATS.filter(c=>catViva(c.id)).forEach(c=>h+='<button type="button" class="chip" data-c="'+c.id+'" onclick="filterProducts(\''+escJs(c.id)+'\')">'+esc(c.n)+' <small>'+(counts[c.id]||0)+'</small></button>');
   $("chips").innerHTML=h;
 }
 function renderMobileMenu(){
   let h='<li><button onclick="toggleMenu();scrollToSection(\'tienda\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Todos los productos</button></li>';
-  CATS.filter(c=>!catOculta(c.id)).forEach(c=>h+='<li><button onclick="toggleMenu();filterProducts(\''+escJs(c.id)+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>'+esc(c.n)+'</button></li>');
+  CATS.filter(c=>catViva(c.id)).forEach(c=>h+='<li><button onclick="toggleMenu();filterProducts(\''+escJs(c.id)+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="'+c.i+'"/></svg>'+esc(c.n)+'</button></li>');
   h+='<li><button onclick="toggleMenu();scrollToSection(\'favoritos\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/></svg>Los favoritos de <img src="logo_120.png" alt="" style="height:16px;vertical-align:-2px;margin-left:2px" onerror="this.remove()"></button></li>';
   h+='<li><button onclick="toggleMenu();scrollToSection(\'faq\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2A2.6 2.6 0 0 1 12 7.4c1.4 0 2.5 1 2.5 2.2 0 2.2-2.5 2-2.5 4M12 17h.01"/></svg>Preguntas frecuentes</button></li>';
   $("mobileMenuList").innerHTML=h;
@@ -1455,7 +1465,7 @@ function syncActive(){
 
 /* ===== Catálogo ===== */
 function listado(){
-  let l=PRODUCTOS.filter(p=>(filter==="todo"||p.cat===filter)&&(!onlyFav||favs.includes(p.id))&&!prodOculto(p.id)&&!catOculta(p.cat)&&!provOculto(p.prov));
+  let l=PRODUCTOS.filter(p=>(filter==="todo"||p.cat===filter)&&(!onlyFav||favs.includes(p.id))&&prodVisible(p));
   if(orden==="a")l=l.slice().sort((a,b)=>a.p-b.p);
   else if(orden==="d")l=l.slice().sort((a,b)=>b.p-a.p);
   else if(orden==="cat"){const idx=c=>CATS.findIndex(x=>x.id===c);l=l.slice().sort((a,b)=>idx(a.cat)-idx(b.cat)||a.p-b.p);}
@@ -1672,7 +1682,7 @@ const COMPLEMENTOS={
    y con foto, precio accesible primero. Si agregan ropa urbana, veran mas
    ropa urbana para combinar + joyas/moda como complemento, y asi. */
 function sugeridosPorTicket(enCarrito){
-  const disp=PRODUCTOS.filter(p=>!enCarrito.has(p.id)&&productImgs(p).length>0&&!prodOculto(p.id)&&!provOculto(p.prov)&&!catOculta(p.cat));
+  const disp=PRODUCTOS.filter(p=>!enCarrito.has(p.id)&&productImgs(p).length>0&&prodVisible(p));
   if(!disp.length||!cart.length)return[];
   const catsCarrito=new Set();
   cart.forEach(it=>{const p=prod(it.id);if(p)catsCarrito.add(p.cat);});
@@ -2136,7 +2146,7 @@ function renderLightbox(){
   const multi=lb.imgs.length>1;
   $("lbPrev").style.display=multi?"grid":"none";
   $("lbNext").style.display=multi?"grid":"none";
-  const otros=PRODUCTOS.filter(x=>x.id!==lb.pid&&productImgs(x).length>0);
+  const otros=PRODUCTOS.filter(x=>x.id!==lb.pid&&prodVisible(x)&&productImgs(x).length>0);
   otros.sort((a,b)=>((a.cat===p.cat)?-1:0)-((b.cat===p.cat)?-1:0));
   const sug=otros.slice(0,8);
   const box=$("lbUpsell");
@@ -2174,7 +2184,7 @@ function searchProducts(){
   if(q.length<2){box.style.display="none";return;}
   clearTimeout(window.__sq);
   window.__sq=setTimeout(()=>track("Search",{search_string:q}),900);
-  const r=PRODUCTOS.filter(p=>p.n.toLowerCase().includes(q)||labelOf(p.cat).toLowerCase().includes(q)).slice(0,8);
+  const r=PRODUCTOS.filter(p=>prodVisible(p)&&(p.n.toLowerCase().includes(q)||labelOf(p.cat).toLowerCase().includes(q))).slice(0,8);
   box.innerHTML=r.length?r.map(p=>{
     const imgs=productImgs(p);
     return '<button type="button" class="sri" onclick="scrollToProduct(\''+escJs(p.id)+'\')"><span class="srt"'+(imgs.length?' style="background-image:url(\''+esc(imgs[0])+'\')"':"")+'>'+(imgs.length?"":"IKI")+'</span><span><b>'+esc(p.n)+'</b><i>'+cop(p.p)+' · '+esc(labelOf(p.cat))+'</i></span></button>';
@@ -2358,18 +2368,21 @@ function scrollCarousel(d,tid){
   t.scrollBy({left:paso*d,behavior:"smooth"});
 }
 /* Categorías top para los 5 carruseles: prioridad comercial + resto por
-   cantidad. La usan la tienda y el panel para NOMBRAR los carruseles. */
+   cantidad. La usan la tienda y el panel para NOMBRAR los carruseles.
+   Solo categorias VIVAS y conteos de productos visibles: ocultar un
+   catalogo saca sus categorias de los carruseles en vez de dejar filas
+   vacias con conteos inflados. */
 function topCategorias(){
-  const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
+  const counts={};PRODUCTOS.forEach(p=>{if(prodVisible(p))counts[p.cat]=(counts[p.cat]||0)+1;});
   const PRIORIDAD=["joyas","juguetes","urbana","moda","bebe"];
-  const prioridad=PRIORIDAD.filter(c=>counts[c]&&!catOculta(c));
-  const resto=Object.keys(counts).filter(c=>!PRIORIDAD.includes(c)&&!catOculta(c)).sort((a,b)=>counts[b]-counts[a]);
+  const prioridad=PRIORIDAD.filter(c=>counts[c]);
+  const resto=Object.keys(counts).filter(c=>!PRIORIDAD.includes(c)).sort((a,b)=>counts[b]-counts[a]);
   return prioridad.concat(resto).slice(0,5).map(function(c){return{id:c,n:counts[c]};});
 }
 function initCarouseles(){
   const sel=CONFIG.favoritosIds.map(prod).filter(Boolean);
   const fr=$("favoritos");
-  const vis=sel.filter(p=>!prodOculto(p.id)&&!provOculto(p.prov));
+  const vis=sel.filter(prodVisible);
   if(vis.length>=2&&!carruselOculto("favoritos")){
     fr.style.display="";
     $("favRowMeta").textContent=vis.length+" selecciones de la tienda";
@@ -2377,7 +2390,6 @@ function initCarouseles(){
     vis.forEach(p=>t.appendChild(crearItemCarro(p)));
     buildDots("carFav","dotsFav");hookScroll("carFav","dotsFav");
   }else fr.style.display="none";
-  const counts={};PRODUCTOS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
   const top=topCategorias();
   [["row1","car1","dots1","row1Label","row1Meta"],
    ["row2","car2","dots2","row2Label","row2Meta"],
@@ -2388,9 +2400,9 @@ function initCarouseles(){
     if(!cat||carruselOculto(cfg[0])){row.style.display="none";return;}
     row.style.display="";
     $(cfg[3]).textContent=labelOf(cat);
-    $(cfg[4]).textContent=counts[cat]+" producto"+(counts[cat]===1?"":"s");
+    $(cfg[4]).textContent=conteoVivo(cat)+" producto"+(conteoVivo(cat)===1?"":"s");
     t.innerHTML="";
-    PRODUCTOS.filter(p=>p.cat===cat&&!prodOculto(p.id)&&!provOculto(p.prov)).slice(0,24).forEach(p=>t.appendChild(crearItemCarro(p)));
+    PRODUCTOS.filter(p=>p.cat===cat&&prodVisible(p)).slice(0,24).forEach(p=>t.appendChild(crearItemCarro(p)));
     buildDots(cfg[1],cfg[2]);hookScroll(cfg[1],cfg[2]);
   });
   iniciarAutoplay();
@@ -2466,7 +2478,7 @@ function actualizarHero(){
   let h="";
   ids.forEach(function(pid){
     const p=window.PRODUCTOS.find(function(x){return x.id===pid;});
-    if(!p||!p.img||prodOculto(pid)||provOculto(p.prov))return;
+    if(!p||!p.img||!prodVisible(p))return;
     h+='<div class="hg-item" onclick="scrollToProduct(\''+pid+'\')" role="button" tabindex="0" aria-label="Ver '+p.n+'">'
       +'<img src="'+p.img+'" alt="'+p.n+'" decoding="async" loading="eager">'
       +'<div class="hg-info"><b>'+p.n+'</b><span>'+cop(p.p)+'</span></div>'
@@ -2571,6 +2583,18 @@ function prodOculto(id){return ocultasLista(TIENDA.productosOcultos).includes(id
 function seccionOculta(id){return ocultasLista(TIENDA.seccionesOcultas).includes(id);}
 function carruselOculto(id){return ocultasLista(TIENDA.carruselesOcultos).includes(id);}
 function provOculto(prv){return ocultasLista(TIENDA.catalogosOcultos).includes(prv);}
+/* Producto visible en tienda: categoria no oculta, no oculto a mano y su
+   catalogo (linea de inventario) no oculto. UNA SOLA fuente de verdad
+   para grid, burbujas, chips, subnav, menu, carruseles, favoritos, heroe,
+   buscador, lightbox y sugeridos. */
+function prodVisible(p){return !!p&&!catOculta(p.cat)&&!prodOculto(p.id)&&!provOculto(p.prov);}
+/* Categoria viva: no esta oculta y le queda al menos UN producto visible.
+   Ocultar un catalogo vacia sus categorias completas y TODO lo que
+   depende de ellas desaparece solo: burbujas, chips, subnav, menu,
+   carruseles, conteos y enlaces del pie. */
+function catViva(id){return !catOculta(id)&&PRODUCTOS.some(p=>p.cat===id&&prodVisible(p));}
+/* Cuantos productos visibles tiene una categoria (para conteos honestos) */
+function conteoVivo(id){let n=0;PRODUCTOS.forEach(p=>{if(p.cat===id&&prodVisible(p))n++;});return n;}
 /* Lineas de inventario (codigos internos neutrales: una sola marca ante el cliente) */
 const PROVEEDORES=[{id:"l1",n:"Línea Joyas"},{id:"l2",n:"Línea Moda"},{id:"l3",n:"Línea Juguetes y escolar"},{id:"l4",n:"Línea Bebé y regalos"},{id:"l5",n:"Línea Ropa urbana"}];
 function aplicarSeccionesVisibles(){
@@ -2584,6 +2608,12 @@ function aplicarVisibilidad(){
   aplicarSeccionesVisibles();
   renderSubnav();renderBubbles();renderChips();renderGrid();initCarouseles();renderMobileMenu();
   actualizarHero();
+  /* Pie de pagina: los enlaces de Tienda de categorias muertas (vacias por
+     catalogo oculto, categoria oculta o sin productos) desaparecen tambien. */
+  document.querySelectorAll("footer .flink").forEach(function(b){
+    const m=/filterProducts\('([a-z]+)'\)/.exec(b.getAttribute("onclick")||"");
+    if(m)b.style.display=catViva(m[1])?"":"none";
+  });
 }
 function aplicarContraEntrega(){
   const activa=contraEntregaActiva();
@@ -2666,19 +2696,19 @@ function pintarPanelAdmin(){
   pintarPreviewAdmin();
 }
 function pintarCategoriasAdmin(){
-  const counts={};window.PRODUCTOS.forEach(function(p){counts[p.cat]=(counts[p.cat]||0)+1;});
   let h="";
   CATS.forEach(function(c){
     const m=PRECIOS.margenesPorCategoria[c.id];
     const val=(typeof m==="number")?Math.round(m*1000)/10:"";
-    h+='<div class="admin-cat-fila"><span class="admin-cat-nombre"><svg class="ic" viewBox="0 0 24 24" style="color:var(--y)"><path d="'+c.i+'"/></svg>'+esc(c.n)+' <small>('+ (counts[c.id]||0) +')</small></span>'
+    const vivos=conteoVivo(c.id);
+    h+='<div class="admin-cat-fila"><span class="admin-cat-nombre"><svg class="ic" viewBox="0 0 24 24" style="color:var(--y)"><path d="'+c.i+'"/></svg>'+esc(c.n)+' <small>('+ vivos +')</small></span>'
       +'<input type="number" min="0" step="1" data-cat="'+c.id+'" value="'+val+'" placeholder="igual" title="Ganancia % para '+esc(c.n)+'">'
       +'<span class="admin-cat-preview">ej: <strong>'+cop(precioEjemplo(c.id))+'</strong></span></div>';
   });
   $("adminCats").innerHTML=h;
 }
 function precioEjemplo(cat){
-  const barato=window.PRODUCTOS.filter(function(p){return p.cat===cat}).sort(function(a,b){return a.p-b.p})[0];
+  const barato=window.PRODUCTOS.filter(function(p){return p.cat===cat&&prodVisible(p);}).sort(function(a,b){return a.p-b.p})[0];
   return barato?barato.p:0;
 }
 function pintarHeroAdmin(){
@@ -2753,10 +2783,13 @@ function pintarVisibilidadAdmin(){
   let h="";
   CATS.forEach(function(c){
     const vis=!oc.includes(c.id);
+    const vivos=conteoVivo(c.id);
+    const catalogo=PROVEEDORES.find(function(pr){return PRODUCTOS.some(function(p){return p.cat===c.id&&p.prov===pr.id;});});
+    const catOcultoPorLinea=catalogo&&provOculto(catalogo.id);
     h+='<div class="admin-cat-fila">'
       +'<svg class="ic" viewBox="0 0 24 24" style="color:var(--y)"><path d="'+c.i+'"/></svg>'
-      +'<span class="admin-cat-nombre">'+esc(c.n)+'</span>'
-      +'<label class="admin-check" style="min-height:0;font-size:12px"><input type="checkbox" '+(vis?"checked":"")+' onchange="toggleCategoriaVis(\''+escJs(c.id)+'\',this.checked)"> Visible</label>'
+      +'<span class="admin-cat-nombre">'+esc(c.n)+' <small style="font:500 10.5px Poppins;color:var(--mu)">'+(vivos?(vivos+" en la tienda"):"vacía"+(catOcultoPorLinea?" — su catálogo está oculto":""))+'</small></span>'
+      +'<label class="admin-check" style="min-height:0;font-size:12px"><input type="checkbox" '+(vis?"checked":"")+' onchange="toggleCategoriaVis(\''+escJs(c.id)+'\',this.checked)'+(vivos?"":";showToast(\'Categoría vacía: aparecerá cuando tenga productos visibles (revisa el catálogo de su línea)\',\'err\')")+'"> Visible</label>'
       +'</div>';
   });
   $("adminCatsVis").innerHTML=h;
@@ -2805,6 +2838,9 @@ function toggleCatalogo(id,visible){
   if(visible)l=l.filter(function(x){return x!==id;});
   else if(!l.includes(id))l.push(id);
   TIENDA.catalogosOcultos=l.join(",");
+  /* Si el filtro activo era de una categoria de este catalogo, la
+     categoria quedo muerta: se vuelve a Todo para no dejar un grid vacio. */
+  if(filter!=="todo"&&!catViva(filter))filter="todo";
   aplicarVisibilidad();persistirPanel();pintarVisibilidadAdmin();
 }
 function toggleCategoriaVis(id,visible){
@@ -2812,7 +2848,7 @@ function toggleCategoriaVis(id,visible){
   if(visible)l=l.filter(function(x){return x!==id;});
   else if(!l.includes(id))l.push(id);
   TIENDA.categoriasOcultas=l.join(",");
-  if(catOculta(filter))filter="todo";
+  if(!catViva(filter))filter="todo";
   aplicarVisibilidad();persistirPanel();pintarVisibilidadAdmin();
 }
 function buscarAdminOcultar(){
@@ -2838,7 +2874,11 @@ function toggleProductoOculto(id){
   if(estaba)l=l.filter(function(x){return x!==id;});
   else l.push(id);
   TIENDA.productosOcultos=l.join(",");
-  renderGrid();renderChips();initCarouseles();actualizarHero();
+  /* Ocultar el ultimo producto de una categoria tambien la mata: se
+     repinta TODO (burbujas, subnav, menu, carruseles) y el filtro activo
+     vuelve a Todo si quedo vacio. */
+  if(filter!=="todo"&&!catViva(filter))filter="todo";
+  aplicarVisibilidad();
   persistirPanel();pintarOcultosAdmin();
   $("adminResOcultar").innerHTML="";$("adminBuscarOcultar").value="";
   showToast(estaba?"Producto visible en la tienda":"Producto oculto de la tienda");
