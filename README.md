@@ -231,6 +231,7 @@ del código + E2E en navegador contra la tienda en vivo):
 | Organización | 11/11: 8 categorías, m30 restaurado, márgenes, precios exactos |
 | Familiares | 11/11: 13 prendas, tallas/estampados, enlaces viejos |
 | Pedido móvil | 5/5: share con imagen+texto, fallbacks |
+| **Panel admin (`qa_admin_e2e.js`)** | **52/52: las 3 vías de acceso + login/clave nueva, todos los campos y funciones del panel (identidad, legales, redes, ganancias por categoría, precio exacto, héroe con tope de 6, favoritos, 7 secciones + carruseles + catálogo completo + categorías + productos, contra entrega, token, publicar en vivo, guardar/restaurar/copiar, preview y lista completa)** |
 
 ---
 

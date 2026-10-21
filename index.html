@@ -1074,7 +1074,8 @@ footer a:hover{color:var(--cr)}
       <div class="admin-fijados" id="adminResPrecio"></div>
       <div id="adminFijados"></div>
 
-      <div class="admin-h">Lista completa de productos</div>
+      <div class="admin-h">Lista completa de productos <small>por categoría, con precio de venta y precio fijo opcional</small></div>
+      <button class="btn o" type="button" onclick="toggleListaTodosAdmin()">Ver la lista completa</button>
       <div class="admin-lista" id="adminLista" hidden></div>
 
       <div class="admin-h">Publicar para TODOS <small>sube esta configuración al proyecto de GitHub: todos los visitantes la ven en ~1 minuto, sin editar archivos</small></div>
@@ -2790,7 +2791,9 @@ function pintarFijadosAdmin(){
 }
 function pintarListaAdmin(){
   const la=$("adminLista");
-  la.hidden=false;
+  if(!la)return;
+  /* Llena la lista SIN abrirla: la visibilidad la manda el boton de
+     "Ver la lista completa" (antes se auto-abria con 2.000+ filas) */
   const grupos={};
   window.PRODUCTOS.forEach(function(p){(grupos[p.cat]=grupos[p.cat]||[]).push(p);});
   let h="";
@@ -2966,6 +2969,27 @@ function quitarHeroAdmin(id){
   TIENDA.heroIds=ids.join(",");
   aplicarTienda();actualizarHero();pintarHeroAdmin();
   showToast("Quitado del héroe");
+}
+/* Favoritos del carrusel: agregar/quitar desde el panel (las funciones
+   originales se perdieron en un refactor y los botones quedaron sueltos) */
+function agregarFavoritoAdmin(id){
+  const favs=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  if(!favs.includes(id))favs.push(id);
+  TIENDA.favoritos=favs.join(",");
+  aplicarTienda();initCarouseles();
+  pintarFavoritosAdmin();$("adminResFav").innerHTML="";$("adminBuscarFav").value="";
+  showToast("Agregado a favoritos");
+}
+function quitarFavoritoAdmin(id){
+  TIENDA.favoritos=TIENDA.favoritos.split(",").map(function(s){return s.trim();}).filter(function(x){return x&&x!==id;}).join(",");
+  aplicarTienda();initCarouseles();pintarFavoritosAdmin();
+  showToast("Quitado de favoritos");
+}
+function toggleListaTodosAdmin(){
+  const la=$("adminLista");
+  if(!la)return;
+  if(la.hidden){pintarListaAdmin();la.hidden=false;}
+  else la.hidden=true;
 }
 function destacarAdminHero(id){
   agregarHeroAdmin(id);
