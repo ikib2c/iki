@@ -76,9 +76,14 @@ section[id]{scroll-margin-top:88px}
 .ib.on{background:var(--c);color:var(--cr)}
 .subnav{position:relative;background:#fff;border-top:1px solid var(--bd)}
 #subnavTrack{display:flex;gap:4px;align-items:center;justify-content:center;max-width:1180px;margin:0 auto;padding:7px 26px;overflow-x:auto;scrollbar-width:none}
-#subnavTrack.is-desb{justify-content:flex-start}
+#subnavTrack.is-desb{justify-content:flex-start;scroll-snap-type:x proximity;padding-right:52px}
 #subnavTrack::-webkit-scrollbar{display:none}
-.snl{flex:none;border:0;background:none;font:500 13px var(--fb);color:var(--c);padding:7px 12px;border-radius:999px;cursor:pointer;transition:background .2s;white-space:nowrap}
+.snl{flex:none;border:0;background:none;font:500 13px var(--fb);color:var(--c);padding:7px 12px;border-radius:999px;cursor:pointer;transition:background .2s;white-space:nowrap;scroll-snap-align:start}
+/* Cuando la barra desborda, un degradado al borde derecho senala que hay
+   MAS categorias: el corte se lee como carrusel intencional ("Navi" a
+   medias parecia texto roto) y el snap hace que el scroll pare SIEMPRE
+   entre categorias, nunca a mitad de palabra. */
+.subnav:has(#subnavTrack.is-desb)::after{content:"";position:absolute;right:0;top:1px;bottom:0;width:58px;background:linear-gradient(90deg,#fff0,#fff);pointer-events:none}
 .snl:hover{background:#2424240d}
 .snl.on{background:var(--c);color:var(--cr);font-weight:600}
 .sn-sep{width:1px;height:18px;background:var(--bd);flex:none;margin:0 6px}
@@ -1564,7 +1569,7 @@ function toggleQty(id,forzar){
   if(abrir){
     selQty[id]=selQty[id]||1;
     const p=prod(id);
-    if(p)track("ViewContent",{content_name:p.n,content_type:"product",currency:"COP"});
+    if(p)track("ViewContent",{content_name:p.n,content_ids:[id],content_type:"product",value:p.p,currency:"COP"});
   }
 }
 function changeQty(id,d){
@@ -1664,7 +1669,7 @@ function addToCart(id,qty,vari){
   if(it)it.qty+=qty;else cart.push({id:id,qty:qty,var:vari||null});
   sv("iki-cart",cart);
   const p=prod(id);
-  if(p)track("AddToCart",{content_name:p.n,content_type:"product",contents:[{id:id,quantity:qty}],value:p.p*qty,currency:"COP"});
+  if(p)track("AddToCart",{content_name:p.n,content_type:"product",content_ids:[id],contents:[{id:id,quantity:qty,item_price:p.p}],num_items:qty,value:p.p*qty,currency:"COP"});
   renderCart();
   /* Dopamina fisica: vibracion corta en telefonos (no-op en escritorio) */
   try{if("vibrate" in navigator)navigator.vibrate(30);}catch(e){}
@@ -1780,7 +1785,7 @@ function openOrderForm(){
   if(!ya&&body)body.scrollTop=0;
   if(!ya){
     const s=cartResumen();
-    track("InitiateCheckout",{num_items:s.count,value:s.total,currency:"COP",content_ids:cart.map(i=>i.id)});
+    track("InitiateCheckout",{num_items:s.count,value:s.total,currency:"COP",content_type:"product",content_ids:cart.map(i=>i.id),contents:cart.map(i=>{const pp=prod(i.id);return{id:i.id,quantity:i.qty,item_price:pp?pp.p:0};})});
   }
 }
 function closeOrderForm(){$("orderModal").classList.remove("show");lock(false);}
@@ -1934,7 +1939,11 @@ function sendOrder(){
   m+="\n*TOTAL PRODUCTOS: "+cop(s.total)+"*\n";
   m+="Envío: pagado, se cotiza según la ciudad y se confirma por WhatsApp.";
   if(notas)m+="\n\n*Notas:* "+notas;
-  track("Lead",{value:s.total,currency:"COP",num_items:s.count,content_name:"Pedido WhatsApp"});
+  /* Evento de COMPRA para el Pixel de Meta: valor total + articulos con su
+     precio unitario, para que el administrador de eventos capte el valor
+     de cada pedido y los anuncios optimicen por compras reales. En una
+     venta por WhatsApp contra entrega, el pedido enviado ES la compra. */
+  track("Purchase",{value:s.total,currency:"COP",num_items:s.count,content_type:"product",content_name:"Pedido WhatsApp",content_ids:cart.map(i=>i.id),contents:cart.map(i=>{const pp=prod(i.id);return{id:i.id,quantity:i.qty,item_price:pp?pp.p:0};})});
   /* wa.me abre WhatsApp DIRECTO en cualquier dispositivo: sin selector
      de apps, sin fricción, cero pérdida de ventas por confusion. */
   enviarPedido(m,consec);
