@@ -26,6 +26,7 @@ del catálogo**.
 | `GitHub.txt` | **Local** (en `.gitignore`): donde vive el token de GitHub |
 | `IKI_Brief_Branding.md` | Manual de marca y del sistema publicado |
 | `*_Catalogo.xlsx` | Excel completos por proveedor (5), generados por el sync |
+| `dropi-analytics/` | **Sistema de inteligencia de Dropi** (externo a la tienda): mide ventas reales por delta de stock, genera el informe por categorías (perfumería, joyas, ropa, calzado, relojes, pijamas) en HTML/PDF/Excel y corre automático 2 veces al día — ver su `README.md` |
 
 ---
 
