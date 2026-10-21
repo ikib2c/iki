@@ -2607,17 +2607,18 @@ function aplicarSeccionesVisibles(){
     const el=document.querySelector(mapa[k]);
     if(el)el.style.display=seccionOculta(k)?"none":"";
   });
+  /* Pie de pagina: los enlaces de Tienda de categorias muertas (vacias por
+     catalogo oculto, categoria oculta o sin productos) desaparecen tambien.
+     Corre al arrancar y en cada cambio de visibilidad. */
+  document.querySelectorAll("footer .flink").forEach(function(b){
+    const m=/filterProducts\('([a-z]+)'\)/.exec(b.getAttribute("onclick")||"");
+    if(m)b.style.display=catViva(m[1])?"":"none";
+  });
 }
 function aplicarVisibilidad(){
   aplicarSeccionesVisibles();
   renderSubnav();renderBubbles();renderChips();renderGrid();initCarouseles();renderMobileMenu();
   actualizarHero();
-  /* Pie de pagina: los enlaces de Tienda de categorias muertas (vacias por
-     catalogo oculto, categoria oculta o sin productos) desaparecen tambien. */
-  document.querySelectorAll("footer .flink").forEach(function(b){
-    const m=/filterProducts\('([a-z]+)'\)/.exec(b.getAttribute("onclick")||"");
-    if(m)b.style.display=catViva(m[1])?"":"none";
-  });
 }
 function aplicarContraEntrega(){
   const activa=contraEntregaActiva();
