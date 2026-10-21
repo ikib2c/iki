@@ -764,10 +764,39 @@ if __name__ == "__main__":
     #     igual — el hash del URL ABSOLUTO mantiene el rehost incremental
     #     (las ya descargadas no se vuelven a bajar) y la marca sigue sin
     #     exponer ningun dominio ajeno en las fotos.
+    #     Las fotos de Majestic (Supabase) son ORIGINALES del proveedor
+    #     (100-200 KB para casillas de 235px): se rehospedan REDIMENSIONADAS
+    #     a webp (~600px, 40-80 KB) — misma receta que volvio instantanea a
+    #     la vitrina de juguetes. Pillow la genera; el hash del URL original
+    #     mantiene todo incremental.
     TAIWAN_BASE = "https://jugueteriataiwanoficial.github.io/jugueteriataiwan/"
-    def rehost_imgs(items):
-        carpeta = os.path.join(RAIZ, "img", "p")
-        os.makedirs(carpeta, exist_ok=True)
+    carpeta = os.path.join(RAIZ, "img", "p")
+    os.makedirs(carpeta, exist_ok=True)
+
+    def rehost_una(original, redimensionar):
+        h = hashlib.md5(original.encode()).hexdigest()[:16]
+        dest = os.path.join(carpeta, h + ".webp")
+        if not os.path.exists(dest):
+            data = get_bin(original)
+            if not data:
+                return None
+            if redimensionar:
+                try:
+                    from io import BytesIO
+                    from PIL import Image
+                    im = Image.open(BytesIO(data))
+                    im = im.convert("RGB") if im.mode != "RGB" else im
+                    im.thumbnail((640, 800))
+                    im.save(dest, "WEBP", quality=78, method=6)
+                except Exception:
+                    with open(dest, "wb") as f:
+                        f.write(data)
+            else:
+                with open(dest, "wb") as f:
+                    f.write(data)
+        return "img/p/" + h + ".webp"
+
+    def rehost_imgs(items, redimensionar=False):
         n = 0
         for x in items:
             nuevas = []
@@ -775,30 +804,28 @@ if __name__ == "__main__":
                 if not u:
                     continue
                 if u.startswith("assets/"):
-                    original = TAIWAN_BASE + u
+                    original, red = TAIWAN_BASE + u, False
                 elif "jugueteriataiwan" in u:
-                    original = u
+                    original, red = u, False
+                elif redimensionar and "supabase" in u:
+                    original, red = u, True
                 else:
                     nuevas.append(u)
                     continue
-                h = hashlib.md5(original.encode()).hexdigest()[:16]
-                dest = os.path.join(carpeta, h + ".webp")
-                if not os.path.exists(dest):
-                    data = get_bin(original)
-                    if not data:
-                        nuevas.append(u)
-                        continue
-                    with open(dest, "wb") as f:
-                        f.write(data)
-                nuevas.append("img/p/" + h + ".webp")
+                nueva = rehost_una(original, red)
+                if not nueva:
+                    nuevas.append(u)
+                    continue
+                nuevas.append(nueva)
                 n += 1
             x["imgs"] = nuevas
         if n:
-            print("  rehost: %d imagenes locales" % n)
+            print("  rehost: %d imagenes locales%s" % (n, " (redimensionadas a webp)" if redimensionar else ""))
         return items
 
     juguetes = rehost_imgs(juguetes)
     escolar = rehost_imgs(escolar)
+    moda = rehost_imgs(moda, redimensionar=True)
 
     print("== catalogo.js ==")
     escribir_catalogo_js([

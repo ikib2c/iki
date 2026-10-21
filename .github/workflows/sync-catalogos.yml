@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Instalar dependencias
-        run: python -m pip install openpyxl
+        run: python -m pip install openpyxl pillow
       - name: Sincronizar catalogos
         run: python scripts/sync_catalogos.py
       - name: Publicar cambios (si los hay)
