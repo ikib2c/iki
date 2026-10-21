@@ -2,7 +2,7 @@
 // (botón "Publicar para TODOS"). Se aplica a TODOS los visitantes de
 // https://ikib2c.github.io/iki/ — nadie necesita editar este archivo a mano.
 window.CONFIG_PUBLICADA = {
-  "version": 1792576063678,
+  "version": 1792576105103,
   "tienda": {
     "nombre": "Pijamas",
     "logo": "logo_120.png",
