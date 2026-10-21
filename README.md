@@ -122,7 +122,12 @@ Protecciones activas:
 
 - **Miniaturas de Taiwan rehospedadas** en `img/p/<md16>.webp` (rutas
   relativas `assets/fotos/…` resueltas contra su base pública; rehost
-  incremental por hash del URL absoluto). Cero dominios ajenos en las fotos.
+  incremental por hash del URL absoluto).
+- **Fotos de Majestic rehospedadas y redimensionadas**: Supabase servía
+  los originales del proveedor (100–200 KB para casillas de 235 px); el
+  sync las reduce a **webp 640 px, ~46 KB promedio** (máx. 78 KB) con
+  Pillow — la descarga inicial bajó de 6,7–8,4 MB a **~3 MB**. Cero
+  dominios ajenos en las fotos; rehost incremental por hash del URL.
 - **Cadena de respaldo en la tienda**: foto fallida → siguiente foto de la
   galería del producto → placeholder "IKI" de la categoría (`fbkFrom`
   anti-bucles; el lightbox y los carruseles reciclan el mismo `<img>`).
@@ -143,14 +148,22 @@ solo toca `data/configuracion.js`) → push.
 
 ## 3. Precios
 
-`precioFinal = base × multiplicador × (1 + margen) → redondeado a 100`
+`precioFinal = base × multiplicador × (1 + margen) → techo a $1.000`
 
 Prioridad: **1)** precio exacto fijado en el panel → **2)** margen de
 temporada → **3)** margen de categoría → **4)** margen global.
 
-- Márgenes por categoría: las 8 de Majestic al **60%** (mismo precio final que
-  la antigua "moda"), joyas 70%, juguetes/escolar 50%, regalos 30%, bebé 25%,
-  urbana 20%, global 25%.
+- **Redondeo COMERCIAL hacia arriba** (tope de $1.000 publicado): jamás
+  quedan colas tipo $2.400/$2.600 — el precio siempre sube al múltiplo
+  limpio ($54.400→$55.000, $161.600→$162.000). Los precios ya exactos en
+  miles no se mueven; el tope es configurable desde el panel (sin
+  redondeo / 50 / 100 / 500 / 1.000, todos con semántica de techo).
+- **Orden del catálogo**: por defecto, de **menor a mayor precio** (la más
+  barata primero, empates por orden original).
+- Márgenes por categoría: las 8 de Majestic al **60%**, joyas 70%,
+  juguetes/escolar 50%, regalos 30%, bebé 25%, urbana 20%, global 25%.
+  Sobre el costo real de mayoreo esto equivale a 1,8–3,0× el costo,
+  dentro del estándar de moda al detal en Colombia (2–2,5×).
 - **Temporada navideña automática** del 15-nov al 6-ene: +10 puntos solo en
   categorías de regalo (`juguetes, regalos, joyas, navidad`).
 
@@ -200,26 +213,64 @@ TODOS".
 - **Héroe de temporada** (solo escritorio, hasta 6 productos): 2 Halloween +
   4 Navidad, con texto "Halloween y Navidad ya llegaron / Pijamas y outfits
   para toda la familia". Se cura desde el panel (heroIds) y se publica.
-- **Favoritos del carrusel**: 14 prendas de moda seleccionadas.
+  En pantallas pequeñas el héroe está oculto y sus fotos son lazy (cero
+  descargas regaladas).
+- **Header**: junto al logo va el eslogan ("Todo lo que te hace feliz, en un
+  solo lugar") como tagline de escritorio; en móvil se oculta (el logo basta).
+- **Favoritos del carrusel**: 20 prendas con Halloween y Navidad al frente.
 - Los IDs son estables: la curación sobrevive a los syncs.
 
 ---
 
-## 7. Compra y dopamina
+## 7. Compra, buscador y dopamina
 
 - **Checkout por fases** (pedido → datos → entrega → pago → notas) con
   validación en vivo y consecutivo `PED-YYYYMMDD-NNN`.
 - **Vuelo al carrito**: la foto de la tarjeta vuela al carrito (WAAPI, arco
   ~520 ms, miniatura en caché); sin vuelo con checkout abierto o
   `prefers-reduced-motion`; badge con rebote elástico y vibración en celulares.
-- **Pedido en móvil**: la hoja PNG del pedido viaja **junto con el texto** por
-  Web Share (wa.me no admite adjuntos); en escritorio, wa.me + descarga.
+- **Pedido SIEMPRE directo por wa.me** en cualquier dispositivo: WhatsApp
+  abre con el chat del vendedor listo (sin selector de apps ni elección de
+  número); la hoja PNG del pedido se **descarga** para adjuntarla en el
+  mismo chat.
 - **Enlace de alistamiento**: cada artículo del pedido lleva enlace
-  `?art=IKI-XXXX` a su ficha (CIDs permanentes, jamás reutilizados).
+  `?art=IKI-XXXX` a su ficha (CIDs permanentes, jamás reutilizados), y la
+  navegación aterriza directo en la tarjeta (con su panel de cantidad).
+- **Buscador con cobertura total**: normaliza tildes y ñ ("navidena",
+  "nino"), busca por **palabras sueltas en cualquier orden** ("grinch
+  dama"), incluye el **código IKI-XXXX y el SKU** del proveedor, y avisa
+  "+N resultados más" cuando el tope de 8 recorta consultas amplias.
+
+### Eventos para el Pixel de Meta
+
+Con el ID configurado en el panel (Redes y analítica → Pixel de Meta) la
+tienda emite: `PageView`, `ViewContent` (value + content_ids), `AddToCart`
+(value + item_price + num_items), `Search`, `InitiateCheckout` (contents
+completo) y **`Purchase` al enviar el pedido con el VALOR TOTAL de la
+compra** en COP + contents con id, cantidad y precio unitario — Meta capta
+el valor de cada compra y los anuncios optimizan por compras reales. (GA4
+recibe los mismos eventos con nombres estándar: `purchase`, etc.)
 
 ---
 
-## 8. Pruebas
+## 8. Rendimiento medido (octubre 2026)
+
+Medido con CDP (bytes reales por red, caché fría, CDN caliente):
+
+| Métrica | Escritorio | Móvil |
+|---|---|---|
+| FCP / LCP | 636 ms | 508 ms |
+| Carga completa | ~1,0 s | ~1,0 s |
+| Descarga inicial | 3,0 MB | 3,6 MB |
+| Peso por foto | ~46 KB promedio (máx. 78 KB) | igual |
+
+LCP < 650 ms en ambos (Google considera "bueno" < 2.500 ms). Las ~3 MB
+iniciales son ~55 fotos visibles de la vitrina (favoritos + carruseles +
+grid), todas lazy: solo se descargan las que entran al viewport.
+
+---
+
+## 9. Pruebas
 
 Cada cambio de fondo se verifica antes de publicar (bloques reales extraídos
 del código + E2E en navegador contra la tienda en vivo):
@@ -231,12 +282,15 @@ del código + E2E en navegador contra la tienda en vivo):
 | Visibilidad | 18/18: ocultar l3 (mata 2 categorías), restauración, filtro muerto |
 | Organización | 11/11: 8 categorías, m30 restaurado, márgenes, precios exactos |
 | Familiares | 11/11: 13 prendas, tallas/estampados, enlaces viejos |
-| Pedido móvil | 5/5: share con imagen+texto, fallbacks |
-| **Panel admin (`qa_admin_e2e.js`)** | **52/52: las 3 vías de acceso + login/clave nueva, todos los campos y funciones del panel (identidad, legales, redes, ganancias por categoría, precio exacto, héroe con tope de 6, favoritos, 7 secciones + carruseles + catálogo completo + categorías + productos, contra entrega, token, publicar en vivo, guardar/restaurar/copiar, preview y lista completa)** |
+| Panel admin (`qa_admin_e2e.js`) | 52/52: las 3 vías de acceso + login/clave nueva, todos los campos y funciones del panel |
+| **Aterrizaje y matemática (`qa_aterrizaje_precios.js`)** | **51/51: los 20 favoritos + 1.º y último de los 5 carruseles + 6 del héroe + buscador + `?art=` aterrizan en SU tarjeta con panel abierto; los 99 precios exactos contra el catálogo; carrito/líneas/totales/mensaje WhatsApp/hoja de pedido** |
+| Subnav + Pixel | 9/9: degradado y snap de categorías, funnel completo del pixel con valores exactos (Purchase $323.200 verificado) |
+| Orden + redondeo | 5/5: catálogo menor→mayor global, los 99 precios terminados en .000, techo a $1.000 |
+| Buscador | Cobertura 100%: 99/99 nombre exacto, 15/15 sin tildes/ñ, 21/21 dos palabras, IKI-XXXX y SKU |
 
 ---
 
-## 9. Operación diaria
+## 10. Operación diaria
 
 | Tarea | Cómo |
 |---|---|

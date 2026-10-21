@@ -1,12 +1,23 @@
 # IKI --- Brief de identidad de marca y manual para diseño
 
-**Versión:** 1.3\
+**Versión:** 1.4\
 **Fecha:** octubre de 2026\
 **Mercado:** Colombia\
 **Modelo de negocio:** comercio electrónico (venta por WhatsApp)\
 **Etapa:** tienda publicada y operativa en GitHub Pages\
 **Documento para:** diseñador/a de branding, diseñador/a web, empaque,
 fotografía y contenido
+
+> **Cambios de la versión 1.4:** precios con **redondeo comercial hacia
+> arriba** (tope de $1.000 publicado: jamás colas tipo $2.400/$2.600 —
+> siempre suben al múltiplo limpio) y catálogo ordenado por defecto de
+> **menor a mayor precio**; el texto junto al logo del header pasa de
+> "IKI" al **eslogan** (redundancia con el logo); pedido SIEMPRE directo
+> por wa.me (sin selector de apps); las fotos de la línea de moda se
+> rehospedan redimensionadas en `img/p/` (~46 KB webp, descarga inicial
+> de ~3 MB, LCP < 650 ms); buscador con cobertura total (sin tildes/ñ,
+> palabras sueltas, código IKI-XXXX y SKU); el pixel de Meta emite
+> `Purchase` con el valor total de cada compra.
 
 > **Cambios de la versión 1.3:** el panel publica la configuración para
 > todos vía API de GitHub (`data/configuracion.js`, con versión creciente
@@ -1177,12 +1188,20 @@ Esta sección documenta **lo que está publicado hoy** en
 - **Sincronización:** GitHub Actions cada 6 horas regenera `catalogo.js`,
   los Excel y las miniaturas rehospedadas en `img/p/`; GitHub Pages
   publica el resultado solo.
+- **Precios y orden:** todos los precios llevan **redondeo comercial
+  hacia arriba** al múltiplo de $1.000 (tope publicado desde el panel:
+  $54.400→$55.000, $161.600→$162.000; jamás colas tipo $2.400/$2.600) y
+  el catálogo se ordena por defecto de **menor a mayor precio**.
 
 ### 20.5 Páginas y estructura del index
 
 1. Barra superior (envíos y medios de pago) · encabezado fijo con logo
-   transparente, buscador con sugerencias, favoritos, carrito y menú
-   móvil · subnavegación por categorías.
+   transparente **y el eslogan como tagline** ("Todo lo que te hace
+   feliz, en un solo lugar" — la palabra IKI junto al logo era
+   redundante; en móvil se oculta y basta el logo), buscador con
+   sugerencias, favoritos, carrito y menú móvil · subnavegación por
+   categorías (con degradado de continuidad y scroll que para entre
+   categorías cuando desborda).
 2. Héroe de temporada (solo escritorio, hasta 6 productos): "Halloween y
    Navidad ya llegaron — pijamas y outfits para toda la familia", con 2
    artículos de Halloween y 4 de Navidad; se cura desde el panel
@@ -1214,9 +1233,9 @@ Esta sección documenta **lo que está publicado hoy** en
   rebota con easing elástico y el teléfono vibra; el checkout espera
   ~0,3 s a que la foto aterrice.
 - **Hoja de pedido PNG** (logo, consecutivo `PED-YYYYMMDD-NNN`, una fila
-  por producto): en celular viaja **junto con el texto del pedido** por
-  Web Share (wa.me no admite adjuntos); en escritorio se descarga para
-  adjuntarla.
+  por producto): se **descarga** al dispositivo para adjuntarla en el
+  mismo chat (el pedido viaja SIEMPRE directo por wa.me: WhatsApp abre
+  con el chat listo, sin selector de apps ni elección de número).
 - **Enlaces de alistamiento**: cada artículo del pedido lleva un enlace
   clicable a su ficha (`?art=IKI-XXXX`), con Códigos permanentes que
   nunca se reutilizan.
@@ -1261,9 +1280,13 @@ Esta sección documenta **lo que está publicado hoy** en
 
 - Dominio propio y URL absoluta de `og:image` / datos estructurados.
 - Razón social y NIT reales (editables desde el panel).
-- Alojar fotos propias de las demás líneas: las de juguetes y escolar ya
-  viven rehospedadas en `img/p/`; joyas, moda, bebé y urbana siguen en
-  CDNs neutrales (Shopify/Supabase).
+- Alojar fotos propias de las líneas dormidas: juguetes, escolar y TODA la
+  línea de moda ya viven rehospedadas (y redimensionadas a webp ~46 KB)
+  en `img/p/`; solo joyas, bebé y urbana seguirían en CDN neutral al
+  reactivarse.
+- Configurar el ID del Pixel de Meta en el panel (hoy está vacío: sin ID
+  no llega nada a Meta aunque los eventos ya emiten `Purchase` con el
+  valor de cada compra).
 - Políticas de envío con costos y plazos definitivos por ciudad.
 - Verificar la disponibilidad del nombre en la SIC.
 
