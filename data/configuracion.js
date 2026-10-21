@@ -2,7 +2,7 @@
 // (botón "Publicar para TODOS"). Se aplica a TODOS los visitantes de
 // https://ikib2c.github.io/iki/ — nadie necesita editar este archivo a mano.
 window.CONFIG_PUBLICADA = {
-  "version": 1792580627014,
+  "version": 1792588720869,
   "tienda": {
     "nombre": "IKI",
     "logo": "logo_120.png",
@@ -29,7 +29,7 @@ window.CONFIG_PUBLICADA = {
   "precios": {
     "margenGlobal": 0.25,
     "multiplicadorBase": 1,
-    "redondeo": 100,
+    "redondeo": 1000,
     "margenesPorCategoria": {
       "joyas": 0.7,
       "moda": 0.6,
