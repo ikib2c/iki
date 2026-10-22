@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sitemap de IKI para Google Search Console / Bing Webmaster.
+     Al mover al dominio oficial: reemplazar ikib2c.github.io/iki
+     por el dominio nuevo en las URLs de abajo (GitHub Pages redirige 301
+     automaticamente, y las senales SEO se transfieren).
+     Tienda de una sola pagina: home + legal. Los productos abren con
+     ?art=IKI-XXXX (permitidos en robots.txt). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ikib2c.github.io/iki/</loc>
+    <lastmod>2026-10-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://ikib2c.github.io/iki/legal.html</loc>
+    <lastmod>2026-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

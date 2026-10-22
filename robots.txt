@@ -1,0 +1,12 @@
+# IKI — rastreo abierto para buscadores
+# Al mover al dominio oficial: actualizar la linea Sitemap.
+
+User-agent: *
+Allow: /
+
+# Copias viejas de la tienda (no enlazadas desde ningun lado): fuera del
+# indice para evitar contenido duplicado en Google.
+Disallow: /index%20(5).html
+Disallow: /index_jugueteria.html
+
+Sitemap: https://ikib2c.github.io/iki/sitemap.xml

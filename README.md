@@ -21,7 +21,12 @@ del catálogo**.
 | `legal.html` | 8 políticas con anclas; absorbe la configuración publicada (razón social, NIT, contacto) |
 | `scripts/sync_catalogos.py` | Descarga los 5 proveedores, normaliza, cura, clasifica, escribe `catalogo.js` y los 5 Excel |
 | `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, commitea y publica (con `pull --rebase` para absorber lo publicado por el panel) |
+| `.github/workflows/qa-smoke.yml` | QA smoke diario (12:00 UTC) contra la tienda publicada: abre/cierra issue automático con etiqueta `qa-smoke` |
 | `img/p/` | Imágenes rehospedadas de la tienda (miniaturas webp, hash del URL) |
+| `qa_admin_e2e.js`, `qa_aterrizaje_precios.js` | Suites E2E locales (panel: 52 checks; aterrizajes y matemática: 51 checks) |
+| `qa_smoke_produccion.js` | Smoke L4 de producción (31 checks de lectura) contra ikib2c.github.io/iki; escribe `smoke_resultado.txt` (ignorado) |
+| `sitemap.xml`, `robots.txt` | SEO: envío a Google Search Console; canonical en index/legal. Al comprar el dominio oficial: actualizar URLs (GitHub Pages redirige 301 automáticamente) |
+| `PLAN_AUDITORIA_E2E_QA.md` | Plan de auditoría E2E/QA: niveles L0-L5, severidades, calendario |
 | `generar_enlace_config.py` | **Local** (en `.gitignore`): arma el enlace de configuración de un solo toque (token) |
 | `GitHub.txt` | **Local** (en `.gitignore`): donde vive el token de GitHub |
 | `IKI_Brief_Branding.md` | Manual de marca y del sistema publicado |
@@ -287,6 +292,13 @@ del código + E2E en navegador contra la tienda en vivo):
 | Subnav + Pixel | 9/9: degradado y snap de categorías, funnel completo del pixel con valores exactos (Purchase $323.200 verificado) |
 | Orden + redondeo | 5/5: catálogo menor→mayor global, los 99 precios terminados en .000, techo a $1.000 |
 | Buscador | Cobertura 100%: 99/99 nombre exacto, 15/15 sin tildes/ñ, 21/21 dos palabras, IKI-XXXX y SKU |
+| **Producción (`qa_smoke_produccion.js`)** | **31/31 checks de lectura contra la tienda publicada: home/SEO (título, og:, canonical, schema.org), catálogo (≥2.000, visibles según config, héroe/favoritos vivos, códigos y precios), muestra de 20 imágenes, config sin secretos, legal, robots/sitemap, 12 activos y deploy de Pages** |
+
+**Producción (automática):** el smoke L4 corre diario a las 12:00 UTC vía
+`qa-smoke.yml` (o a mano con `node qa_smoke_produccion.js`): 31 checks de
+lectura — si algo falla abre un issue `qa-smoke` con el log y se cierra solo al
+recuperarse. Plan completo en `PLAN_AUDITORIA_E2E_QA.md` (niveles L0-L5,
+severidades y calendario).
 
 ---
 
