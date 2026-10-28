@@ -2,7 +2,7 @@
 // (botón "Publicar para TODOS"). Se aplica a TODOS los visitantes de
 // https://ikib2c.github.io/iki/ — nadie necesita editar este archivo a mano.
 window.CONFIG_PUBLICADA = {
-  "version": 1793207580370,
+  "version": 1793208108763,
   "tienda": {
     "nombre": "IKI",
     "logo": "logo_120.png",
@@ -15,7 +15,7 @@ window.CONFIG_PUBLICADA = {
     "instagram": "",
     "tiktok": "",
     "pixelMeta": "516381950837357",
-    "ga4": "",
+    "ga4": "G-B331HZC1JK",
     "heroIds": "m85,m86,m59,m80,m81,m82",
     "favoritos": "m85,m86,m59,m80,m81,m84,m03,m06,m08,m11,m15,m16,m18,m21,m23,m29,m44,m47,m61,m66",
     "pagoContraEntrega": true,
