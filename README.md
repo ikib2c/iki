@@ -215,11 +215,18 @@ TODOS".
 
 ## 6. Héroe y favoritos
 
-- **Héroe de temporada** (solo escritorio, hasta 6 productos): 2 Halloween +
-  4 Navidad, con texto "Halloween y Navidad ya llegaron / Pijamas y outfits
+- **Héroe de temporada** (solo escritorio, 6 productos): 1 Halloween +
+  5 Navidad, con texto "Halloween y Navidad ya llegaron / Pijamas y outfits
   para toda la familia". Se cura desde el panel (heroIds) y se publica.
   En pantallas pequeñas el héroe está oculto y sus fotos son lazy (cero
   descargas regaladas).
+- **Vigencia de la curación (30-oct-2026)**: los syncs eliminan del catálogo
+  lo retirado por el proveedor; si héroe/favoritos curan un producto caído,
+  los checks 2.7/2.8 del smoke L4 lo marcan y abren el issue `qa-smoke`.
+  Caso resuelto: el proveedor retiró el Enterizo Halloween (`m85`) después
+  del publish del 21-oct, el sync del 28-oct lo sacó del catálogo, el smoke
+  lo marcó el 29-oct (issue #1) y el 30-oct se publicó la curación nueva
+  sustituyéndolo por `m101` (Pijama Navidad Familiar) — 31/31 verificado.
 - **Header**: junto al logo va el eslogan ("Todo lo que te hace feliz, en un
   solo lugar") como tagline de escritorio; en móvil se oculta (el logo basta).
 - **Favoritos del carrusel**: 20 prendas con Halloween y Navidad al frente.
@@ -297,7 +304,10 @@ del código + E2E en navegador contra la tienda en vivo):
 **Producción (automática):** el smoke L4 corre diario a las 12:00 UTC vía
 `qa-smoke.yml` (o a mano con `node qa_smoke_produccion.js`): 31 checks de
 lectura — si algo falla abre un issue `qa-smoke` con el log y se cierra solo al
-recuperarse. Plan completo en `PLAN_AUDITORIA_E2E_QA.md` (niveles L0-L5,
+recuperarse. Validado en producción: el 29-oct detectó la curación huérfana
+(héroe/favoritos apuntando a `m85` ya retirado por el proveedor) y al publicar
+la curación corregida pasó 31/31 y el issue se cerró con el diagnóstico.
+Plan completo en `PLAN_AUDITORIA_E2E_QA.md` (niveles L0-L5,
 severidades y calendario).
 
 ---
