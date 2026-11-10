@@ -20,8 +20,8 @@ del catálogo**.
 | `data/configuracion.js` | Configuración publicada desde el panel ("Publicar para TODOS"). La mantiene el panel vía API de GitHub: nadie la edita a mano |
 | `legal.html` | 8 políticas con anclas; absorbe la configuración publicada (razón social, NIT, contacto) |
 | `scripts/sync_catalogos.py` | Descarga los 5 proveedores, normaliza, cura, clasifica, escribe `catalogo.js` y los 5 Excel |
-| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, commitea y publica (con `pull --rebase` para absorber lo publicado por el panel) |
-| `.github/workflows/qa-smoke.yml` | QA smoke diario (12:00 UTC) contra la tienda publicada: abre/cierra issue automático con etiqueta `qa-smoke` |
+| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, commitea y publica — absorbe lo publicado por el panel con `pull --rebase` y push con 3 reintentos; timeout de 20 min y cola (no cancela corridas en marcha) |
+| `.github/workflows/qa-smoke.yml` | QA smoke diario (12:00 UTC) contra la tienda publicada: abre/cierra issue automático con etiqueta `qa-smoke`; timeout de 20 min |
 | `img/p/` | Imágenes rehospedadas de la tienda (miniaturas webp, hash del URL) |
 | `qa_admin_e2e.js`, `qa_aterrizaje_precios.js` | Suites E2E locales (panel: 52 checks; aterrizajes y matemática: 51 checks) |
 | `qa_smoke_produccion.js` | Smoke L4 de producción (31 checks de lectura) contra ikib2c.github.io/iki; escribe `smoke_resultado.txt` (ignorado) |
@@ -307,7 +307,10 @@ del código + E2E en navegador contra la tienda en vivo):
 lectura — si algo falla abre un issue `qa-smoke` con el log y se cierra solo al
 recuperarse. Validado en producción: el 29-oct detectó la curación huérfana
 (héroe/favoritos apuntando a `m85` ya retirado por el proveedor) y al publicar
-la curación corregida pasó 31/31 y el issue se cerró con el diagnóstico.
+la curación corregida pasó 31/31 y el issue se cerró con el diagnóstico; el
+10-nov detectó un deploy de Pages caído (fallo transitorio de GitHub) — la
+tienda siguió sirviendo la versión anterior, el deploy siguiente lo sanó y el
+issue se cerró solo en la corrida posterior.
 Plan completo en `PLAN_AUDITORIA_E2E_QA.md` (niveles L0-L5,
 severidades y calendario).
 

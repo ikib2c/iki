@@ -1116,7 +1116,7 @@ Esta sección documenta **lo que está publicado hoy** en
 | `data/configuracion.js`      | Configuración publicada desde el panel ("Publicar para TODOS"); la mantiene el propio panel vía API de GitHub |
 | `legal.html`                 | Página legal propia: 8 políticas con anclas, índice y datos del negocio desde la configuración publicada |
 | `scripts/sync_catalogos.py`  | Descarga los 5 proveedores, normaliza, cura, clasifica y escribe `catalogo.js` y los 5 Excel |
-| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, absorbe lo publicado con `pull --rebase`, commitea y publica |
+| `.github/workflows/sync-catalogos.yml` | Cron cada 6 horas (+ manual): sincroniza, absorbe lo publicado con `pull --rebase` (push con 3 reintentos), commitea y publica; timeout de 20 min y cola (no cancela corridas en marcha) |
 | `*_Catalogo.xlsx` (5)        | Excel completos por proveedor: Gava, Sublimados Majestic, Juguetería Taiwan, Solobabys y Open Mind |
 | `img/p/`                     | Miniaturas rehospedadas de la tienda (webp, hash del URL): ningún dominio ajeno en las fotos |
 | `generar_enlace_config.py`   | Local (en `.gitignore`): enlace de configuración de un solo toque para cargar el token del panel |
