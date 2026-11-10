@@ -147,7 +147,8 @@ Resumen), generados en cada corrida.
 Cada 6 horas: checkout con historial completo → sync → `git add catalogo.js
 *.xlsx img` → si hay cambios: commit `[skip ci]` → **`git pull --rebase`**
 (absorbe lo publicado por el panel vía API, sin conflicto posible: el panel
-solo toca `data/configuracion.js`) → push.
+solo toca `data/configuracion.js`) → push, con **3 intentos** (espera de 10 s
+entre intentos) por si el panel publica justo en paralelo.
 
 ---
 

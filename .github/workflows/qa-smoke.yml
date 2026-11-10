@@ -20,6 +20,7 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    timeout-minutes: 20 # corta si la red se cuelga (el default son 360 min)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

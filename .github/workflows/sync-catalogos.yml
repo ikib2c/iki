@@ -16,11 +16,12 @@ permissions:
 
 concurrency:
   group: sync-catalogos
-  cancel-in-progress: true
+  cancel-in-progress: false # una corrida en cola espera; matar el sync a mitad podria dejar cambios sin publicar
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 20 # corta si un proveedor se cuelga (el default son 360 min)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,12 +44,19 @@ jobs:
             # Si el panel publico la configuracion mientras este cron corria,
             # el repositorio quedo adelante: se absorbe con rebase (el panel
             # solo toca data/configuracion.js, nunca catalogo.js ni los Excel,
-            # asi que no hay conflicto posible) y se reintenta el push.
-            if ! git pull --rebase origin main; then
-              echo "No se pudo absorber lo publicado por el panel; el catalogo se regenera en la proxima corrida."
-              exit 1
-            fi
-            git push
+            # asi que no hay conflicto posible). 3 intentos: por si el panel
+            # publica justo entre el rebase y el push de un intento.
+            for intento in 1 2 3; do
+              if git pull --rebase origin main && git push; then
+                echo "Publicado en el intento $intento."
+                exit 0
+              fi
+              git rebase --abort >/dev/null 2>&1 || true
+              echo "Intento $intento fallo (el panel pudo publicar en paralelo); reintento en 10 s."
+              sleep 10
+            done
+            echo "No se pudo absorber lo publicado por el panel; el catalogo se regenera en la proxima corrida."
+            exit 1
           else
             echo "Sin cambios: los catalogos ya estaban al dia."
           fi
