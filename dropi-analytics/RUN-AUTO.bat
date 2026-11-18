@@ -13,6 +13,9 @@ rem     (nadie en el PC): regenera los informes con la ultima data, escribe
 rem     el aviso en el log y muestra un popup que permite lanzar
 rem     RUN-DIARIO.bat (login 2FA) con un clic. Define la variable
 rem     DROPANALYTICS_SIN_AVISO=1 para silenciar el popup (pruebas).
+rem   - refresca solo la lista de proveedores cada 7 dias (--refresh-if-old 7):
+rem     mide pedidos/mes del universo BFF y reconstruye config\suppliers.json
+rem     (con guardas: si el BFF o la sesion fallan, conserva la config anterior).
 rem Tarea programada: "DropAnalytics Rutina Diaria" - diario 07:00 y 19:00
 rem Log: data\state\run-auto.log
 
@@ -28,6 +31,10 @@ call :ts
 echo [%TS%] Verificando sesion de Dropi... >> %LOG%
 call node scripts\local-snapshot.js --check >> %LOG% 2>&1
 if errorlevel 1 goto sinSesion
+
+call :ts
+echo [%TS%] Revisando lista de proveedores (se refresca sola si tiene mas de 7 dias)... >> %LOG%
+call node scripts\local-snapshot.js --refresh-if-old 7 --max 120 >> %LOG% 2>&1
 
 call :ts
 echo [%TS%] Sesion OK - extrayendo catalogos, Chromium visible en pantalla, es normal... >> %LOG%

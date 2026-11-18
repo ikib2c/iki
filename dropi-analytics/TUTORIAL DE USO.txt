@@ -28,6 +28,7 @@ Qué hacer con el 2FA (ya NO es manual)
 Qué produce cada corrida
 Salida	Dónde
 Dashboard web (top vendidos hoy, acumulado, por proveedor, buscador con historial)	se abre solo · dashboard\index.html
+Informe por categorías (fotos, días de inventario, enlace al producto, IDs copiables)	data\analysis\categorias\informe-categorias.html
 Ranking juguetes (HTML a oscuro con IDs, unidades, costos, márgenes)	data\categories\jugueteria\ranking-juguetes.html
 CSVs para Excel	data\analysis\ y junto al ranking
 Recomendaciones de uso

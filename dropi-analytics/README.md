@@ -18,10 +18,10 @@ dropi-analytics/
 ├── RUN-AUTO.bat               Rutina DESATENDIDA para el Programador de tareas (popup si expiro la sesion; DROPANALYTICS_DESATENDIDA=1)
 ├── RUN-JUGUETES.bat           Doble clic: snapshot juguetes + ranking de mas vendidos
 ├── config/
-│   ├── suppliers.json         Proveedores monitoreados (auto-actualizable con --refresh-config)
+│   ├── suppliers.json         Proveedores monitoreados (refresco automatico cada 7 dias en RUN-AUTO)
 │   ├── credenciales.json      Credenciales Dropi (GITIGNORED — cambiables, ver abajo)
 ├── scripts/
-│   ├── local-snapshot.js      Extractor LOCAL Playwright (--login --all --supplier --toys --refresh-config)
+│   ├── local-snapshot.js      Extractor LOCAL Playwright (--login --all --supplier --toys --refresh-config --refresh-if-old)
 │   ├── servidor-delta.js      Servidor local de deltas (puerto 3777) para la extension
 │   ├── aviso-login.ps1        Popup "Sesion expirada" con boton que lanza RUN-DIARIO (login 2FA)
 │   ├── analyze.ps1            Motor de deltas + tier list -> dashboard
@@ -64,14 +64,17 @@ node scripts\local-snapshot.js --login
 node scripts\local-snapshot.js --all
 #    Un solo proveedor:    node scripts\local-snapshot.js --supplier 205895
 #    Catalogo de juguetes: node scripts\local-snapshot.js --toys
-#    Refrescar config (mensual): node scripts\local-snapshot.js --refresh-config
+#    Refrescar config:      node scripts\local-snapshot.js --refresh-config
+#        Solo si tiene >7 dias: node scripts\local-snapshot.js --refresh-if-old 7  (lo usa RUN-AUTO)
 #        Con tope de activos:   node scripts\local-snapshot.js --refresh-config --cap 50
+#        Con tope total:        node scripts\local-snapshot.js --refresh-config --max 120
 #    Verificar sesion:     node scripts\local-snapshot.js --check
 
 # 2. ANÁLISIS — calcula ventas (deltas) y genera el dashboard
 .\scripts\analyze.ps1
 #    Analisis por categorias (perfumeria, joyas, ropa, calzado, relojes, pijamas):
-#    CSVs + informe HTML (IDs copiables + Exportar PDF) + Excel detallado + PDF:
+#    CSVs + informe HTML (fotos + dias de inventario + enlace al producto + IDs copiables)
+#    + Excel detallado + PDF:
 node scripts\categorias-analisis.js --pdf
 
 # 3. ABRIR DASHBOARD
@@ -87,7 +90,7 @@ programada, corre apenas se enciende (`StartWhenAvailable`).
 
 | Pieza | Rol |
 |---|---|
-| `RUN-AUTO.bat` | Rutina desatendida: check de sesión → snapshots (reanudable) → análisis → informe por categorías (CSVs + Excel + HTML + PDF). Sin pausas, no abre dashboards; todo queda en `data\state\run-auto.log` |
+| `RUN-AUTO.bat` | Rutina desatendida: check de sesión → refresco de proveedores si la config tiene >7 días → snapshots (reanudable) → análisis → informe por categorías (CSVs + Excel + HTML + PDF). Sin pausas, no abre dashboards; todo queda en `data\state\run-auto.log` |
 | `scripts/aviso-login.ps1` | Si la sesión expiró: popup con botón **Sí → abre RUN-DIARIO.bat** para renovar con el 2FA (auto-cierra en 1 h) |
 
 **El 2FA puede ser 100% automático**: la sesión de Dropi dura ~12 h. Cuando expira, si
@@ -161,8 +164,13 @@ La config NO es fija: Dropi cambia a diario. El modo `--refresh-config`:
 3. Respalda la config anterior (`config/suppliers.backup-{fecha}.json`) y reporta altas/bajas
 4. `--cap N` limita los activos a los N mayores (para acotar el tiempo del run diario)
 
-**Frecuencia recomendada: semanal o mensual.** Tiempo del run diario: ~2-5 min por
-proveedor (observado 20-oct: 100 proveedores ≈ 7,5 h; con `--cap 50` ≈ la mitad).
+**Ya no es manual:** `RUN-AUTO.bat` corre `--refresh-if-old 7 --max 120` antes de cada
+rutina — si `config/suppliers.json` tiene 7+ días se reconstruye solo, con guardas: sin
+token de sesión o con >20% de métricas BFF fallidas **aborta y conserva la config
+anterior** (no puede vaciar la cartera por una caída). El `--max 120` reserva GOLDBOX +
+top-12 catálogos grandes y completa por pedidos/mes: sin él, el refresco del 11-18 subió
+la lista de 108 a 225 proveedores (~17 h de extracción). Tiempo del run diario: ~2-5 min
+por proveedor (observado 20-oct: 100 proveedores ≈ 7,5 h; con `--cap 50` ≈ la mitad).
 Los 8 que no se capturan son catálogos vacíos/no visibles (7) o paginación atascada (1).
 
 **Advertencia descubierta (2026-10-17):** la métrica BFF `total_monthly_orders` es VOLÁTIL —
@@ -230,8 +238,8 @@ nunca en git). Formato: `{"usuario": "...", "contrasena": "..."}`.
 
 - **1 snapshot diario** (misma hora idealmente) — con 2+ snapshots/día se detectan
   reposiciones y mejora la precisión
-- **`--refresh-config` semanal/mensual** para adaptar la lista de proveedores
-  (Dropi cambia a diario: el primer refresco detectó 94 activos vs 38 dos días antes)
+- **Refresco de proveedores automático** (`--refresh-if-old 7` en RUN-AUTO; semanal) para
+  adaptar la lista (Dropi cambia a diario: el primer refresco detectó 94 activos vs 38 dos días antes)
 
 ## Lecciones técnicas incorporadas en los scripts
 
@@ -334,6 +342,14 @@ nunca en git). Formato: `{"usuario": "...", "contrasena": "..."}`.
      headless (2026-11-17): Dropi lo bloquea (el modal 2FA nunca aparece) → se mantiene
      headed, ahora con flags anti-throttling para poder minimizar la ventana durante la
      extracción.
+21. **Fotos y enlaces de producto de Dropi** (11-18): las fotos de los snapshots apuntaban a
+     `dropi.s3.amazonaws.com`, que hoy devuelve **403**; el host vivo es el CDN
+     `d39ru7awumhhs2.cloudfront.net` (misma ruta `colombia/products/...`). `extractImages()`
+     ya guarda el CDN y el informe reescribe las URLs viejas. La ficha real de producto es
+     `/dashboard/product-details/<id>/<slug>` (sacada del bundle de la app; el router usa
+     solo el ID, el slug puede ir simplificado). El informe ahora trae foto + días de
+     inventario (stock ÷ ventas/día, rojo ≤7 / ámbar ≤20) + enlace; el PDF pesa ~40 MB
+     por las fotos embebidas (el HTML es liviano: carga lazy).
 
 ## Datos cargados (histórico → 2026-10-20)
 
@@ -357,8 +373,9 @@ nunca en git). Formato: `{"usuario": "...", "contrasena": "..."}`.
   nicho = fragancias de feromonas; 1 producto con ventas medidas: Golden Lure 6 u) ·
   pijamas 5 p (Dropi no es fuente viable de pijamas)**. Ventas medidas por categoría:
   aún casi 0 (solo 3 proveedores tienen historial) — se llenan con las corridas diarias.
-  Cada corrida genera: CSVs + `informe-categorias-{fecha}.html` (IDs copiables con clic
-  + botón Exportar PDF) + `informe-categorias-{fecha}.pdf` (con `--pdf`) +
+  Cada corrida genera: CSVs + `informe-categorias-{fecha}.html` (fotos de producto,
+  días de inventario, enlace al producto en Dropi, IDs copiables con clic + botón
+  Exportar PDF) + `informe-categorias-{fecha}.pdf` (con `--pdf`; ~40 MB por las fotos) +
   `informe-categorias-detallado-{fecha}.xlsx` (Info · Resumen · 6 hojas de categoría ·
   Top Ventas) — todo en `data\analysis\categorias\`.
 

@@ -158,11 +158,16 @@ for (const r of REGLAS) {
     const v = ventas.get(p.id) || {};
     const margen = v.margen_pct != null ? v.margen_pct
       : (p.sale_price > 0 && p.suggested_price >= p.sale_price ? Math.round((1 - p.sale_price / p.suggested_price) * 100) : null);
+    // host vivo de las fotos: snapshots viejos guardaron S3 directo (403); el CDN responde 200
+    const foto = (p.imagenes && p.imagenes[0])
+      ? String(p.imagenes[0]).replace('https://dropi.s3.amazonaws.com/', 'https://d39ru7awumhhs2.cloudfront.net/')
+      : '';
+    const diasInv = (v.vendidas_dia > 0 && p.stock != null) ? Math.round(p.stock / v.vendidas_dia) : null;
     items.push({
       id: p.id, nombre: p.name, proveedor: p.supplier, proveedor_id: p.supplier_id,
       categorias: p.categories, precio_proveedor: p.sale_price, precio_sugerido: p.suggested_price,
       stock: p.stock, vendidas_total: v.vendidas_total || 0, vendidas_dia: v.vendidas_dia || 0,
-      tier: v.tier || '', margen_pct: margen
+      tier: v.tier || '', margen_pct: margen, dias_inventario: diasInv, foto
     });
   }
   items.sort((a, b) => (b.vendidas_total - a.vendidas_total) || (b.stock - a.stock));
@@ -170,8 +175,8 @@ for (const r of REGLAS) {
 
   // CSV de la categoria
   const esc = s => '\u0022' + String(s == null ? '' : s).replace(/\u0022/g, '\u0022\u0022') + '\u0022';
-  const csv = ['id,nombre,proveedor,proveedor_id,categorias,precio_proveedor,precio_sugerido,stock,vendidas_total,vendidas_dia,tier,margen_pct']
-    .concat(items.map(i => [i.id, esc(i.nombre), esc(i.proveedor), i.proveedor_id, esc(i.categorias), i.precio_proveedor, i.precio_sugerido, i.stock, i.vendidas_total, i.vendidas_dia, i.tier, i.margen_pct].join(',')))
+  const csv = ['id,nombre,proveedor,proveedor_id,categorias,precio_proveedor,precio_sugerido,stock,vendidas_total,vendidas_dia,tier,margen_pct,dias_inventario,foto']
+    .concat(items.map(i => [i.id, esc(i.nombre), esc(i.proveedor), i.proveedor_id, esc(i.categorias), i.precio_proveedor, i.precio_sugerido, i.stock, i.vendidas_total, i.vendidas_dia, i.tier, i.margen_pct, i.dias_inventario, i.foto].join(',')))
     .join('\r\n');
   fs.writeFileSync(path.join(outDir, `${r.key}-catalogo-${hoy}.csv`), '\ufeff' + csv);
 
@@ -225,17 +230,31 @@ fs.writeFileSync(path.join(outDir, `resumen-${hoy}.json`), JSON.stringify(resume
 // =====================================================================
 const TIER_CLS = { S: 'tierS', A: 'tierA', B: 'tierB', C: 'tierC', D: 'tierD' };
 
+function urlProducto(id, nombre) {
+  const slug = String(nombre || 'producto').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase().substring(0, 100);
+  return 'https://app.dropi.co/dashboard/product-details/' + id + '/' + (slug || 'producto');
+}
+
 function filaHtml(i, n) {
   const tier = i.tier ? `<span class="tier ${TIER_CLS[i.tier] || 'tierC'}" title="tier ${i.tier}">${i.tier}</span>` : '—';
+  const foto = i.foto
+    ? `<a href="${i.foto}" target="_blank" rel="noopener" title="Abrir foto"><img class="ph" src="${i.foto}" loading="lazy" alt="" onerror="this.parentNode.removeChild(this)"></a>`
+    : '<span class="mut">—</span>';
+  const dias = i.dias_inventario != null
+    ? `<td class="num ${i.dias_inventario <= 7 ? 'warn' : i.dias_inventario <= 20 ? 'midw' : ''}" title="Dias de stock al ritmo actual de ventas">${num$(i.dias_inventario)}</td>`
+    : '<td class="num mut">—</td>';
   return `<tr>
+    <td class="phcell">${foto}</td>
     <td class="rank">${n}</td>
     <td class="pid" title="Clic para copiar el ID" onclick="copyId('${i.id}',event)">${i.id}<span class="cp">&#10697;</span></td>
-    <td><b>${i.nombre || '—'}</b><div class="mut">${(i.categorias || '').slice(0, 60)}</div></td>
+    <td><a class="plink" href="${urlProducto(i.id, i.nombre)}" target="_blank" rel="noopener" title="Abrir el producto en Dropi"><b>${i.nombre || '—'}</b></a><div class="mut">${(i.categorias || '').slice(0, 60)}</div></td>
     <td>${i.proveedor}</td>
     <td class="num">${cop$(i.precio_proveedor)}</td>
     <td class="num">${cop$(i.precio_sugerido)}</td>
     <td class="num">${i.margen_pct != null ? i.margen_pct + '%' : '—'}</td>
     <td class="num">${num$(i.stock)}</td>
+    ${dias}
     <td class="num ${i.vendidas_total > 0 ? 'pos' : ''}">${i.vendidas_total || '—'}</td>
     <td class="tcell">${tier}</td>
   </tr>`;
@@ -265,7 +284,7 @@ function seccionHtml(key) {
   ${univ}
   <div class="note"><b>Proveedores monitoreados top:</b> ${provChips}</div>
   <table>
-    <tr><th>#</th><th title="Clic en el ID para copiarlo">ID Dropi ⧉</th><th>Producto</th><th>Proveedor</th><th class="num">Costo</th><th class="num">PVP sugg.</th><th class="num">Margen</th><th class="num">Stock</th><th class="num">Vendidas</th><th>Tier</th></tr>
+    <tr><th>Foto</th><th>#</th><th title="Clic en el ID para copiarlo">ID Dropi ⧉</th><th>Producto ⇗</th><th>Proveedor</th><th class="num">Costo</th><th class="num">PVP sugg.</th><th class="num">Margen</th><th class="num">Stock</th><th class="num" title="Dias de stock al ritmo actual de ventas">Inv. días</th><th class="num">Vendidas</th><th>Tier</th></tr>
     ${top.map((i, n) => filaHtml(i, n + 1)).join('')}
   </table>
   ${items.length > top.length ? `<div class="trunc hint">Mostrando top ${top.length} de ${items.length} — catalogo completo en el CSV y en la hoja "${LABEL[key].slice(0, 28)}" del Excel detallado.</div>` : ''}
@@ -323,6 +342,12 @@ tr:hover td{background:#1a2029}
 .pid{cursor:pointer;font-family:Consolas,monospace;color:var(--yellow);font-size:12px;white-space:nowrap}
 .pid:hover{text-decoration:underline}
 .pid .cp{opacity:.6;font-size:10px;margin-left:3px}
+.phcell{width:52px}
+.ph{width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:#0d1117;display:block}
+.plink{color:var(--txt);text-decoration:none}
+.plink:hover{color:var(--acc);text-decoration:underline}
+.warn{color:var(--red);font-weight:700}
+.midw{color:var(--yellow);font-weight:700}
 .tier{color:#0d1117;font-weight:800;border-radius:4px;padding:1px 7px;font-size:11px}
 .tierS{background:#3fb950}.tierA{background:#58a6ff}.tierB{background:#d29922}.tierC{background:#8b949e}.tierD{background:#f85149}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#3fb950;color:#0d1117;font-weight:700;padding:9px 20px;border-radius:20px;font-size:13px;display:none;box-shadow:0 4px 14px rgba(0,0,0,.4)}
@@ -337,6 +362,10 @@ footer{margin-top:26px;color:var(--muted);font-size:11px;line-height:1.6}
   tr:hover td{background:#fff}
   .pid{color:#7a5c00}
   .pos{color:#0a7a28}
+  .plink{color:#111}
+  .ph{width:34px;height:34px}
+  .warn{color:#b00020}
+  .midw{color:#7a5c00}
   .kpi,.chip{background:#fff;border:1px solid #bbb}
   .kpi .v{color:#0a58ca}.kpi .v.green{color:#0a7a28}
   .kpi .l,.chip,.note,footer,.sub,.mut,.rank{color:#555}
@@ -355,7 +384,7 @@ footer{margin-top:26px;color:var(--muted);font-size:11px;line-height:1.6}
 
 <div class="toolbar">
   <button class="btn" onclick="window.print()">&#11037; Exportar PDF</button>
-  <span class="hint">Clic en cualquier <b>ID Dropi</b> para copiarlo al portapapeles · en el dialogo de impresion usa Destino: "Guardar como PDF" · se imprime 1 categoria por pagina</span>
+  <span class="hint">Clic en el <b>ID Dropi</b> para copiarlo · clic en el <b>nombre</b> o la <b>foto</b> para abrir el producto en Dropi · en el dialogo de impresion usa Destino: "Guardar como PDF" · se imprime 1 categoria por pagina</span>
 </div>
 
 <div class="kpis">
@@ -418,10 +447,10 @@ const catSheet = key => {
   const r = resumen.categorias[key];
   return {
     name: key === 'perfumeria' ? 'Perfumeria' : key === 'joyas' ? 'Joyas' : key[0].toUpperCase() + key.slice(1),
-    widths: [10, 52, 22, 12, 30, 13, 15, 9, 9, 12, 11, 7],
+    widths: [10, 52, 22, 12, 30, 13, 15, 9, 9, 9, 12, 7, 7, 55],
     rows: [
-      ['ID Dropi', 'Producto', 'Proveedor', 'ID Proveedor', 'Categorias Dropi', 'Costo (COP)', 'PVP sugerido (COP)', 'Margen %', 'Stock', 'Vendidas total', 'Vendidas/dia', 'Tier'],
-      ...(itemsPorCat[key] || []).map(i => [i.id, i.nombre, i.proveedor, i.proveedor_id, i.categorias, i.precio_proveedor || null, i.precio_sugerido || null, i.margen_pct, i.stock || null, i.vendidas_total || null, i.vendidas_dia || null, i.tier || null])
+      ['ID Dropi', 'Producto', 'Proveedor', 'ID Proveedor', 'Categorias Dropi', 'Costo (COP)', 'PVP sugerido (COP)', 'Margen %', 'Stock', 'Inv. dias', 'Vendidas total', 'Vendidas/dia', 'Tier', 'Foto'],
+      ...(itemsPorCat[key] || []).map(i => [i.id, i.nombre, i.proveedor, i.proveedor_id, i.categorias, i.precio_proveedor || null, i.precio_sugerido || null, i.margen_pct, i.stock || null, i.dias_inventario, i.vendidas_total || null, i.vendidas_dia || null, i.tier || null, i.foto || null])
     ]
   };
 };
@@ -483,7 +512,14 @@ if (conPdf) {
       const { pathToFileURL } = require('url');
       const browser = await chromium.launch();
       const page = await browser.newPage();
-      await page.goto(pathToFileURL(htmlDated).href, { waitUntil: 'networkidle' });
+      await page.goto(pathToFileURL(htmlDated).href, { waitUntil: 'networkidle', timeout: 120000 });
+      // fuerza la carga de thumbnails con loading=lazy antes de imprimir (salen del CDN)
+      await page.evaluate(async () => {
+        document.querySelectorAll('img[loading="lazy"]').forEach(i => { i.loading = 'eager'; });
+        for (let y = 0; y < document.body.scrollHeight; y += 700) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 60)); }
+        window.scrollTo(0, 0);
+      }).catch(() => {});
+      await page.waitForTimeout(1500);
       const pdfDated = path.join(outDir, `informe-categorias-${hoy}.pdf`);
       await page.pdf({ path: pdfDated, printBackground: true, preferCSSPageSize: true });
       await browser.close();

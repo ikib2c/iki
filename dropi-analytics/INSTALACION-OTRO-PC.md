@@ -89,16 +89,18 @@ node scripts\local-snapshot.js --supplier 205895     # extrae GOLDBOX (~2 min)
 Doble clic en los lanzadores:
 - **`RUN-DIARIO.bat`** — si la sesión expiró, renueva el login solo (100% automático con `totp_secret`; sin él, abre la ventana y espera el 2FA sin cerrarse);
   luego snapshot de todos los proveedores + dashboard + informe por categorías (HTML con
-  IDs copiables + PDF + Excel detallado en `data\analysis\categorias\`)
+  fotos, días de inventario y enlaces a Dropi + PDF + Excel detallado en `data\analysis\categorias\`)
 - **`RUN-JUGUETES.bat`** — snapshot de juguetes + ranking de más vendidos (mismo manejo de 2FA)
 
-Y semanal/mensual: `node scripts\local-snapshot.js --refresh-config` para actualizar
-la lista de proveedores activos.
+La lista de proveedores se refresca **sola** en la rutina automática cada 7 días
+(`--refresh-if-old 7`); el manual sigue disponible:
+`node scripts\local-snapshot.js --refresh-config`.
 
 ## Paso 7 — Automatización (recomendado: Windows corre todo solo)
 
 La tarea programada **"DropAnalytics Rutina Diaria"** ejecuta `RUN-AUTO.bat` a las
-**07:00 y 19:00** (si el PC estaba apagado, corre apenas se enciende). Sin pausas, todo
+**07:00 y 19:00** (si el PC estaba apagado, corre apenas se enciende). Antes de extraer,
+refresca la lista de proveedores si tiene 7+ días. Sin pausas, todo
 queda en `data\state\run-auto.log`. Con `totp_secret` la corrida se **re-loguea sola** al
 expirar la sesión (~12 h) y sigue completa, sin popups. Sin él, regenera los informes con
 la última data y muestra un popup: botón **"Sí" → abre RUN-DIARIO** para renovar con el 2FA (~30 s).
@@ -148,6 +150,7 @@ Administrarla: `Start-ScheduledTask` / `Disable-ScheduledTask` /
 | El .bat no corre | Ejecutarlo desde la carpeta raíz del proyecto (cd correcto) |
 | Response vacía intermitente | El sistema reintenta solo; volver a correr reanuda donde quedó |
 | No aparece el PDF del informe | El PDF usa Playwright: verificar `npx playwright install chromium`; el botón "Exportar PDF" del HTML siempre funciona (Ctrl+P) |
+| El PDF pesa ~40 MB | Normal: incluye las fotos de los productos. El HTML es liviano (carga lazy) y abre al instante |
 
 ## Checklist de traslado
 

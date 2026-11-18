@@ -9,6 +9,8 @@
 //   node scripts/local-snapshot.js --all            Snapshot de todos los proveedores de config
 //   node scripts/local-snapshot.js --toys           Catalogo filtrado por categoria "Jugueteria"
 //   node scripts/local-snapshot.js --check          Verificar sesion (login vigente?)
+//   node scripts/local-snapshot.js --refresh-config Re-construir config/suppliers.json midiendo el universo BFF
+//   node scripts/local-snapshot.js --refresh-if-old 7  Igual, solo si la config tiene mas de N dias (auto)
 //   --headless (o env DROPANALYTICS_HEADLESS=1)     Navegador en segundo plano (requiere totp_secret;
 //                                                   sin el se ignora porque el 2FA manual necesita ventana)
 //
@@ -356,15 +358,16 @@ function parsePages(pages) {
 }
 
 // Extrae las URLs de foto de un producto BFF de forma tolerante. Las fotos viven
-// en gallery[i].urlS3 con ruta S3 RELATIVA (colombia/products/...); tambien soporta
-// campos absolutos (urlImage/image/...) y codifica espacios a %20 para URLs validas.
+// en gallery[i].urlS3 con ruta RELATIVA (colombia/products/...); tambien soporta
+// campos absolutos (urlImage/image/...). Host final: CDN CloudFront de Dropi
+// (dropi.s3.amazonaws.com directo devuelve 403). Codifica espacios a %20.
 function extractImages(o) {
   const out = [];
   const abs = u => {
     u = (u || '').trim();
     if (!u) return null;
     if (/^https?:\/\//i.test(u)) return u.replace(/ /g, '%20');
-    if (/^(colombia|mexico)\//i.test(u)) return ('https://dropi.s3.amazonaws.com/' + u).replace(/ /g, '%20');
+    if (/^(colombia|mexico)\//i.test(u)) return ('https://d39ru7awumhhs2.cloudfront.net/' + u).replace(/ /g, '%20');
     return null;
   };
   const push = v => {
@@ -439,11 +442,13 @@ async function snapshotSupplier(ctx, t, force) {
 }
 
 // ---- refresco de config: re-mide metricas BFF del universo y reconstruye la lista ----
-async function refreshConfig(ctx, capActivos) {
+async function refreshConfig(ctx, capActivos, maxTotal = 0) {
   const page = ctx.pages()[0] || await ctx.newPage();
   await page.goto('https://app.dropi.co/dashboard/home', { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
   await page.waitForTimeout(3000);
-  const tok = 'Bearer ' + (await readLoginToken(page) || '');
+  const token = await readLoginToken(page);
+  if (!token) throw new Error('Sin token de sesion: no se refresca la config (correr --login primero) - config anterior conservada');
+  const tok = 'Bearer ' + token;
   const H = { accept: 'application/json, text/plain, */*', authorization: tok, 'x-authorization': tok, 'x-host': 'co' };
   const uniPath = path.join(ROOT, 'data', 'universe-suppliers.json');
   if (!fs.existsSync(uniPath)) throw new Error('Falta data/universe-suppliers.json');
@@ -469,6 +474,9 @@ async function refreshConfig(ctx, capActivos) {
   for (const id of failed) { metrics[id] = await fetchOne(id); await new Promise(r => setTimeout(r, 120)); }
   failed = ids.filter(id => metrics[id] === -1);
   console.log('   metricas OK. errores:', failed.length);
+  if (ids.length && failed.length > Math.max(5, ids.length * 0.2)) {
+    throw new Error('Refresco abortado: ' + failed.length + '/' + ids.length + ' metricas fallaron (sesion vencida o BFF caido) - se conserva config/suppliers.json anterior');
+  }
   // GOLDBOX (privado, fuera del universo)
   metrics['205895'] = await fetchOne('205895');
   fs.writeFileSync(path.join(ROOT, 'data', 'universe-metrics-' + today + '.json'), JSON.stringify(metrics));
@@ -508,6 +516,20 @@ async function refreshConfig(ctx, capActivos) {
     if (!seen.has(String(r.id))) { seen.add(String(r.id)); sel.push(r); }
   }
   sel.sort((a, b) => b.pedidos_mes - a.pedidos_mes);
+
+  // tope total (para automatizacion): reserva GOLDBOX + top12 catalogos grandes y
+  // llena el resto por pedidos/mes, luego por tamano de catalogo (historial incluido)
+  if (maxTotal > 0 && sel.length > maxTotal) {
+    const keep = new Set([String(goldbox.id), ...bigCats.map(r => String(r.id))]);
+    const out = sel.filter(r => keep.has(String(r.id)));
+    const rest = sel.filter(r => !keep.has(String(r.id)))
+      .sort((a, b) => (b.pedidos_mes - a.pedidos_mes) || (b.num_productos - a.num_productos));
+    for (const r of rest) { if (out.length >= maxTotal) break; out.push(r); }
+    console.log('   tope total: ' + sel.length + ' -> ' + out.length + ' proveedores (--max ' + maxTotal + ')');
+    sel.length = 0; sel.push(...out);
+    seen.clear();
+    sel.forEach(r => seen.add(String(r.id)));
+  }
 
   // comparar con config anterior y respaldar
   const cfgPath = path.join(ROOT, 'config', 'suppliers.json');
@@ -639,7 +661,25 @@ async function harvestCategory(ctx, catName) {
       await requireLogin(ctx);
       const capIdx = args.indexOf('--cap');
       const capActivos = capIdx > 0 ? parseInt(args[capIdx + 1]) || 0 : 0;
-      await refreshConfig(ctx, capActivos);
+      const maxIdx = args.indexOf('--max');
+      const maxTotal = maxIdx > 0 ? parseInt(args[maxIdx + 1]) || 0 : 0;
+      await refreshConfig(ctx, capActivos, maxTotal);
+    }
+    else if (mode === '--refresh-if-old') {
+      const days = parseInt(args[1]) || 7;
+      const act = CFG.actualizado ? new Date(CFG.actualizado + 'T12:00:00') : null;
+      const ageD = act ? Math.floor((Date.now() - act.getTime()) / 86400000) : null;
+      if (ageD != null && ageD < days) {
+        console.log('Config de proveedores al dia (' + CFG.actualizado + ', hace ' + ageD + ' dias < ' + days + ') - no se refresca');
+      } else {
+        console.log('Config de proveedores ' + (ageD == null ? 'sin fecha de actualizacion' : 'con ' + ageD + ' dias (>= ' + days + ')') + ' - refrescando automaticamente...');
+        await requireLogin(ctx);
+        const capIdx = args.indexOf('--cap');
+        const capActivos = capIdx > 0 ? parseInt(args[capIdx + 1]) || 0 : 0;
+        const maxIdx = args.indexOf('--max');
+        const maxTotal = maxIdx > 0 ? parseInt(args[maxIdx + 1]) || 0 : 0;
+        await refreshConfig(ctx, capActivos, maxTotal);
+      }
     }
     else if (mode === '--check') {
       let ok = await ensureLogin(ctx);
