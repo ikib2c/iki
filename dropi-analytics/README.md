@@ -179,7 +179,7 @@ vendían 2.259 y 588 unidades medidas por delta de stock.
 | Sesiones | sin límite de tiempo | ~10 min por sesión |
 | Salida | directa a archivos | truncada a 1MB por llamada |
 | Requisitos | Node.js + Playwright (ya instalado) | créditos Firecrawl |
-| 2FA | en el navegador visible (lo tipias tu) | flujo asistido por terminal |
+| 2FA | automático con `totp_secret` (TOTP calculado en el PC); sin él, ventana visible | flujo asistido por terminal |
 
 `snapshot.ps1` queda como respaldo; el extractor local es el recomendado.
 
@@ -189,7 +189,7 @@ vendían 2.259 y 588 unidades medidas por delta de stock.
 | Capa | Tecnología | Notas |
 |---|---|---|
 | Extracción | **Node.js 18+ · Playwright · Chromium** | local, gratis, ilimitado — reemplazó Firecrawl/credits |
-| Sesión | Perfil persistente de Chromium (`auth/profile`) | login Dropi con JWT ~12h; 2FA manual en ventana visible |
+| Sesión | Perfil persistente de Chromium (`auth/profile`) | login Dropi con JWT ~12h; 2FA **100% automático** con `totp_secret` (TOTP propio); sin él, ventana visible |
 | Análisis | **PowerShell 5.1** (nativo de Windows) | `analyze.ps1`, `toys-delta.ps1` — sin dependencias |
 | Almacenamiento | Archivos planos JSON (por proveedor/fecha) + CSV | sin base de datos ni nube — portable y auditable |
 | Dashboard | HTML + JS + CSS **vanilla** (cero frameworks) | lee `data.js` generado; se abre en cualquier navegador |

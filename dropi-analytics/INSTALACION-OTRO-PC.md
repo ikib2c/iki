@@ -2,7 +2,8 @@
 
 > El sistema es 100% local y portable: **sí se puede correr en otro equipo**.
 > Lo único que no se traslada es la sesión abierta de Dropi (cada equipo hace su propio
-> login con tu Google Authenticator — las claves son de la CUENTA, no de la máquina).
+> login). El `totp_secret` **sí** se puede copiar: es de la CUENTA, no de la máquina — con
+> él el equipo nuevo se re-loguea solo y el celular no hace falta.
 
 ---
 
@@ -12,7 +13,7 @@
 |---|---|
 | Windows 10/11 + internet | Todo corre local; internet solo para extraer |
 | **Node.js 18+** | Descargar LTS de https://nodejs.org (instalación siguiente-siguiente) |
-| Tu celular con **Google Authenticator** | Para el login de Dropi (código de 6 dígitos) |
+| Opcional: celular con **Google Authenticator** | Solo si NO configuras `totp_secret`. Con el secreto TOTP en `config\credenciales.json` el login es 100% automático |
 | Opcional: Excel / LibreOffice | Solo para ABRIR los .xlsx — el sistema los genera solo (sin Excel instalado) |
 
 **No necesita:** Firecrawl ni créditos · la sesión del equipo anterior · carpetas de `.firecrawl`
@@ -54,25 +55,27 @@ npx playwright install chromium
 
 El último comando descarga Chromium (~118 MB, unos minutos).
 
-## Paso 4 — Primer login de Dropi (la única parte manual)
+## Paso 4 — Primer login de Dropi (automático si copias el `totp_secret`)
 
-> Las credenciales están en `config\credenciales.json` (usuario + contraseña + `totp_secret` opcional).
-> Si el equipo nuevo no las tiene, crear el archivo con el formato
-> `{"usuario": "tucorreo", "contrasena": "tuclave", "totp_secret": ""}` — **no se sube a git**.
-> Si pegas la clave base32 de Google Authenticator en `totp_secret`, el login (incluida la
-> clave dinámica) pasa a ser **100% automático** en este equipo.
+> Las credenciales están en `config\credenciales.json` (usuario + contraseña + `totp_secret`).
+> **Copia ese archivo tal cual al equipo nuevo** (nunca se sube a git): el `totp_secret` es la
+> clave base32 de Google Authenticator y es de la CUENTA, no de la máquina — con él, el login
+> (incluida la clave dinámica de 6 dígitos) es **100% automático** y **no hace falta el celular**.
+> Si no lo tienes: en Dropi → 2FA → "No puedo escanear el QR" (o el QR de exportación de
+> Google Authenticator) → copiar la clave base32 (letras A-Z y números 2-7).
+> Sin `totp_secret`, crear el archivo con `{"usuario": "...", "contrasena": "..."}` y el login
+> abre la ventana para tipear el código (hasta 30 min).
 
 ```powershell
 node scripts\local-snapshot.js --login
 ```
 
-1. Se abre una ventana de Chrome
-2. Las credenciales se llenan solas (están en `config\credenciales.json`)
-3. Aparece el cuadro de 6 casillas → con `totp_secret` el código se ingresa **solo**;
-   sin él, **tipea el código de tu Google Authenticator ahí**
-   (la ventana **NO se cierra sola**: espera hasta 30 minutos, y si el código falla o
-   vence, tipa el nuevo y sigue verificando)
-4. Espera el mensaje `LOGIN OK - sesión persistida` (dura ~12 horas)
+1. Se abre una ventana de Chromium (**necesaria**: Dropi bloquea el modo headless)
+2. Las credenciales se llenan solas
+3. Con `totp_secret`, la clave de 6 dígitos se calcula en el PC y se ingresa sola;
+   sin él, tipea el código de tu Google Authenticator ahí (la ventana **NO se cierra sola**:
+   espera hasta 30 minutos, y si el código falla o vence, tipa el nuevo y sigue verificando)
+4. Espera el mensaje `LOGIN OK - sesión persistida` (JWT ~12 horas; se renueva solo en cada corrida)
 
 ## Paso 5 — Probar que todo funciona
 
@@ -84,7 +87,7 @@ node scripts\local-snapshot.js --supplier 205895     # extrae GOLDBOX (~2 min)
 ## Paso 6 — Operación diaria
 
 Doble clic en los lanzadores:
-- **`RUN-DIARIO.bat`** — si la sesión expiró, abre Chrome solo y espera el 2FA sin cerrarse;
+- **`RUN-DIARIO.bat`** — si la sesión expiró, renueva el login solo (100% automático con `totp_secret`; sin él, abre la ventana y espera el 2FA sin cerrarse);
   luego snapshot de todos los proveedores + dashboard + informe por categorías (HTML con
   IDs copiables + PDF + Excel detallado en `data\analysis\categorias\`)
 - **`RUN-JUGUETES.bat`** — snapshot de juguetes + ranking de más vendidos (mismo manejo de 2FA)
@@ -96,9 +99,9 @@ la lista de proveedores activos.
 
 La tarea programada **"DropAnalytics Rutina Diaria"** ejecuta `RUN-AUTO.bat` a las
 **07:00 y 19:00** (si el PC estaba apagado, corre apenas se enciende). Sin pausas, todo
-queda en `data\state\run-auto.log`. Cuando la sesión de Dropi expira (~12 h), la corrida
-regenera los informes con la última data y muestra un popup: botón **"Sí" → abre
-RUN-DIARIO** para renovar con el 2FA (~30 s).
+queda en `data\state\run-auto.log`. Con `totp_secret` la corrida se **re-loguea sola** al
+expirar la sesión (~12 h) y sigue completa, sin popups. Sin él, regenera los informes con
+la última data y muestra un popup: botón **"Sí" → abre RUN-DIARIO** para renovar con el 2FA (~30 s).
 
 En PowerShell (ajustar la ruta a la carpeta del equipo nuevo):
 
@@ -139,6 +142,7 @@ Administrarla: `Start-ScheduledTask` / `Disable-ScheduledTask` /
 | `SESION EXPIRADA` al correr | Ya no bloquea: con `totp_secret` el re-login es automático; sin él, RUN-DIARIO/RUN-JUGUETES abren el login solos y la ventana espera el 2FA (hasta 30 min). A mano: `node scripts\local-snapshot.js --login` (cada ~12h) |
 | Popup "Sesión expirada" 2 veces al día | Solo ocurre sin `totp_secret`: clic "Sí" → RUN-DIARIO → tipear el 2FA (o correr `--login` directo). Con `totp_secret` la rutina se re-loguea sola y no hay popup |
 | El navegador no abre | Repite `npx playwright install chromium` |
+| Se ve la ventana de Chromium trabajando | Es normal: la extracción corre en ventana visible. Se puede **minimizar** (flags anti-throttling). El modo headless está bloqueado por Dropi (probado) — no usar |
 | `node` no se reconoce | Cerrar y reabrir PowerShell tras instalar Node.js |
 | Un proveedor da 0 productos | Verificar el `slug` en `config\suppliers.json` (debe venir del campo name) |
 | El .bat no corre | Ejecutarlo desde la carpeta raíz del proyecto (cd correcto) |
@@ -152,7 +156,7 @@ Administrarla: `Start-ScheduledTask` / `Disable-ScheduledTask` /
 [ ] Node.js instalado (node --version responde)
 [ ] npm install playwright ejecutado
 [ ] npx playwright install chromium ejecutado
-[ ] --login hecho (código 2FA tipeado)
+[ ] --login hecho (automático con totp_secret; sin él, código 2FA tipeado)
 [ ] --check dice "SESION OK"
 [ ] RUN-DIARIO.bat corre y abre el dashboard
 [ ] Tarea programada registrada (Paso 7) — opcional pero recomendado

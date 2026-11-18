@@ -5,25 +5,26 @@ Es tu propio Dropdata: toma una "foto" del stock de miles de productos de Dropi 
 Requisito	Detalle
 Computador encendido	SÍ — todo corre LOCAL en tu máquina, no hay nube ni servidor. Si el PC está apagado, no hay foto del día
 Internet	Solo durante la extracción
-Sesión Dropi activa	Dura ~12 horas → 1 vez al día (o cada 2 días) pide el código de Google Authenticator
+Sesión Dropi activa	Se renueva SOLA (TOTP ya configurado en config\credenciales.json) — no pide código ni hace falta el celular
 Nada más	Playwright y Chromium ya quedaron instalados. Costo: $0 para siempre
 Tu rutina diaria — 2 pasos (doble clic)
 Creados para ti en la carpeta IKI\dropi-analytics\:
 RUN-DIARIO.bat — el análisis general (108 proveedores en config)
 Doble clic. El hace solo, en orden:
 1. Verifica la sesión de Dropi
-2. Si expiró → se abre una ventana de Chrome → tú tipias el código de 6 dígitos del Google Authenticator en esa ventana (30 segundos, sin prisa) → sigue solo
+2. Si expiró → se re-loguea SOLO (credenciales + clave dinámica TOTP calculadas en el PC; el 2FA ya no es manual)
 3. Extrae los catálogos de los 108 proveedores (~3-7 horas, reanudable si se corta; los catálogos vacíos se saltan)
 4. Calcula las ventas (delta de la última foto vs hoy)
 5. Abre el dashboard en tu navegador
 RUN-JUGUETES.bat — solo la categoría juguetes (5.300+ productos)
 Doble clic. Extrae el snapshot (~5-20 min) y genera el ranking de juguetes más vendidos (HTML + CSV) comparando contra el último día distinto con foto.
 El primer día de cada categoría no hay ranking (solo línea base). Desde el segundo día ya sale el ranking real. El PRIMER RANKING REAL de juguetes ya salió (17→20 oct: 94 juguetes, 1.056 u). Si la captura falla, reintenta solo 3 veces y NO guarda archivos vacíos.
-Qué hacer con el 2FA (lo único manual)
-- La sesión de Dropi dura ~12 horas. Al expirar, RUN-DIARIO.bat te avisa con un mensaje claro
-- Se abre una ventana de Chrome: las credenciales se llenan solas, aparece el cuadro de 6 casillas → tipias el código de tu app Authenticator ahí → Enter → listo
-- La sesión queda guardada hasta la próxima expiración
-- Si corres los 2 .bat el mismo día, solo pide el código una vez
+Qué hacer con el 2FA (ya NO es manual)
+- El secreto TOTP (del QR de exportación de Google Authenticator) vive en config\credenciales.json — archivo privado, no se sube a git
+- El PC calcula la clave de 6 dígitos solo, cada 30 segundos, y la ingresa sola: el celular ya no hace falta
+- Si la sesión expira (~12 h), la rutina se re-loguea sin intervención: no hay popup ni ventana esperando códigos
+- La ventana de Chromium se puede MINIMIZAR mientras extrae (flags anti-throttling). El modo headless está bloqueado por Dropi (probado) — no usar
+- Si algo falla: revisar que el reloj del PC esté en hora y que el secreto corresponda a ESTA cuenta (node scripts\local-snapshot.js --check)
 Qué produce cada corrida
 Salida	Dónde
 Dashboard web (top vendidos hoy, acumulado, por proveedor, buscador con historial)	se abre solo · dashboard\index.html
