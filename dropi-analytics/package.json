@@ -1,0 +1,16 @@
+{
+  "name": "dropi-analytics",
+  "version": "1.0.0",
+  "description": "Sistema de analítica de **ventas reales de Dropi por producto**, construido sobre el método de **delta de stock** (el mismo que usa Dropdata): Dropi expone el stock de cada producto en el catálogo; comparando snapshots consecutivos → `ventas = stock_anterior − stock_actual`.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.64.1"
+  }
+}

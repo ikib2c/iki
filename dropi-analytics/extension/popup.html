@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><style>body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',sans-serif;width:230px;padding:14px;font-size:13px}
+h3{margin:0 0 10px;font-size:15px}h3 span{color:#58a6ff}
+.kpi{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:8px 12px;margin-bottom:8px}
+.kpi .v{font-size:18px;font-weight:700;color:#58a6ff}.kpi .l{font-size:10px;color:#8b949e;text-transform:uppercase}
+.on{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px}
+label.switch{position:relative;width:38px;height:20px}input{opacity:0;width:0;height:0}
+.sl{position:absolute;cursor:pointer;inset:0;background:#30363d;border-radius:20px;transition:.2s}
+.sl:before{content:"";position:absolute;height:14px;width:14px;left:3px;top:3px;background:#e6edf3;border-radius:50%;transition:.2s}
+input:checked+.sl{background:#238636}input:checked+.sl:before{transform:translateX(18px)}
+.hint{color:#8b949e;font-size:10px;margin-top:10px}</style></head>
+<body>
+<h3>Drop<span style="color:#58a6ff">Analytics</span></h3>
+<div class="kpi"><div class="l">Servidor local</div><div class="v" id="srv">...</div></div>
+<div class="kpi"><div class="l">Productos en esta pagina</div><div class="v" id="prod">...</div></div>
+<div class="kpi"><div class="l">Badges inyectados</div><div class="v" id="bad">0</div></div>
+<div class="on"><label class="switch"><input type="checkbox" id="on" checked><span class="sl"></span></label> Overlay activo</div>
+<div class="hint">Requiere servidor-delta.js corriendo en el puerto 3777.</div>
+<script src="popup.js"></script>
+</body></html>

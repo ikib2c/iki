@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DropAnalytics — Ventas reales Dropi</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--txt:#e6edf3;--muted:#8b949e;--acc:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+h1{font-size:22px;font-weight:600}
+h1 span{color:var(--acc)}
+.sub{color:var(--muted);font-size:12px;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi .v{font-size:24px;font-weight:700;color:var(--acc);margin-top:4px}
+.kpi .v.green{color:var(--green)}
+.kpi .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tab{background:var(--panel);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+.tab.active{color:var(--txt);border-color:var(--acc);background:#1c2735}
+.search{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--txt);padding:10px 14px;font-size:14px;margin-bottom:14px;outline:none}
+.search:focus{border-color:var(--acc)}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+th{background:#1c2129;color:var(--muted);text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;white-space:nowrap;user-select:none}
+th:hover{color:var(--txt)}
+td{padding:9px 12px;border-top:1px solid var(--border);vertical-align:top}
+tr:hover td{background:#1a2029}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.pos{color:var(--green);font-weight:700}
+.neg{color:var(--red)}
+.mut{color:var(--muted);font-size:12px}
+.idm{font-family:Consolas,monospace;color:var(--yellow);font-size:12px}
+.rank{color:var(--muted);font-family:Consolas,monospace}
+.bar{height:5px;background:var(--acc);border-radius:3px;min-width:2px}
+.barcell{width:90px}
+.spark{display:block;margin-top:3px}
+.expand td{background:#10151c;padding:12px}
+.expandbox{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.tag{display:inline-block;background:#1c2735;color:var(--acc);border-radius:5px;padding:1px 7px;font-size:11px;margin-left:6px}
+footer{margin-top:26px;color:var(--muted);font-size:11px;text-align:center}
+.empty{color:var(--muted);padding:40px;text-align:center}
+.cbtn{cursor:pointer;color:var(--acc);font-size:11px;margin-left:5px;border:1px solid var(--border);border-radius:4px;padding:0 5px;user-select:none;white-space:nowrap}
+.cbtn:hover{border-color:var(--acc);background:#1c2735}
+.printbtn{background:#1c2735;border:1px solid var(--acc);color:var(--acc);padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+.printbtn:hover{background:var(--acc);color:#0d1117}
+@media(max-width:720px){.hide-m{display:none}}
+@media print{
+  :root{--bg:#fff;--panel:#fff;--border:#ccc;--txt:#111;--muted:#666;--acc:#0a58ca;--yellow:#8a6d00;--green:#0a7a28;--red:#a02020}
+  .printbtn,.search,.cbtn{display:none!important}
+  th{background:#eee;color:#333}
+  tr:hover td{background:#fff}
+  .tag{background:#eee;color:#0a58ca}
+  .bar{background:#0a58ca}
+  .expand td{background:#fff}
+  .kpi{border-radius:0}
+}
+@page{size:A4;margin:12mm}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Drop<span>Analytics</span></h1>
+    <div class="sub">Ventas reales de Dropi por delta de stock — nuestro propio Dropdata</div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <button class="printbtn" onclick="window.print()" title="En el dialogo usa Destino: Guardar como PDF">&#11037; Exportar PDF</button>
+    <div class="sub" id="gen"></div>
+  </div>
+</header>
+
+<div class="kpis" id="kpis"></div>
+
+<input class="search" id="q" placeholder="Buscar producto, ID o proveedor..." oninput="render()">
+
+<div class="tabs">
+  <div class="tab active" data-tab="hoy" onclick="setTab('hoy')">Top vendidos HOY</div>
+  <div class="tab" data-tab="total" onclick="setTab('total')">Acumulado</div>
+  <div class="tab" data-tab="prov" onclick="setTab('prov')">Proveedores</div>
+  <div class="tab" data-tab="dia" onclick="setTab('dia')">Histórico diario</div>
+</div>
+
+<div id="table"></div>
+
+<footer>Ventas = reducción de stock entre snapshots · Los aumentos de stock = reposiciones (se descartan) ·
+  A mayor frecuencia de snapshots, mayor precisión · Datos: perfil dropi-iki</footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+let tab='hoy', sortKey=null, sortDir=-1, expanded={};
+const $=id=>document.getElementById(id);
+const fmt=n=>n==null?'—':Number(n).toLocaleString('es-CO');
+const cop=n=>n==null?'—':'$'+Number(n).toLocaleString('es-CO');
+
+function kpis(){
+  const t=DASH_DATA.totales;
+  const cards=[
+    ['Fecha', DASH_DATA.fecha],
+    ['Productos monitoreados', fmt(t.productos_monitor)],
+    ['Unidades vendidas hoy', fmt(t.unidades_hoy),'green'],
+    ['Proveedores con ventas', fmt(t.proveedores_con_ventas)]
+  ];
+  $('kpis').innerHTML=cards.map(c=>`<div class="kpi"><div class="l">${c[0]}</div><div class="v ${c[2]||''}">${c[1]}</div></div>`).join('');
+  $('gen').textContent='Generado: '+DASH_DATA.generado+' · '+DASH_DATA.fechas.length+' snapshot(s): '+DASH_DATA.fechas.join(' → ');
+}
+
+function setTab(t){tab=t;sortKey=null;render()}
+
+function spark(serie){
+  if(!serie||serie.length<2)return '';
+  const w=120,h=28,pad=3;
+  const vals=serie.map(p=>p.s);
+  const min=Math.min(...vals),max=Math.max(...vals),rng=(max-min)||1;
+  const pts=serie.map((p,i)=>`${pad+i*(w-2*pad)/(serie.length-1)},${h-pad-(p.s-min)/rng*(h-2*pad)}`).join(' ');
+  return `<svg class="spark" width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="#58a6ff" stroke-width="1.5"/></svg>`;
+}
+
+function detailRow(p){
+  const s=p.serie||[];
+  const rows=s.map(x=>`<tr><td>${x.d}</td><td class="num">${fmt(x.s)}</td><td class="num pos">${x.v>0?'+'+fmt(x.v):'—'}</td></tr>`).join('');
+  return `<tr class="expand"><td colspan="9"><div class="expandbox">
+    <div><b>${p.nombre}</b> <span class="tag" style="cursor:pointer" title="Clic para copiar el ID" onclick="copyId(${p.id},this)">ID ${p.id}</span><div class="mut" style="margin-top:6px">Proveedor: ${p.proveedor} (${p.ciudad})</div>
+    <div class="mut">Costo: ${cop(p.precio_proveedor)} · PVP sugerido: ${cop(p.precio_sugerido)} · Stock actual: ${fmt(p.stock)}</div></div>
+    <div>${spark(s)}<div class="mut" style="text-align:center">stock en el tiempo</div></div>
+    <div><table style="width:auto"><tr><th>Fecha</th><th class="num">Stock</th><th class="num">Vendidas</th></tr>${rows}</table></div>
+  </div></td></tr>`;
+}
+
+function render(){
+  const q=$('q').value.toLowerCase();
+  let html='';
+  if(tab==='hoy'||tab==='total'){
+    const src=tab==='hoy'?DASH_DATA.ranking_hoy:DASH_DATA.ranking_total;
+    const key=tab==='hoy'?'vendidas_hoy':'vendidas_dia';
+    let rows=src.filter(p=>!q||(''+p.id).includes(q)||(p.nombre||'').toLowerCase().includes(q)||(p.proveedor||'').toLowerCase().includes(q));
+    if(sortKey)rows=[...rows].sort((a,b)=>(a[sortKey]>b[sortKey]?1:-1)*sortDir*-1);
+    const max=Math.max(...rows.map(r=>r[key]),1);
+    const tcnt={};rows.forEach(r=>{const t=r.tier||'C';tcnt[t]=(tcnt[t]||0)+1;});
+    const tcls={S:'#3fb950',A:'#58a6ff',B:'#d29922',C:'#8b949e',D:'#f85149'};
+    let tierBar='';
+    ['S','A','B','C','D'].forEach(t=>{if(tcnt[t])tierBar+=`<span style="margin-right:10px"><span style="background:${tcls[t]};color:#0d1117;font-weight:800;border-radius:4px;padding:1px 7px;font-size:11px">${t}</span> <span class="mut">${tcnt[t]}</span></span>`;});
+    if(tierBar)tierBar=`<div style="margin-bottom:10px">${tierBar}<span class="mut" style="margin-left:6px">— S: velocidad p85+ y margen &ge;40% · A: p60+ y &ge;30% · B: vende · C: sin ventas · D: sospechoso</span></div>`;
+    html=tierBar+`<table><tr>
+      <th>#</th><th onclick="sortBy('tier')">Tier</th><th onclick="sortBy('nombre')">Producto</th><th class="hide-m" onclick="sortBy('proveedor')">Proveedor</th>
+      <th class="num" onclick="sortBy('${key}')">Vendidas</th><th class="barcell hide-m"></th>
+      <th class="num hide-m" onclick="sortBy('precio_proveedor')">Costo</th><th class="num hide-m" onclick="sortBy('precio_sugerido')">PVP sugg.</th>
+      <th class="num hide-m" onclick="sortBy('stock')">Stock</th></tr>`;
+    rows.slice(0,200).forEach((p,i)=>{
+      const pid=p.id;
+      const tcol=tcls[p.tier||'C']||'#8b949e';
+      const mH=p.margen_pct!=null?(p.margen_pct+'%'):'?';
+      html+=`<tr onclick="toggle(${pid})" style="cursor:pointer">
+        <td class="rank">${i+1}</td>
+        <td><span style="background:${tcol};color:#0d1117;font-weight:800;border-radius:4px;padding:1px 7px" title="margen ${mH}">${p.tier||'C'}</span></td>
+        <td><b>${p.nombre||'—'}</b><div class="idm">ID ${p.id} <span class="cbtn" title="Clic para copiar el ID" onclick="event.stopPropagation();copyId(${pid},this)">&#10697;</span></div></td>
+        <td class="hide-m">${p.proveedor}<div class="mut">${p.ciudad||''}</div></td>
+        <td class="num pos">${fmt(p[key])}</td>
+        <td class="barcell hide-m"><div class="bar" style="width:${Math.max(4,p[key]/max*90)}px"></div></td>
+        <td class="num hide-m">${cop(p.precio_proveedor)}</td>
+        <td class="num hide-m">${cop(p.precio_sugerido)}</td>
+        <td class="num hide-m">${fmt(p.stock)}</td></tr>`;
+      if(expanded[pid]){const full=DASH_DATA.productos.find(x=>x.id===pid);if(full)html+=detailRow(full);}
+    });
+    html+='</table>';
+    if(rows.length===0)html='<div class="empty">Sin resultados</div>';
+  }else if(tab==='prov'){
+    let rows=DASH_DATA.proveedores.filter(p=>!q||(p.nombre||'').toLowerCase().includes(q));
+    if(sortKey)rows=[...rows].sort((a,b)=>(a[sortKey]>b[sortKey]?1:-1)*sortDir*-1);
+    html=`<table><tr><th>#</th><th onclick="sortBy('nombre')">Proveedor</th><th class="hide-m" onclick="sortBy('ciudad')">Ciudad</th>
+      <th class="num" onclick="sortBy('unidades_hoy')">Unidades hoy</th><th class="num hide-m" onclick="sortBy('productos_activos')">Prods. activos</th>
+      <th class="num hide-m" onclick="sortBy('productos')">Catálogo</th><th class="num hide-m" onclick="sortBy('pedidos_mes')">Pedidos/mes (BFF)</th></tr>`;
+    rows.forEach((p,i)=>{html+=`<tr><td class="rank">${i+1}</td><td><b>${p.nombre}</b><div class="idm">ID ${p.id} <span class="cbtn" title="Clic para copiar el ID" onclick="copyId(${p.id},this)">&#10697;</span></div></td><td class="hide-m">${p.ciudad||''}</td>
+      <td class="num ${p.unidades_hoy>0?'pos':''}">${fmt(p.unidades_hoy)}</td><td class="num hide-m">${fmt(p.productos_activos)}</td>
+      <td class="num hide-m">${fmt(p.productos)}</td><td class="num hide-m">${fmt(p.pedidos_mes)}</td></tr>`;});
+    html+='</table>';
+  }else{
+    const d=DASH_DATA.ventas_por_dia||{};
+    html=`<table><tr><th>Fecha</th><th class="num">Unidades vendidas (delta)</th></tr>`;
+    Object.keys(d).sort().forEach(k=>{html+=`<tr><td>${k}</td><td class="num pos">${fmt(d[k])}</td></tr>`;});
+    html+='</table>';
+  }
+  $('table').innerHTML=html;
+}
+function sortBy(k){if(sortKey===k){sortDir*=-1}else{sortKey=k;sortDir=-1}render()}
+function toggle(id){expanded[id]=!expanded[id];render()}
+function copyId(id,el){
+  const s=String(id);
+  const done=()=>{el.innerHTML='&#10003;';setTimeout(()=>{el.innerHTML='&#10697;'},900)};
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=s;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(ta)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(done).catch(fb)}else fb();
+}
+kpis();render();
+</script>
+</body>
+</html>

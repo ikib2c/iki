@@ -1,0 +1,87 @@
+{
+  "id": 793921,
+  "sku": "01",
+  "name": "Beevana crema dolores y articulaciones",
+  "type": "SIMPLE",
+  "user": {
+    "id": 205895,
+    "name": "GOLDBOX",
+    "plan": {
+      "id": 4,
+      "name": "SUPPLIER PREMIUM",
+      "type": "SUPPLIER",
+      "active": true,
+      "created_at": null,
+      "deleted_at": null,
+      "updated_at": "2022-07-05T18:12:09",
+      "description": "El proveedor gestiona su logística pero genera la guía con el sistema de dropi, y no se le cobra comision",
+      "white_brand_id": 1,
+      "use_fullfillment": false,
+      "supplier_commission": null,
+      "wb_comission_amount": null,
+      "wb_pay_comission_to": null,
+      "auto_manage_delivery": true,
+      "commission_product_supplier": 0,
+      "dropi_percent_product_drops": 5,
+      "dropi_percent_product_supplier": 0,
+      "dropi_shipping_increment_amount": 1000,
+      "profit_percentage_orders_influencers": 0,
+      "ignore_dropi_percent_product_supplier": false,
+      "dropi_product_supplier_increment_fixed": false
+    },
+    "store_name": "GOLDBOX",
+    "category_id": 1,
+    "white_brand": {
+      "id": 1,
+      "name": "Dropi",
+      "product_increment_another_white_brands": null
+    },
+    "category_user": {
+      "id": 1,
+      "icon": "premium",
+      "name": "PREMIUM",
+      "reel": true,
+      "type": "SUPPLIER",
+      "style": "-",
+      "swipe": false,
+      "status": "activo",
+      "role_id": 3,
+      "user_id": 22,
+      "created_at": "2024-04-30T07:14:27",
+      "deleted_at": null,
+      "updated_at": null,
+      "description": "-",
+      "max_order_quantity": 0,
+      "min_order_quantity": 0
+    },
+    "subscription_plan_id": 4
+  },
+  "gallery": [
+    {
+      "url": null,
+      "main": true,
+      "urlS3": "colombia/products/793921/1714074849WhatsApp Image 2024-04-24 at 4.23.12 PM (1).jpeg"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Salud"
+    }
+  ],
+  "sale_price": 8000,
+  "variations": [],
+  "external_id": null,
+  "import_list": null,
+  "suggested_price": 15000,
+  "privated_product": false,
+  "warehouse_product": [
+    {
+      "id": 915402,
+      "stock": 70647,
+      "warehouse_id": 13341
+    }
+  ],
+  "combo_combinations": null,
+  "private_product_inventories": [],
+  "dropi_percent_product_supplier": null
+}

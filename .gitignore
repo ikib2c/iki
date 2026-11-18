@@ -9,4 +9,7 @@ dropi-analytics/node_modules/
 dropi-analytics/auth/
 dropi-analytics/data/snapshot-*.log
 dropi-analytics/config/credenciales.json
+dropi-analytics/QR_IMPORTADO.jpeg
+dropi-analytics/data/
+dropi-analytics/snapshot-*.log
 smoke_resultado.txt

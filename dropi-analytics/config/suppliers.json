@@ -1,0 +1,871 @@
+{
+  "proveedores": [
+    {
+      "id": 525739,
+      "nombre": "Glowtiva",
+      "ciudad": "CALI",
+      "pedidos_mes": 91192,
+      "num_productos": 113,
+      "slug": "glowtiva"
+    },
+    {
+      "id": 6606,
+      "nombre": "Quality Tienda",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 79778,
+      "num_productos": 640,
+      "slug": "quality"
+    },
+    {
+      "id": 596479,
+      "nombre": "BODEGA MARKET",
+      "ciudad": "MANIZALES",
+      "pedidos_mes": 79276,
+      "num_productos": 85,
+      "slug": "sergio"
+    },
+    {
+      "id": 359739,
+      "nombre": "SABANAS,PROTECTORES DE COLCHON Y LENCERIA  LAS VEGAS HOME",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 78116,
+      "num_productos": 56,
+      "slug": "eliana"
+    },
+    {
+      "id": 27771,
+      "nombre": "tienda la herramienta",
+      "ciudad": "CALI",
+      "pedidos_mes": 39682,
+      "num_productos": 123,
+      "slug": "julian"
+    },
+    {
+      "id": 642797,
+      "nombre": "SKALING UP",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 37626,
+      "num_productos": 4,
+      "slug": "yeison"
+    },
+    {
+      "id": 250912,
+      "nombre": "Decoplantas Online",
+      "ciudad": "TABIO",
+      "pedidos_mes": 27940,
+      "num_productos": 215,
+      "slug": "jeimy"
+    },
+    {
+      "id": 90729,
+      "nombre": "SARO",
+      "ciudad": "MEDELLIN, ITAGUI",
+      "pedidos_mes": 26644,
+      "num_productos": 24,
+      "slug": "robinson"
+    },
+    {
+      "id": 11207,
+      "nombre": "WOLKYS",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 25669,
+      "num_productos": 36,
+      "slug": "jose"
+    },
+    {
+      "id": 917,
+      "nombre": "Denuevoo",
+      "ciudad": "CALI",
+      "pedidos_mes": 21197,
+      "num_productos": 914,
+      "slug": "natalia"
+    },
+    {
+      "id": 73449,
+      "nombre": "Collab",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 19494,
+      "num_productos": 2,
+      "slug": "distribuidoramayoristacln"
+    },
+    {
+      "id": 91797,
+      "nombre": "Boldu",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 15465,
+      "num_productos": 290,
+      "slug": "arley"
+    },
+    {
+      "id": 2498,
+      "nombre": "HOBBY CITY",
+      "ciudad": "CALI",
+      "pedidos_mes": 14665,
+      "num_productos": 152,
+      "slug": "hobbycity"
+    },
+    {
+      "id": 179249,
+      "nombre": "ADYSFAST",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 10501,
+      "num_productos": 1179,
+      "slug": "adysfast"
+    },
+    {
+      "id": 39425,
+      "nombre": "COSMETICOS Y SKINCARE",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 8124,
+      "num_productos": 140,
+      "slug": "ana"
+    },
+    {
+      "id": 29689,
+      "nombre": "TECNO MANHATAN",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 7913,
+      "num_productos": 177,
+      "slug": "elcira"
+    },
+    {
+      "id": 73211,
+      "nombre": "Ventas colombia",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 7134,
+      "num_productos": 514,
+      "slug": "alberth"
+    },
+    {
+      "id": 308998,
+      "nombre": "GLOMYF",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 6757,
+      "num_productos": 43,
+      "slug": "gloria"
+    },
+    {
+      "id": 10928,
+      "nombre": "Ideat",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 5481,
+      "num_productos": 405,
+      "slug": "mary"
+    },
+    {
+      "id": 45063,
+      "nombre": "GL GROUP",
+      "ciudad": "DOSQUEBRADAS",
+      "pedidos_mes": 5314,
+      "num_productos": 11,
+      "slug": "gustavo"
+    },
+    {
+      "id": 125258,
+      "nombre": "Shop Colombia",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 5044,
+      "num_productos": 792,
+      "slug": "andres"
+    },
+    {
+      "id": 43926,
+      "nombre": "CCB TENCHNOLOGY STORE",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 4488,
+      "num_productos": 379,
+      "slug": "cristian"
+    },
+    {
+      "id": 171017,
+      "nombre": "Armonía Belleza & Salud",
+      "ciudad": "FLORIDABLANCA",
+      "pedidos_mes": 3321,
+      "num_productos": 28,
+      "slug": "hernan"
+    },
+    {
+      "id": 93388,
+      "nombre": "SAGRADOS",
+      "ciudad": "BUCARAMANGA",
+      "pedidos_mes": 2931,
+      "num_productos": 25,
+      "slug": "david"
+    },
+    {
+      "id": 525870,
+      "nombre": "LA GLORIA DEL BEBE",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 2030,
+      "num_productos": 90,
+      "slug": "leon"
+    },
+    {
+      "id": 28373,
+      "nombre": "Ventas Margarita",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 2027,
+      "num_productos": 792,
+      "slug": "carlos"
+    },
+    {
+      "id": 236681,
+      "nombre": "KUAIMAI",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1974,
+      "num_productos": 18,
+      "slug": "kuaimai"
+    },
+    {
+      "id": 456809,
+      "nombre": "Santiago",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1844,
+      "num_productos": 10,
+      "slug": "santiago"
+    },
+    {
+      "id": 258837,
+      "nombre": "EAC",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1748,
+      "num_productos": 26,
+      "slug": "edgarantonio"
+    },
+    {
+      "id": 136645,
+      "nombre": "Master Escala",
+      "ciudad": "CALI",
+      "pedidos_mes": 1626,
+      "num_productos": 43,
+      "slug": "maria"
+    },
+    {
+      "id": 911649,
+      "nombre": "M&M MARKET",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1460,
+      "num_productos": 96,
+      "slug": "hernan"
+    },
+    {
+      "id": 45639,
+      "nombre": "maxdy_shoes",
+      "ciudad": "CUCUTA",
+      "pedidos_mes": 1452,
+      "num_productos": 25,
+      "slug": "lesly"
+    },
+    {
+      "id": 796386,
+      "nombre": "D&T.STORE COLOMBIA-",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1393,
+      "num_productos": 94,
+      "slug": "diego"
+    },
+    {
+      "id": 614418,
+      "nombre": "ventas MRM",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1365,
+      "num_productos": 14,
+      "slug": "mauricio"
+    },
+    {
+      "id": 352476,
+      "nombre": "Techno Bloom",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1365,
+      "num_productos": 1,
+      "slug": "juan"
+    },
+    {
+      "id": 2451,
+      "nombre": "poolbuy.store",
+      "ciudad": "MEDELLIN, CALI, BOGOTA",
+      "pedidos_mes": 1315,
+      "num_productos": 2,
+      "slug": "andres"
+    },
+    {
+      "id": 427934,
+      "nombre": "FORE",
+      "ciudad": "BOGOTA, MEDELLIN, CUCUTA",
+      "pedidos_mes": 1291,
+      "num_productos": 1,
+      "slug": "aysen"
+    },
+    {
+      "id": 117680,
+      "nombre": "esencia y estilo",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1187,
+      "num_productos": 35,
+      "slug": "john"
+    },
+    {
+      "id": 185893,
+      "nombre": "Fe Market",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 953,
+      "num_productos": 2,
+      "slug": "sas"
+    },
+    {
+      "id": 125562,
+      "nombre": "boomdelatecnologia@gmail.com",
+      "ciudad": "CALI",
+      "pedidos_mes": 829,
+      "num_productos": 51,
+      "slug": "carolina"
+    },
+    {
+      "id": 15118,
+      "nombre": "Eon clothing",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 755,
+      "num_productos": 45,
+      "slug": "david"
+    },
+    {
+      "id": 141937,
+      "nombre": "Homehobbies77",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 659,
+      "num_productos": 42,
+      "slug": "brayan"
+    },
+    {
+      "id": 9253,
+      "nombre": "Homecolor",
+      "ciudad": "CALI",
+      "pedidos_mes": 588,
+      "num_productos": 1,
+      "slug": "paula"
+    },
+    {
+      "id": 444646,
+      "nombre": "FOOVERS JEANS",
+      "ciudad": "CUCUTA",
+      "pedidos_mes": 583,
+      "num_productos": 53,
+      "slug": "fooversjeans"
+    },
+    {
+      "id": 580361,
+      "nombre": "Drupow Prime",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 579,
+      "num_productos": 34,
+      "slug": "marco"
+    },
+    {
+      "id": 611383,
+      "nombre": "cristaleriataiwanelmellizo",
+      "ciudad": "TULUA",
+      "pedidos_mes": 425,
+      "num_productos": 131,
+      "slug": "angie"
+    },
+    {
+      "id": 241251,
+      "nombre": "marketshop",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 359,
+      "num_productos": 86,
+      "slug": "jeisson"
+    },
+    {
+      "id": 343216,
+      "nombre": "TechWeigh Distribuciones",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 271,
+      "num_productos": 15,
+      "slug": "jose"
+    },
+    {
+      "id": 202755,
+      "nombre": "Importadora El Puntazo",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 237,
+      "num_productos": 73,
+      "slug": "santiago"
+    },
+    {
+      "id": 284717,
+      "nombre": "Global Business",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 232,
+      "num_productos": 1,
+      "slug": "juan"
+    },
+    {
+      "id": 552913,
+      "nombre": "MAYKA Variedad y Tecnologia",
+      "ciudad": "CALI",
+      "pedidos_mes": 212,
+      "num_productos": 46,
+      "slug": "katherine"
+    },
+    {
+      "id": 198188,
+      "nombre": "SEBCOL DISTRIBUCIONES",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 206,
+      "num_productos": 219,
+      "slug": "sebastian"
+    },
+    {
+      "id": 32477,
+      "nombre": "STEVEN STORE",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 182,
+      "num_productos": 99,
+      "slug": "sergio"
+    },
+    {
+      "id": 114415,
+      "nombre": "HOME ZOMI SAS",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 136,
+      "num_productos": 16,
+      "slug": "carlos"
+    },
+    {
+      "id": 54027,
+      "nombre": "TIENDA GAMPA",
+      "ciudad": "BOGOTA, FLORIDABLANCA",
+      "pedidos_mes": 134,
+      "num_productos": 6,
+      "slug": "elizabeth"
+    },
+    {
+      "id": 546454,
+      "nombre": "Mas Imagen",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 127,
+      "num_productos": 102,
+      "slug": "dany"
+    },
+    {
+      "id": 667753,
+      "nombre": "AyP Shop Tv",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 113,
+      "num_productos": 10,
+      "slug": "alison"
+    },
+    {
+      "id": 359984,
+      "nombre": "PROTEINAS Y VITAMINAS",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 84,
+      "num_productos": 72,
+      "slug": "freddy"
+    },
+    {
+      "id": 721328,
+      "nombre": "Donado Importaciones",
+      "ciudad": "CARTAGENA, FUNDACION",
+      "pedidos_mes": 71,
+      "num_productos": 26,
+      "slug": "moises"
+    },
+    {
+      "id": 205131,
+      "nombre": "BIOSALUDABLE",
+      "ciudad": "VALLEDUPAR",
+      "pedidos_mes": 67,
+      "num_productos": 80,
+      "slug": "marydel"
+    },
+    {
+      "id": 78370,
+      "nombre": "RAMON",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 51,
+      "num_productos": 13,
+      "slug": "ramon"
+    },
+    {
+      "id": 3925,
+      "nombre": "MI NORTE",
+      "ciudad": "CALI",
+      "pedidos_mes": 44,
+      "num_productos": 27,
+      "slug": "jose"
+    },
+    {
+      "id": 432548,
+      "nombre": "RB DESIGN STUDIO",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 41,
+      "num_productos": 16,
+      "slug": "claudia"
+    },
+    {
+      "id": 667801,
+      "nombre": "JESICA",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 40,
+      "num_productos": 61,
+      "slug": "jesica"
+    },
+    {
+      "id": 804772,
+      "nombre": "YULSTORE",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 37,
+      "num_productos": 58,
+      "slug": "yuliana"
+    },
+    {
+      "id": 848157,
+      "nombre": "Pidelo YA",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 34,
+      "num_productos": 1,
+      "slug": "maria"
+    },
+    {
+      "id": 202483,
+      "nombre": "Rosangela",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 31,
+      "num_productos": 6,
+      "slug": "rosangela"
+    },
+    {
+      "id": 160356,
+      "nombre": "WARTECHBOGOTA",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 30,
+      "num_productos": 41,
+      "slug": "wartechbogota"
+    },
+    {
+      "id": 673928,
+      "nombre": "Dacar Calzado Romulo",
+      "ciudad": "CALI",
+      "pedidos_mes": 25,
+      "num_productos": 36,
+      "slug": "rosemberg"
+    },
+    {
+      "id": 35535,
+      "nombre": "Beautyblass A&I",
+      "ciudad": "BARRANQUILLA, MEDELLIN",
+      "pedidos_mes": 19,
+      "num_productos": 13,
+      "slug": "ivan"
+    },
+    {
+      "id": 94556,
+      "nombre": "BROCOLI DISPENSARIO",
+      "ciudad": "BARRANQUILLA, BOGOTA, MEDELLIN, BUCARAMANGA",
+      "pedidos_mes": 18,
+      "num_productos": 60,
+      "slug": "david"
+    },
+    {
+      "id": 965595,
+      "nombre": "comercializadora el Hueco",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 15,
+      "num_productos": 186,
+      "slug": "duber"
+    },
+    {
+      "id": 74880,
+      "nombre": "Jordan",
+      "ciudad": "BUCARAMANGA, FLORIDABLANCA, GIRON, BOGOTA",
+      "pedidos_mes": 15,
+      "num_productos": 6,
+      "slug": "jordan"
+    },
+    {
+      "id": 572867,
+      "nombre": "MELO&MAS",
+      "ciudad": "SOACHA, BOGOTA",
+      "pedidos_mes": 14,
+      "num_productos": 27,
+      "slug": "maria"
+    },
+    {
+      "id": 707247,
+      "nombre": "CentralPowerCO",
+      "ciudad": "PEREIRA",
+      "pedidos_mes": 13,
+      "num_productos": 2,
+      "slug": "ferney"
+    },
+    {
+      "id": 144519,
+      "nombre": "ALMAR BODEGA",
+      "ciudad": "CALI, FUNZA",
+      "pedidos_mes": 9,
+      "num_productos": 1,
+      "slug": "juan"
+    },
+    {
+      "id": 424905,
+      "nombre": "Brian",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 8,
+      "num_productos": 4,
+      "slug": "brian"
+    },
+    {
+      "id": 21746,
+      "nombre": "EXCLUSIVITY GADGETS",
+      "ciudad": "CALI",
+      "pedidos_mes": 8,
+      "num_productos": 31,
+      "slug": "david"
+    },
+    {
+      "id": 83054,
+      "nombre": "HobbiesDMO",
+      "ciudad": "COPACABANA",
+      "pedidos_mes": 8,
+      "num_productos": 104,
+      "slug": "duvan"
+    },
+    {
+      "id": 479183,
+      "nombre": "DIOS PROVEDORES",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 5,
+      "num_productos": 2,
+      "slug": "sebastian"
+    },
+    {
+      "id": 6618,
+      "nombre": "Denzel Love",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 5,
+      "num_productos": 6,
+      "slug": "faver"
+    },
+    {
+      "id": 175689,
+      "nombre": "LIMAVANA STORE",
+      "ciudad": "ENVIGADO, ITAGUI",
+      "pedidos_mes": 3,
+      "num_productos": 11,
+      "slug": "valentina"
+    },
+    {
+      "id": 627337,
+      "nombre": "Carovi Importaciones",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 3,
+      "num_productos": 20,
+      "slug": "daniela"
+    },
+    {
+      "id": 75050,
+      "nombre": "Kali Multi Store",
+      "ciudad": "CALI",
+      "pedidos_mes": 3,
+      "num_productos": 24,
+      "slug": "kalimultistore"
+    },
+    {
+      "id": 149198,
+      "nombre": "NUTRI VIDA",
+      "ciudad": "PEREIRA",
+      "pedidos_mes": 3,
+      "num_productos": 2,
+      "slug": "carolina"
+    },
+    {
+      "id": 6237,
+      "nombre": "Diana",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 2,
+      "num_productos": 9,
+      "slug": "diana"
+    },
+    {
+      "id": 513488,
+      "nombre": "OMNISHOP",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 2,
+      "num_productos": 7,
+      "slug": "francelys"
+    },
+    {
+      "id": 277223,
+      "nombre": "NZ importados",
+      "ciudad": "ENVIGADO",
+      "pedidos_mes": 2,
+      "num_productos": 40,
+      "slug": "importados"
+    },
+    {
+      "id": 17691,
+      "nombre": "SapposStore",
+      "ciudad": "CHIQUINQUIRA",
+      "pedidos_mes": 2,
+      "num_productos": 14,
+      "slug": "sandra"
+    },
+    {
+      "id": 174940,
+      "nombre": "D.TIENDA DULCE MARIA",
+      "ciudad": "CALI",
+      "pedidos_mes": 1,
+      "num_productos": 24,
+      "slug": "cristian"
+    },
+    {
+      "id": 834036,
+      "nombre": "Casa Mayorista",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1,
+      "num_productos": 6,
+      "slug": "nicoll"
+    },
+    {
+      "id": 481784,
+      "nombre": "JOHN",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1,
+      "num_productos": 18,
+      "slug": "john"
+    },
+    {
+      "id": 897721,
+      "nombre": "COMERCILIZADORA SB",
+      "ciudad": "MEDELLIN",
+      "pedidos_mes": 1,
+      "num_productos": 16,
+      "slug": "santiago"
+    },
+    {
+      "id": 440677,
+      "nombre": "Planeta",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 1,
+      "num_productos": 69,
+      "slug": "planeta"
+    },
+    {
+      "id": 12108,
+      "nombre": "Alanashop",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 7887,
+      "slug": "andres"
+    },
+    {
+      "id": 73779,
+      "nombre": "A Tu Mano Bodega",
+      "ciudad": "SOACHA",
+      "pedidos_mes": 0,
+      "num_productos": 2794,
+      "slug": "ana"
+    },
+    {
+      "id": 8705,
+      "nombre": "Soluciones Shop",
+      "ciudad": "CALI",
+      "pedidos_mes": 0,
+      "num_productos": 2239,
+      "slug": "solucionesshop"
+    },
+    {
+      "id": 192984,
+      "nombre": "ADRIANA",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 1991,
+      "slug": "adriana"
+    },
+    {
+      "id": 36567,
+      "nombre": "FERRETERIA JAMUNDI",
+      "ciudad": "JAMUNDI",
+      "pedidos_mes": 0,
+      "num_productos": 1920,
+      "slug": "sebastian"
+    },
+    {
+      "id": 35040,
+      "nombre": "DTS IMPORTADORES",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 1872,
+      "slug": "dts"
+    },
+    {
+      "id": 43728,
+      "nombre": "impor house",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 1772,
+      "slug": "impor"
+    },
+    {
+      "id": 5935,
+      "nombre": "GGP",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 1616,
+      "slug": "ggp"
+    },
+    {
+      "id": 13657,
+      "nombre": "Tus Machetes Online",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 1595,
+      "slug": "tusmachetes"
+    },
+    {
+      "id": 5076,
+      "nombre": "GRAVIFLY",
+      "ciudad": "LA UNION",
+      "pedidos_mes": 0,
+      "num_productos": 1576,
+      "slug": "andrew"
+    },
+    {
+      "id": 147195,
+      "nombre": "Wopi Bodega",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 1561,
+      "slug": "segundo"
+    },
+    {
+      "id": 106656,
+      "nombre": "IMPONOVEDADES",
+      "ciudad": "MEDELLIN, BOGOTA, CALI",
+      "pedidos_mes": 0,
+      "num_productos": 1484,
+      "slug": "esteban"
+    },
+    {
+      "id": 19662,
+      "nombre": "Ecomlab Desarrollos",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 137,
+      "slug": "ecomlab"
+    },
+    {
+      "id": 205895,
+      "nombre": "GOLDBOX",
+      "ciudad": "BOGOTA",
+      "pedidos_mes": 0,
+      "num_productos": 237,
+      "slug": "goldbox"
+    }
+  ],
+  "actualizado": "2026-10-17",
+  "total": 108,
+  "criterio": "activos (BFF>0) + top12 catalogos>=300 + historial + GOLDBOX"
+}
